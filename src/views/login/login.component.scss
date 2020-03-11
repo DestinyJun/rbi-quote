@@ -1,0 +1,34 @@
+.login {
+  background: linear-gradient(145deg, #B3C3C2,#424A4F);
+  padding-top: 10vh;
+  .form {
+    padding: 8vw;
+    width: 40vw;
+    margin: 0 auto;
+    .title {
+      h1 {
+        font-size: 3rem;
+      }
+    }
+    .content {
+      margin-top: 10vh;
+    }
+    .ivu-btn-primary {
+      margin-top: 3vh;
+      //padding: vh;
+      height: 4vh;
+      background: #2D85AA;
+      border: 1px solid #2C799B;
+      font-size: 18px;
+      box-shadow: 3px 3px 8px #2c3e50;
+      //letter-spacing: 2rem;
+    }
+    /deep/ .ivu-input {
+      height: 38px
+    }
+    /deep/ .ivu-form .ivu-form-item-label {
+      font-size: 20px;
+      color: #2C3E50;
+    }
+  }
+}

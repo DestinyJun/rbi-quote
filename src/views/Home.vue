@@ -1,18 +1,36 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <headers></headers>
+    <sidebar></sidebar>
+    <div class="home_mian">
+      <router-view></router-view>
+    </div>
+<!--    <footer></footer>-->
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-
+import headers from '@/views/home/header/header.vue'
+import sidebar from '@/views/home/sidebar/siderbar.vue'
 export default {
   name: 'Home',
   components: {
-    HelloWorld
-  }
+      headers,
+      sidebar
+}
+
 }
 </script>
+<style lang="scss">
+  .home{
+    margin: 0;
+    padding: 0;
+    .home_mian{
+         margin-top: 6vh;
+         margin-left: 12vw;
+         width: 88vw;
+         height: 94vh;
+       }
+  }
+
+</style>

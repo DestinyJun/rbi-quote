@@ -1,0 +1,86 @@
+{
+  "id": "1679661",
+  "name": "报告验证识别系统",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "2380576",
+      "name": "权限",
+      "font_class": "quanxian",
+      "unicode": "e635",
+      "unicode_decimal": 58933
+    },
+    {
+      "icon_id": "2794184",
+      "name": "统计",
+      "font_class": "tongji",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "7327432",
+      "name": "审核",
+      "font_class": "shenhe",
+      "unicode": "e6b2",
+      "unicode_decimal": 59058
+    },
+    {
+      "icon_id": "12470331",
+      "name": "管理",
+      "font_class": "guani",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "13259879",
+      "name": "信访查阅",
+      "font_class": "xinfangchayue",
+      "unicode": "e646",
+      "unicode_decimal": 58950
+    },
+    {
+      "icon_id": "13383605",
+      "name": "权限",
+      "font_class": "quanxian-copy",
+      "unicode": "e6b3",
+      "unicode_decimal": 59059
+    },
+    {
+      "icon_id": "13383606",
+      "name": "统计",
+      "font_class": "tongji-copy",
+      "unicode": "e6b4",
+      "unicode_decimal": 59060
+    },
+    {
+      "icon_id": "13383607",
+      "name": "审核",
+      "font_class": "shenhe-copy",
+      "unicode": "e6b5",
+      "unicode_decimal": 59061
+    },
+    {
+      "icon_id": "13383608",
+      "name": "管理",
+      "font_class": "guani-copy",
+      "unicode": "e6b6",
+      "unicode_decimal": 59062
+    },
+    {
+      "icon_id": "13383612",
+      "name": "信访查阅",
+      "font_class": "xinfangchayue-copy",
+      "unicode": "e6b7",
+      "unicode_decimal": 59063
+    },
+    {
+      "icon_id": "12268092",
+      "name": "违法审核统计",
+      "font_class": "weifashenhetongji",
+      "unicode": "e60b",
+      "unicode_decimal": 58891
+    }
+  ]
+}
