@@ -27,21 +27,30 @@
          <Input suffix="ios-search" placeholder="请输入报表编号..." style="width: auto" v-model="searchData" @on-search="searchReportData" search />
        </div>
        <div class="report-table">
-         <Table
-             :row-class-name="rowClassName"
-             ref="selection"
-             @on-select="selectRowData"
-             @on-selection-change="selectDataHandle"
-             :columns="columns4"
-             :data="data1">
-           <template slot-scope="{ row }" slot="result">
-             <span style="color: #ffa489">{{ row.result }}</span>
-           </template>
-         </Table>
+         <tables :table-option="tableOption"></tables>
        </div>
        <div class="report-paging">
-         <paging></paging>
+         <paging :page-option="pageOption" @getPageDate="getPageDate"></paging>
        </div>
+    </div>
+    <div class="report-modal">
+      <Modal
+          title="详情"
+          v-model="detailModal"
+          class-name="vertical-center-modal" draggable  scrollable closable >
+        <p style="text-align: center">待开发中...</p>
+
+      </Modal>
+      <Modal
+          title="打印二维码"
+          v-model="QRCodeModal"
+          class-name="vertical-center-modal"  draggable  scrollable closable >
+        <p style="text-align: center">待开发中...</p>
+        <div style="text-align: center;background: #EAEAEA;padding: 2vh">
+          <QRCodes :code-url="codeUrl"></QRCodes>
+        </div>
+
+      </Modal>
     </div>
   </div>
 </template>
@@ -51,5 +60,5 @@
 </script>
 
 <style scoped lang="scss">
- @import "report.component";
+@import "report.component";
 </style>

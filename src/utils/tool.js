@@ -1,4 +1,5 @@
 import {Message} from "view-design";
+import {Modal} from "view-design";
 
 class ToolUtil {
     constructor() {
@@ -23,7 +24,48 @@ class ToolUtil {
         sessionStorage[name] = JSON.stringify(value)
     }
     delitem(name){
-        localStorage.removeItem(name)
+        sessionStorage.removeItem(name)
+    }
+
+    setModal (type, title, content, callback) {
+        switch (type) {
+            case 'info':
+                Modal.info({
+                    title: title,
+                    content: '<p>' + content + '</p>'
+                });
+                break;
+            case 'success':
+                Modal.success({
+                    title: title,
+                    content: '<p>' + content + '</p>'
+                });
+                break;
+            case 'warning':
+                Modal.warning({
+                    title: title,
+                    content: '<p>' + content + '</p>'
+                });
+                break;
+            case 'error':
+                Modal.error({
+                    title: title,
+                    content: '<p>' + content + '</p>'
+                });
+                break;
+            case 'confirm':
+                Modal.confirm({
+                        title: title,
+                        content: '<p>' + content + '</p>',
+                        onOk: () => {
+                            // Modal.info('确认');
+                            callback()
+                        },
+                        onCancel: () => {
+                            // Modal.info('取消');
+                        }
+                    });
+        }
     }
 }
 export default ToolUtil

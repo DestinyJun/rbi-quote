@@ -40,24 +40,26 @@
                         label: '报告管理',
                         icon: 'iconguani',
                         link: '/home/report',
+                        value: '1',
                         children:[]
                     },
                     {
                         label: '报告审核',
                         icon: 'iconshenhe',
-                        link: '123',
+                        link: '2',
+                        value: '2',
                         ishidden: true,
                         children:[
                             {
                                 label: '二级审核',
                                 icon: 'iconquanxian',
-                                link: '123',
+                                link: '/home/secreview?id=2',
                                 children:[]
                             },
                             {
                                 label: '三级审核',
                                 icon: 'iconquanxian',
-                                link: '123',
+                                link: '/home/thrReview?id=2',
                                 children:[]
                             }
                         ]
@@ -66,18 +68,21 @@
                         label: '项目查询',
                         icon: 'iconxinfangchayue-copy',
                         link: '123',
+                        value: '3',
                         children:[]
                     },
                     {
                         label: '图形统计',
                         icon: 'icontongji',
                         link: '123',
+                        value: '4',
                         children:[]
                     },
                     {
                         label: '权限管理',
                         icon: 'iconweifashenhetongji',
                         link: '123',
+                        value: '5',
                         ishidden: true,
                         children:[
                             {
@@ -96,6 +101,13 @@
                     },
                 ]
             }
+        },
+        created() {
+            this.MenuData.forEach( v => {
+                if(v.value === this.$route.query.id) {
+                    v.ishidden = false;
+                }
+            })
         },
         methods: {
             openThisMenuClick(index){

@@ -1,20 +1,19 @@
-import paging from "../../../components/paging";
-import tables from "../../../components/table";
-import QRCodes from "../../../components/QRCode";
+import paging from "../../../../components/paging";
+import tables from "../../../../components/table";
 export default {
-    name: 'report',
-    data(){
+    name: 'secReview',
+    data() {
         return {
             dropData: {
-                    title: '报告类型',
-                    centent: [
-                        {name: '全部', value: '1', bgc: '#FFFFFF', color: '#5D6063'},
-                        {name: '房地产估价报告', value: '1', bgc: '#EFEFEF',  color: '#C2C2C2'},
-                        {name: '房屋估价报告', value: '1',   bgc: '#EFEFEF',  color: '#C2C2C2'},
-                        {name: '资产估价报告', value: '1',  bgc: '#EFEFEF',  color: '#C2C2C2'},
-                        {name: '土地估价报告', value: '1',   bgc: '#EFEFEF',  color: '#C2C2C2'},
-                    ]
-                },
+                title: '报告类型',
+                centent: [
+                    {name: '全部', value: '1', bgc: '#FFFFFF', color: '#5D6063'},
+                    {name: '房地产估价报告', value: '1', bgc: '#EFEFEF',  color: '#C2C2C2'},
+                    {name: '房屋估价报告', value: '1',   bgc: '#EFEFEF',  color: '#C2C2C2'},
+                    {name: '资产估价报告', value: '1',  bgc: '#EFEFEF',  color: '#C2C2C2'},
+                    {name: '土地估价报告', value: '1',   bgc: '#EFEFEF',  color: '#C2C2C2'},
+                ]
+            },
             dropData2: {
                 title: '审核状态',
                 centent: [
@@ -25,15 +24,6 @@ export default {
                     {name: '未三级审核', value: '1',  bgc: '#EFEFEF',  color: '#C2C2C2'},
                     {name: '审核未通过', value: '1',  bgc: '#EFEFEF',  color: '#C2C2C2'},
                 ]
-            },
-            searchData: '',
-            selecteds: [],
-            // 分页数据
-            pageOption: {
-                now_num: 10,// 当前行数
-                now_page: 1, // 当前页
-                pageNum: 15, // 总页数
-                totalRow: 150, //总条数
             },
             // 表格数据
             tableOption :{
@@ -103,27 +93,11 @@ export default {
                             return h('div', [
                                 h('Button', {
                                     props: {
-                                        // type: 'primary',
-                                        size: 'small'
-                                    },
-                                    style: {
-                                        marginRight: '5px',
-                                        fontSize: '12px',
-                                        background: '#3DA2F8',
-                                        color: '#fff'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.showDetailDialog(params.index)
-                                        }
-                                    }
-                                }, '详情'),
-                                h('Button', {
-                                    props: {
                                         size: 'small',
                                     },
                                     style: {
                                         fontSize: '12px',
+                                        width: '4vw',
                                         background: (params.row.flag  !== 1)? '#3DA2F8': "#C9D0D6",
                                         color: '#fff'
                                     },
@@ -132,10 +106,10 @@ export default {
                                     },
                                     on: {
                                         click: () => {
-                                            this.printQRCode(params.index)
+                                            this.reviewClick(params.index)
                                         }
                                     }
-                                }, '打印二维码')
+                                }, '审核')
                             ]);
                         }
                     }
@@ -209,7 +183,7 @@ export default {
                         address: '贵州省遵义市红花岗区和上海路亚园庭院1栋22-3号',
                         persion: '李四',
                         result: '￥2016',
-                        flag: 1
+                        flag: 0
                     },
                     {
                         name: 'Jon Snow',
@@ -234,58 +208,32 @@ export default {
 
                 ],
             },
-            // 详情相关
-            detailModal: false,
-            QRCodeModal: false,
-            // 二维码内容
-            codeUrl: 'http://www.gyrbi.com/quote'
+            // 分页数据
+            pageOption: {
+                now_num: 10,// 当前行数
+                now_page: 1, // 当前页
+                pageNum: 15, // 总页数
+                totalRow: 150, //总条数
+            },
+            searchreviewData: '',
+            // 模态框数据
+            reviewModal: false
         }
     },
-    created(){
-    },
     methods: {
-        // 选择报表类型
-        selectReportType(index){
-            this.dropData.centent.forEach(val => {
-                    val.bgc = '#EFEFEF';
-                    val.color = '#C2C2C2';
-                }
-            );
-            this.dropData.centent[index].bgc = '#FFFFFF';
-            this.dropData.centent[index].color = '#5D6063';
+        // 打印二维码
+        reviewClick(){
+            this.reviewModal = true;
         },
-        // 选择审核状态
-        selectReportReview(index){
-            this.dropData2.centent.forEach(val => {
-                    val.bgc = '#EFEFEF';
-                    val.color = '#C2C2C2';
-                }
-            );
-            this.dropData2.centent[index].bgc = '#FFFFFF';
-            this.dropData2.centent[index].color = '#5D6063';
-        },
-        // 搜索事件
-        searchReportData(){
-            console.log(this.searchData);
-        },
-
         getPageDate(data){
             console.log(data);
         },
-
-        // 展示详情弹窗
-        showDetailDialog(){
-            this.detailModal = true;
+        searchData(){
+            console.log(this.searchData);
         },
-        // 打印二维码
-        printQRCode(){
-           this.QRCodeModal = true;
-        }
     },
     components: {
         paging,
-        tables,
-        QRCodes
+        tables
     }
-
 }

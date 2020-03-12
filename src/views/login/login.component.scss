@@ -1,30 +1,61 @@
 .login {
-  background: linear-gradient(145deg, #B3C3C2,#424A4F);
+  background: url("../../assets/images/login_bgc.png") no-repeat left center;
+  height: 100vh;
   padding-top: 10vh;
+  //display: flex;
+  //align-items: center;
+  //justify-content: center;
   .form {
-    padding: 8vw;
-    width: 40vw;
-    margin: 0 auto;
+    position: absolute;
+    right: 14vw;
+    width: 26vw;
+    margin-top: 10vh;
     .title {
-      h1 {
-        font-size: 3rem;
+      position: relative;
+      height: 2vh;
+      line-height: 2vh;
+      display: flex;
+      justify-content: space-between;
+      padding:0 3.4vw;
+      h2 {
+        top: -10px;
+        position: absolute;
+        left: 9.6vw;
+        font-weight: normal;
+        font-size: 36px;
+        color: rgba(255, 255, 255, 0.48);
+        font-family: "微软雅黑";
       }
     }
     .content {
-      margin-top: 10vh;
+      margin-top: 4.6vh;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 10px;
+      height: 460px;
+      padding: 0 9vh;
+      img{
+        margin: 6vh 0;
+        width: 12vw;
+      }
     }
     .ivu-btn-primary {
-      margin-top: 3vh;
+      margin-top: 1.2vh;
       //padding: vh;
       height: 4vh;
-      background: #2D85AA;
-      border: 1px solid #2C799B;
+      background: #3DA2F8;
+      border: 1px solid #3DA2F8;
       font-size: 18px;
-      box-shadow: 3px 3px 8px #2c3e50;
+      box-shadow: 0 0 1px #247ECB;
       //letter-spacing: 2rem;
     }
     /deep/ .ivu-input {
-      height: 38px
+      height: 38px;
+    }
+    /deep/ .ivu-form-item:nth-child(2) {
+      margin-bottom: 10px
+    }
+    /deep/ .ivu-form-item-content {
+      margin-top: 0.4vh;
     }
     /deep/ .ivu-form .ivu-form-item-label {
       font-size: 20px;

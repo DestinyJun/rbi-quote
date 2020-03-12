@@ -5,17 +5,40 @@
     </div>
     <div class="title">
       <span>您好{{name}},欢迎进入报告验证识别系统！</span>
-      <img src="@/assets/images/ic_header.jpg" alt="">
+      <img src="@/assets/images/ic_header.jpg" alt="" @click="showPreCard">
+      <div :class="{'per-car': true, 'move': !preHiden}" :hidden="preHiden">
+        <li>个人资料</li>
+        <li @click="loginOut">退出登录</li>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+    import ToolUtil from "../../../utils/tool";
     export default {
         name: 'headers',
         data(){
             return{
-                name: 'xxxx'
+                name: 'xxxx',
+                preHiden: true,
+                tool: new ToolUtil()
+
+            }
+        },
+        methods: {
+            showPreCard(){
+                console.log(this.preHiden);
+                if (this.preHiden) {
+                    this.preHiden = false;
+                }else {
+                    this.preHiden = true;
+                }
+            },
+            loginOut(){
+               this.tool.setModal('confirm', '退出提醒', '确定要退出登录吗?', () => {
+                   this.$router.push('/login')
+               })
             }
         }
     }
@@ -52,6 +75,7 @@
       }
     }
     .title{
+      position: relative;
       color: #fff;
       float: right;
       margin-top: 8.5px;
@@ -67,7 +91,37 @@
         box-sizing: content-box;
         border: 2px solid #A5AAAB;
       }
+      .per-car {
+        position: absolute;
+        margin-top: 1.2vh;
+        background: #FFFFFF;
+        width: 6vw;
+        border-radius: 4px;
+        right: 10px;
+        box-shadow: 0 0 5px #4D4D4D;
+        color: #818181;
 
+        li {
+          padding: 10px;
+          list-style: none;
+          border-radius: 4px;
+        }
+        li:hover {
+          background: #E9F3FF;
+        }
+      }
+      .move {
+        -moz-animation:myfirst 1s; /* Firefox */
+        -webkit-animation:myfirst 1s; /* Safari and Chrome */
+        -o-animation:myfirst 1s;
+      }
+      @keyframes myfirst
+      {
+        from {
+          margin-top: 0;
+        }
+        to {margin-top: 1.3vh;}
+      }
     }
   }
 </style>

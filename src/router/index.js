@@ -19,7 +19,9 @@ const routes = [
     name: 'home',
     component: () => import('@/views/Home.vue'),
     children: [
-        {path: 'report', name: 'report', component: () => import('@/views/common/report/report.vue')}
+        {path: 'report', name: 'report', component: () => import('@/views/common/report/report.vue')},
+        {path: 'secreview', name: 'secreview', component: () => import('@/views/common/review/secReview/secReview.vue')},
+        {path: 'thrreview', name: 'thrreview', component: () => import('@/views/common/review/thrReview/thrReview.vue')},
     ]
   },
 ];

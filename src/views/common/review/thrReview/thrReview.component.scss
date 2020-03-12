@@ -1,10 +1,10 @@
-.report {
+.thrReview {
   /*color: #ffa489;*/
   background: #EAEAEA;
   height: 100%;
   width: 100%;
   /*头部标签*/
-  .report-title {
+  .review-title {
     width: 100%;
     height: 6vh;
     display: flex;
@@ -31,7 +31,7 @@
     }
   }
   /*下拉选择*/
-  .report-select {
+  .review-select {
     width: 100%;
     height: 10vh;
     background: #FFFFFF;
@@ -86,13 +86,13 @@
     }
   }
   /*内容*/
-  .report-centent {
+  .review-centent {
     width: 86.8vw;
     height: 76vh;
     background: #fff;
     margin: 1vh 0.6vw;
     /*搜索框*/
-    .report-search {
+    .review-search {
       padding: 1vh 1vw;
       text-align: right;
       /deep/ .ivu-input {
@@ -104,24 +104,13 @@
         line-height: 30px;
       }
     }
-    .report-table {
+    .review-table {
       height: 64vh;
       padding: 0.5vh 10px;
     }
-    .report-paging {
+    .review-paging {
       height: 6.8vh;
 
     }
   }
-  .report-modal {
-    /deep/ .vertical-center-modal{
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      /deep/.ivu-modal{
-        top: 0;
-      }
-    }
-  }
-
 }

@@ -22,6 +22,7 @@ export default {
             formCustom: {
                 username: '',
                 passwd: '',
+                checkbox: []
             },
             ruleCustom: {
                 username: [
@@ -33,10 +34,24 @@ export default {
             }
         };
     },
+    created(){
+      console.log(this.tool.getObject('Userform').checkbox === undefined );
+      if (this.tool.getObject('Userform').checkbox !== undefined && this.tool.getObject('Userform').checkbox.length !== 0) {
+          const form = this.tool.getObject('Userform');
+          this.formCustom.username = form.username;
+          this.formCustom.passwd = form.passwd;
+          this.formCustom.checkbox = form.checkbox;
+          // setTimeout(this.handleSubmit('formCustom'), 100);
+      }
+    },
     methods: {
         handleSubmit: function(name) {
             this.$refs[name].validate((valid) => {
                 if (valid) {
+                    if(this.formCustom.checkbox.length !== 0) {
+                        // console.log(this.formCustom);
+                        this.tool.setObject('Userform', this.formCustom)
+                    }
                     // this.$Message.success('登录成功!');
                     this.tool.toast('success', '登录成功!');
                     this.$router.push('./home/report')
@@ -46,6 +61,12 @@ export default {
                 }
             })
         },
+        delItem(){
+            if (this.formCustom.checkbox.length === 0){
+                this.tool.delitem('Userform')
+            }
+
+        }
     }
 
 }
