@@ -1,8 +1,8 @@
 import paging from "../../../../components/paging";
 import tables from "../../../../components/table";
 export default {
-    name: 'secReview',
-    data() {
+    name: 'inquire',
+    data(){
         return {
             dropData: {
                 title: '报告类型',
@@ -87,7 +87,7 @@ export default {
                     {
                         title: '操作',
                         key: 'action',
-                        width: 200,
+                        width: 240,
                         align: 'center',
                         render: (h, params) => {
                             return h('div', [
@@ -97,24 +97,70 @@ export default {
                                     },
                                     style: {
                                         fontSize: '12px',
-                                        width: '4vw',
+                                        width: '3vw',
                                         background: (params.row.flag  !== 1)? '#3DA2F8': "#C9D0D6",
-                                        color: '#fff'
+                                        color: '#fff',
+                                        border: 0
                                     },
                                     attrs: {
                                         disabled: (params.row.flag === 1)
                                     },
                                     on: {
                                         click: () => {
-                                            this.reviewClick(params.index)
+                                            this.inquireClick(params.index)
                                         }
                                     }
-                                }, '审核')
+                                }, (params.row.flag  !== 1)? '未完成': '已完成'),
+                                h('Button', {
+                                    props: {
+                                        size: 'small',
+                                    },
+                                    style: {
+                                        fontSize: '12px',
+                                        width: '2.4vw',
+                                        background: '#3DA2F8',
+                                        color: '#fff',
+                                        margin: '0 4px',
+                                        border: 0
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.inquireClick(params.index)
+                                        }
+                                    }
+                                }, '详情'),
+                                h('Button', {
+                                    props: {
+                                        size: 'small',
+                                    },
+                                    style: {
+                                        fontSize: '12px',
+                                        width: '4vw',
+                                        background: '#3DA2F8',
+                                        color: '#fff',
+                                        border: 0
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.inquireClick(params.index)
+                                        }
+                                    }
+                                }, '打印二维码')
                             ]);
                         }
                     }
                 ],
                 content: [
+                    {
+                        name: '202015612312',
+                        type: '房地产估价',
+                        status: '未收费',
+                        autor: '张三',
+                        persion: '李四',
+                        address: '贵州省遵义市红花岗区和上海路亚园庭院1栋22-3号',
+                        result: '￥2016',
+                        flag: 1
+                    },
                     {
                         name: '202015612312',
                         type: '房地产估价',
@@ -215,18 +261,27 @@ export default {
                 pageNum: 15, // 总页数
                 totalRow: 150, //总条数
             },
-            searchreviewData: '',
+            searchInquireData: '',
             // 模态框数据
-            reviewModal: false
+            inquireModal: false,
+            itemData: [
+                {label: '报告总数', value: 456, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 456/500*100},
+                {label: '已完成数', value: 132, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 132/500*100},
+                {label: '未二级审核', value: 66, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 66/500*100},
+                {label: '未三级审核', value: 100, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 100/500*100},
+            ],
+            itemData1: [
+                {label: '已收费数', value: 132, fcolor: '#E17055', bgc:'#E17055', borhidden: false, bwidth: 132/500*100},
+                {label: '未收费数', value: 66, fcolor: '#E17055', bgc:'#E17055', borhidden: true, bwidth: 66/500*100},
+            ]
         }
     },
     methods: {
-        // 打印二维码
-        reviewClick(){
-            this.reviewModal = true;
+        getPageDate(){
+            // console.log(this.searchInquireData);
         },
         // 选择报表类型
-        selectReviewType(index){
+        selectInquireType(index){
             this.dropData.centent.forEach(val => {
                     val.bgc = '#EFEFEF';
                     val.color = '#C2C2C2';
@@ -236,7 +291,7 @@ export default {
             this.dropData.centent[index].color = '#5D6063';
         },
         // 选择审核状态
-        selectReview(index){
+        selectInquireReview(index){
             this.dropData2.centent.forEach(val => {
                     val.bgc = '#EFEFEF';
                     val.color = '#C2C2C2';
@@ -245,12 +300,9 @@ export default {
             this.dropData2.centent[index].bgc = '#FFFFFF';
             this.dropData2.centent[index].color = '#5D6063';
         },
-        getPageDate(data){
-            console.log(data);
-        },
         searchData(){
-            console.log(this.searchData);
-        },
+            console.log(this.searchInquireData);
+        }
     },
     components: {
         paging,

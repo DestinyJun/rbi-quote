@@ -1,0 +1,69 @@
+.sign {
+  background: #EAEAEA;
+  height: 100%;
+  width: 100%;
+  /*头部标签*/
+  .sign-title {
+    width: 100%;
+    height: 6vh;
+    display: flex;
+    background: #FFFFFF;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #F0F0F0;
+    padding: 1.5vh 2vw;
+    .title {
+      font-weight: bold;
+      font-size: 12px;
+      font-family: "微软雅黑";
+    }
+    .btn {
+      button {
+        width: 8vh;
+        height: 3vh;
+        margin-right: 5px;
+        background: #fff;
+        font-size: 12px;
+        border: 1px solid #D0D0D0;
+        border-radius: 2px;
+      }
+    }
+  }
+  /*下拉选择*/
+  .sign-select {
+    display: none;
+    width: 100%;
+    //height: 7vh;
+    background: #FFFFFF;
+    text-align: left;
+    //padding: 1vh 2vw;
+  }
+  /*内容*/
+  .sign-centent {
+    width: 86.8vw;
+    height: 86vh;
+    background: #fff;
+    margin: 1vh 0.6vw;
+    /*搜索框*/
+    .sign-search {
+      padding: 1vh 1vw;
+      text-align: right;
+      /deep/ .ivu-input {
+        border-radius: 20px;
+        font-size: 10px;
+        height: 30px;
+      }
+      /deep/ .ivu-input-prefix i, .ivu-input-suffix i {
+        line-height: 30px;
+      }
+    }
+    .sign-table {
+      height: 74vh;
+      padding: 0.5vh 10px;
+    }
+    .sign-paging {
+      height: 6.8vh;
+
+    }
+  }
+}

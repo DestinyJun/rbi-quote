@@ -67,14 +67,14 @@
                     {
                         label: '项目查询',
                         icon: 'iconxinfangchayue-copy',
-                        link: '123',
+                        link: '/home/inquire?id=3',
                         value: '3',
                         children:[]
                     },
                     {
                         label: '图形统计',
                         icon: 'icontongji',
-                        link: '123',
+                        link: '/home/graphic?id=4',
                         value: '4',
                         children:[]
                     },
@@ -88,13 +88,13 @@
                             {
                                 label: '用户权限',
                                 icon: '',
-                                link: '123',
+                                link: '/home/user?id=5',
                                 children:[]
                             },
                             {
                                 label: '签字人员权限',
                                 icon: '',
-                                link: '123',
+                                link: '/home/sign?id=5',
                                 children:[]
                             },
                         ]

@@ -40,4 +40,5 @@ axios.interceptors.response.use( (config) => {
     // 错误的请求结果处理，这里的代码根据后台的状态码来决定错误的输出信息
 });
 
+
 export default axios

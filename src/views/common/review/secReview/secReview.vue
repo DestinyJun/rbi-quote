@@ -14,12 +14,12 @@
        <!--      报告类型-->
        <div>
          <span>{{dropData.title}}：</span>
-         <span v-for="(item_text, index1) in dropData.centent" :key="index1" :style="{'background': item_text.bgc, 'color':item_text.color}" @click="selectreviewType(index1)">{{item_text.name}}</span>
+         <span v-for="(item_text, index1) in dropData.centent" :key="index1" :style="{'background': item_text.bgc, 'color':item_text.color}" @click="selectReviewType(index1)">{{item_text.name}}</span>
        </div>
        <!-- 审核状态-->
        <div>
          <span>{{dropData2.title}}：</span>
-         <span v-for="(item_text, index1) in dropData2.centent" :key="index1" :style="{'background': item_text.bgc,  'color':item_text.color}" @click="selectreviewReview(index1)">{{item_text.name}}</span>
+         <span v-for="(item_text, index1) in dropData2.centent" :key="index1" :style="{'background': item_text.bgc,  'color':item_text.color}" @click="selectReview(index1)">{{item_text.name}}</span>
        </div>
      </div>
      <div class="review-centent">
