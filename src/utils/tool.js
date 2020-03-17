@@ -1,6 +1,5 @@
 import {Message} from "view-design";
 import {Modal} from "view-design";
-
 class ToolUtil {
     constructor() {
     }
@@ -12,10 +11,10 @@ class ToolUtil {
         })
     }
     setItem(name , value){
-        localStorage.setItem(name, value)
+        sessionStorage.setItem(name, value)
     }
     getItem(name){
-        return localStorage.getItem(name)
+        return sessionStorage.getItem(name)
     }
     getObject(name){
         return JSON.parse(sessionStorage[name] || '{}')
@@ -26,7 +25,6 @@ class ToolUtil {
     delitem(name){
         sessionStorage.removeItem(name)
     }
-
     setModal (type, title, content, callback) {
         switch (type) {
             case 'info':

@@ -1,5 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import ToolUtil from "../../utils/tool";
+import service from '../../service/service'
+let loginSrv = new service();
 export default {
     name: 'login',
     data() {
@@ -19,6 +21,7 @@ export default {
         };
         return{
             tool: new ToolUtil(),
+
             formCustom: {
                 username: '',
                 passwd: '',
@@ -35,7 +38,6 @@ export default {
         };
     },
     created(){
-      console.log(this.tool.getObject('Userform').checkbox === undefined );
       if (this.tool.getObject('Userform').checkbox !== undefined && this.tool.getObject('Userform').checkbox.length !== 0) {
           const form = this.tool.getObject('Userform');
           this.formCustom.username = form.username;
@@ -46,18 +48,36 @@ export default {
     },
     methods: {
         handleSubmit: function(name) {
+            // let data['username'] = this.formCustom.username;
+            let data = `username=${this.formCustom.username}&password=${this.formCustom.passwd}`;
+            // console.log(123);
             this.$refs[name].validate((valid) => {
                 if (valid) {
+                    // console.log(123);
                     if(this.formCustom.checkbox.length !== 0) {
                         // console.log(this.formCustom);
                         this.tool.setObject('Userform', this.formCustom)
                     }
-                    // this.$Message.success('登录成功!');
-                    this.tool.toast('success', '登录成功!');
-                    this.$router.push('./home/report')
+
+                    loginSrv.login(data).then(
+                        res => {
+                            console.log(res);
+                            if (Object.is(res.code ,'14')){
+                                this.tool.toast('success', '登录成功!');
+                                this.$router.push('./home/report');
+                                this.tool.setItem('accessToken', res.data)
+                            }else {
+                                this.tool.toast('error', `${res.msg}，用户名或密码错误`);
+                            }
+                        }
+                    ).catch((err) => {
+                        console.log(err);
+                        this.tool.toast('error', '服务器处理异常，请检查网络是否连接!')
+                    })
+
                 } else {
                     // this.$Message.error('登录失败!');
-                    this.tool.toast('error', '登录失败!')
+                    this.tool.toast('error', '请输入用户名和密码!')
                 }
             })
         },

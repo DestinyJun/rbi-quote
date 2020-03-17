@@ -5,8 +5,8 @@
         ref="selection"
         @on-select="selectRowData"
         @on-selection-change="selectDataHandle"
-        :columns="title"
-        :data="content">
+        :columns="tableOption.title"
+        :data="tableOption.content">
       <template slot-scope="{ row }" slot="result">
         <span style="color: #ffa489">{{ row.result }}</span>
       </template>
@@ -19,8 +19,6 @@
         name: 'tables',
         data(){
             return{
-                title: [],
-                content: [],
             }
         },
         props: {
@@ -34,10 +32,6 @@
                       default: []
                 }
             }
-        },
-        created() {
-            this.title = this.tableOption.title;
-            this.content = this.tableOption.content;
         },
         methods: {
             rowClassName (row, index) {

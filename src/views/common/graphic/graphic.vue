@@ -1,7 +1,9 @@
 <template>
    <div class="graphic" id="graphic">
-     <div>
-       <h1>组件创建中。。。</h1>
+     <div class="graphic-title">
+       <div class="title">
+         <h2>图形统计</h2>
+       </div>
      </div>
    </div>
 </template>

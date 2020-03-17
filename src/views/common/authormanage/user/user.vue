@@ -1,13 +1,13 @@
 <template>
     <div id="user" class="user">
-        <div class="review-title">
+      <div class="review-title">
            <div class="title">
               <h2>用户权限</h2>
            </div>
            <div class="btn">
-             <button>填报</button>
-             <button>修改</button>
-             <button>删除</button>
+             <button @click="btnClick('add')">添加</button>
+             <button @click="btnClick('modify')">修改</button>
+             <button @click="btnClick('delete')">删除</button>
            </div>
       </div>
       <div class="review-select">
@@ -33,6 +33,18 @@
           <paging :page-option="pageOption" @getPageDate="getPageDate"></paging>
         </div>
       </div>
+      <Modal v-model="addModal" width="360">
+        <p slot="header" style="color:#f60;text-align:left">
+          <span>添加</span>
+        </p>
+        <div style="text-align:center">
+          <p>After this task is deleted, the downstream 10 tasks will not be implemented.</p>
+          <p>Will you delete it?</p>
+        </div>
+        <div slot="footer">
+          <Button type="error" size="large" long :loading="modal_loading" @click="del">Delete</Button>
+        </div>
+      </Modal>
     </div>
 </template>
 <script src="./user.component.js">

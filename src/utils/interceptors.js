@@ -7,18 +7,22 @@ if (process.env.NODE_ENV === 'development') {
 } else if (process.env.NODE_ENV === 'production') {
     axios.defaults.baseURL = process.env.VUE_APP_URL;
 }
-
 //设置的请求次数，请求的间隙
 axios.defaults.retry = 4;
 axios.defaults.retryDelay = 1000;
 
 // 全局设置超时时间
-axios.defaults.timeout = 3000;
-
+axios.defaults.timeout = 30000;
 axios.interceptors.request.use((config) => {
-    store.dispatch("setLoadingStatus", "showLoading");
-    console.log(config);
-    // if(config.url.includes())
+    if(!Object.is(config.url, undefined)){
+
+        store.dispatch("setLoadingStatus", "showLoading");
+        if (config.url.includes('./user/login')) {
+            config.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+        } else {
+            config.headers.post['accessToken'] = sessionStorage.getItem('accessToken')
+        }
+    }
     return config;
 }, error => {
     return Promise.reject(error)
@@ -40,5 +44,41 @@ axios.interceptors.response.use( (config) => {
     // 错误的请求结果处理，这里的代码根据后台的状态码来决定错误的输出信息
 });
 
+// 封装请求
+class ClientHttp {
+    constructor() {
+    }
+    /**
+     * get 请求
+     * @param url 请求连接
+     * @param data 请求参数
+     */
+   get(url, data) {
+        return new Promise(((resolve, reject) => {
+            axios.get(url + `?${data}`).then(res => {
+                    resolve(res)
+                }
+            ).catch(err => {
+                reject(err);
+            })
+        }));
 
-export default axios
+
+    }
+    /**
+     * post 请求
+     * @param url  请求连接
+     * @param data  请求参数
+     */
+    post(url, data){
+        return new Promise(((resolve, reject) => {
+            axios.post(url, data).then(res => {
+                resolve(res)
+            }).catch(err => {
+                reject(err)
+            })
+        }));
+
+    }
+}
+export default ClientHttp

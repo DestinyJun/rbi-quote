@@ -155,10 +155,16 @@ export default {
             },
             searchreviewData: '',
             // 模态框数据
-            reviewModal: false
+            reviewModal: false,
+            addModal: false
         }
     },
     methods: {
+        btnClick(){
+            // switch (data) {
+            //     case 'add':
+            // }
+        }
 
     },
     components: {

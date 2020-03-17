@@ -55,7 +55,7 @@
   </div>
 </template>
 
-<script src="./reoprt.component.js">
+<script src="./report.component.js">
 
 </script>
 
