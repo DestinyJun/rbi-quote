@@ -1,36 +1,13 @@
 import paging from "../../../../components/paging";
 import tables from "../../../../components/table";
+import Server from '../../../../service/service'
+import Tool from '../../../../utils/tool'
+import AddUser from "../../../../model/model";
 export default {
     name: 'user',
     data() {
         return {
-            cityList: [
-                {
-                    value: '全部',
-                    label: '全部'
-                },
-                {
-                    value: 'London',
-                    label: 'London'
-                },
-                {
-                    value: 'Sydney',
-                    label: 'Sydney'
-                },
-                {
-                    value: 'Ottawa',
-                    label: 'Ottawa'
-                },
-                {
-                    value: 'Paris',
-                    label: 'Paris'
-                },
-                {
-                    value: 'Canberra',
-                    label: 'Canberra'
-                }
-            ],
-            selectType: '全部',
+            selectType: '',
             // 表格数据
             tableOption :{
                 title: [
@@ -88,63 +65,7 @@ export default {
                         }
                     }
                 ],
-                content: [
-                    {
-                        name: '202015612312',
-                        type: '房地产估价',
-                        phone: '18283023242',
-                        autor: '张三',
-                    },
-                    {
-                        name: 'Jim Green',
-                        type: '房地产估价',
-                        phone: '18283023242',
-                        autor: '张三',
-                    },
-                    {
-                        name: 'Joe Black',
-                        type: '房地产估价',
-                        phone: '已完成',
-                        autor: '张三',
-                    },
-                    {
-                        name: 'Jon Snow',
-                        type: '房地产估价',
-                        phone: '18283023242',
-                        autor: '张三',
-                    },
-                    {
-                        name: 'Jon Snow',
-                        type: '房地产估价',
-                        phone: '18283023242',
-                        autor: '张三',
-                    },
-                    {
-                        name: 'Jon Snow',
-                        type: '房地产估价',
-                        phone: '18283023242',
-                        autor: '张三',
-                    },
-                    {
-                        name: 'Jon Snow',
-                        type: '房地产估价',
-                        phone: '18283023242',
-                        autor: '张三',
-                    },
-                    {
-                        name: 'Jon Snow',
-                        type: '房地产估价',
-                        phone: '18283023242',
-                        autor: '张三',
-                    },
-                    {
-                        name: 'Jon Snow',
-                        type: '房地产估价',
-                        phone: '18283023242',
-                        autor: '张三',
-                    },
-
-                ],
+                content: [],
             },
             // 分页数据
             pageOption: {
@@ -153,17 +74,89 @@ export default {
                 pageNum: 15, // 总页数
                 totalRow: 150, //总条数
             },
-            searchreviewData: '',
+            now_num: 10,
+            now_page: 1,
+            searchUserData: '',
             // 模态框数据
             reviewModal: false,
-            addModal: false
+            addModal: false,
+            userSrv: new Server(),
+            userToll: new Tool(),
+            roleList: [],
+            addUser: new AddUser(),
+            ruleValidate: {
+                username: [
+                    { required: true, message: '用户名不能为空', trigger: 'blur' },
+                ],
+                realname: [
+                    { required: true, message: '真实姓名不能为空 ', trigger: 'blur' },
+                ],
+                phone: [
+                    { required: true, validator: (rule, value, callback) => {
+                            if (!value) {
+                                return callback(new Error('手机号不能为空'));
+                            } else if (!/^1[34578]\d{9}$/.test(value)) {
+                                callback('手机号格式不正确');
+                            } else {
+                                callback();
+                            }
+                        }, trigger: 'blur' },
+                ],
+                roleList: [
+                    { required: true, type: 'array', min: 1, message: '请选择用户权限', trigger: 'change' },
+                ],
+            }
         }
     },
+    created(){
+        this.userSrv.getAllRoleListData().then(value => {
+            console.log(value);
+            value.data.forEach(v => {
+                this.roleList.push({label: v.roleName, value: v.roleCode})
+            })
+        });
+        this.initUserData()
+    },
     methods: {
-        btnClick(){
-            // switch (data) {
-            //     case 'add':
-            // }
+        initUserData(){
+            this.userSrv.getUserListData({pageSize: this.now_num, page:this.now_page, role: this.selectType}).then(
+                value => {
+                    console.log(value);
+                }
+            )
+        },
+        changeType(){
+          console.log(this.selectType);
+        },
+        btnClick(data){
+            switch(data) {
+                case 'add': this.addModal = true;
+            }
+        },
+        addSure(name){
+            this.$refs[name].validate((valid) => {
+                if (valid) {
+                    const roleLists = `[${this.addUser.roleList}]`;
+                    this.userSrv.addUserInfo({username: this.addUser.username, realname: this.addUser.realname, phone: this.addUser.phone, roleList: roleLists}).then(value => {
+                        if (value.code === '200') {
+                            this.addModal = false;
+                            this.addUser = new AddUser();
+                            this.userToll.toast('success', '请求成功');
+                        }else {
+                            this.userToll.toast('error', value.msg);
+                        }
+                    });
+
+                } else {
+                    this.userToll.toast('error', '请求失败');
+                }
+            })
+        },
+        getPageDate(){
+
+        },
+        searchData(){
+
         }
 
     },

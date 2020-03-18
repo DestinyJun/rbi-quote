@@ -168,9 +168,9 @@ export default {
     methods: {
         //初始化
         initReportData(){
-
-            this.reportSrv.getReportTableData({auditStatus: this.auditName, tableName: this.tableName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
+          this.reportSrv.getReportTableData({auditStatus: this.auditName, tableName: this.tableName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
                 this.pageOption.page_list = [];
+                console.log(value);
                 if (value.code  === '1000') {
                     this.tableOption.content = value.data.contents;
                     this.tableOption.content.forEach(v=> {

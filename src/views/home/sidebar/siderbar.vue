@@ -111,8 +111,6 @@
         },
         methods: {
             openThisMenuClick(index){
-                console.log(index);
-                console.log(this.MenuData);
                 this.MenuData[index].ishidden = this.MenuData[index].ishidden !== true;
             }
         }
