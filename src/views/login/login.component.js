@@ -62,12 +62,12 @@ export default {
                     loginSrv.login(data).then(
                         res => {
                             console.log(res);
-                            if (Object.is(res.code ,'14')){
+                            if (Object.is(res.code ,'1000')){
                                 this.tool.toast('success', '登录成功!');
                                 this.$router.push('./home/report');
                                 this.tool.setItem('accessToken', res.data)
                             }else {
-                                this.tool.toast('error', `${res.msg}，用户名或密码错误`);
+                                this.tool.toast('error', `${res.msg}`);
                             }
                         }
                     ).catch((err) => {

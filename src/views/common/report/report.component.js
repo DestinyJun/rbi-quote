@@ -2,14 +2,18 @@ import paging from "../../../components/paging";
 import tables from "../../../components/table";
 import QRCodes from "../../../components/QRCode";
 import serve from "../../../service/service";
+import Tool from '../../../utils/tool'
+import mianModel from "../../../model/model";
 export default {
     name: 'report',
     data(){
         return {
-            dropData: {
+            // 报告类型列表
+            reportTypeList: {
                     title: '报告类型',
                     centent: []
-                },
+             },
+            // 报告状态列表
             dropData2: {
                 title: '审核状态',
                 centent: [
@@ -30,10 +34,11 @@ export default {
                 totalRow: 0, //总条数
                 page_list: []
             },
+            // 分页数据
             now_page: 1,
             now_num: 10,
             auditName: 4,
-            tableName: '',
+            selectReportName: '',
             // 表格数据
             tableOption :{
                 title: [
@@ -141,24 +146,43 @@ export default {
                 ],
                 content: [],
             },
-            // 详情相关
-            detailModal: false,
-            QRCodeModal: false,
+            // 模态框数据
+            detailModal: false, //详情弹窗
+            QRCodeModal: false, // 打印二维码弹窗
+            addTypeReportModel: false, // 填报类型选择弹窗
+            addReportModel: false, // 填写报告信息
+
+            // 报告类型选择
+            selRport: new mianModel.SelectReportType(),
+            // 填写报告
+            addReport: new mianModel.AddReport(),
+
             // 二维码内容
             codeUrl: 'http://www.gyrbi.com/quote',
+            // 工具类
+            reportTool: new Tool(),
             reportSrv: new serve(),
+            // 报告选择的规则
+            ruleValidate:{
+                reportType: [
+                    { required: true, message: '请选择报告类型', trigger: 'change' }
+                ],
+            },
+            // 填写报告的规则
+            ruleAddValidate: {
+
+            }
         }
     },
     created(){
         this.reportSrv.getReportTypeList({}).then(value => {
-            console.log(value);
             if (value.code === '1000') {
                 value.data.forEach((v, index) => {
                     if (index === 1) {
-                        this.dropData.centent.push({name: v.tempName, value: '1', bgc: '#FFFFFF',  color: '#5D6063'});
-                        this.tableName = v.tempName;
+                        this.reportTypeList.centent.push({name: v.tempName, value: '1', bgc: '#FFFFFF',  color: '#5D6063'});
+                        this.selectReportName = v.tempName;
                     }else{
-                        this.dropData.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',  color: '#C2C2C2'})
+                        this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',  color: '#C2C2C2'})
                     }
                 });
                 this.initReportData();
@@ -168,9 +192,8 @@ export default {
     methods: {
         //初始化
         initReportData(){
-          this.reportSrv.getReportTableData({auditStatus: this.auditName, tableName: this.tableName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
+          this.reportSrv.getReportTableData({auditStatus: this.auditName, tableName: this.selectReportName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
                 this.pageOption.page_list = [];
-                console.log(value);
                 if (value.code  === '1000') {
                     this.tableOption.content = value.data.contents;
                     this.tableOption.content.forEach(v=> {
@@ -196,17 +219,20 @@ export default {
         },
         // 选择报表类型
         selectReportType(index){
-            this.dropData.centent.forEach(val => {
-                    val.bgc = '#EFEFEF';
-                    val.color = '#C2C2C2';
-                    val.value = '0';
-                }
-            );
-            this.dropData.centent[index].bgc = '#FFFFFF';
-            this.dropData.centent[index].color = '#5D6063';
-            this.dropData.centent[index].value = '1';
-            this.tableName = this.dropData.centent[index].name;
-            this.initReportData();
+            if (this.selectReportName !== this.reportTypeList.centent[index].name){
+                this.reportTypeList.centent.forEach(val => {
+                        val.bgc = '#EFEFEF';
+                        val.color = '#C2C2C2';
+                        val.value = '0';
+                    }
+                );
+                this.reportTypeList.centent[index].bgc = '#FFFFFF';
+                this.reportTypeList.centent[index].color = '#5D6063';
+                this.reportTypeList.centent[index].value = '1';
+                this.selectReportName = this.reportTypeList.centent[index].name;
+                this.initReportData();
+            }
+
         },
         // 选择审核状态
         selectReportReview(index){
@@ -225,6 +251,7 @@ export default {
             console.log(this.searchData);
         },
 
+        // 获取分页组件中当前页条数
         getPageDate(data){
             this.now_num = data.num_Size;
             if (data.label === 'row'){
@@ -242,7 +269,34 @@ export default {
         // 打印二维码
         printQRCode(){
            this.QRCodeModal = true;
+        },
+        // 显示填报选择弹窗
+        showAddRepotrt(){
+            // this.addTypeReportModel = true;
+            this.addReportModel = true;
+        },
+
+        // 确认选择报告类型
+        selectReport(name) {
+
+
+            this.$refs[name].validate(valid => {
+                if (valid) {
+                    // this.reportSrv.getReportAppraiserInfo({uuid: ''}).then( v => {
+                    //     console.log(v);
+                    //     if (v.code === '1000') {
+                    //         this.addTypeReportModel = false;
+                    //         this.addReportModel = true;
+                    //     }else {
+                    //         this.reportTool.toast('error', v.msg)
+                    //     }
+                    // });
+
+                }
+            })
         }
+       // 获取填报的估价师信息
+
     },
     components: {
         paging,

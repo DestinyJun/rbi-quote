@@ -2,7 +2,7 @@ import paging from "../../../../components/paging";
 import tables from "../../../../components/table";
 import Server from '../../../../service/service'
 import Tool from '../../../../utils/tool'
-import AddUser from "../../../../model/model";
+import mainModel from "../../../../model/model";
 export default {
     name: 'user',
     data() {
@@ -19,17 +19,17 @@ export default {
                     },
                     {
                         title: '用户名',
-                        key: 'name',
+                        key: 'username',
                         align: 'left',
                     },
                     {
                         title: '用户权限',
-                        key: 'type',
+                        key: 'roleCodeString',
                         align: 'center',
                     },
                     {
                         title: '用户真实姓名',
-                        key: 'autor',
+                        key: 'realname',
                         align: 'center',
                     },
                     {
@@ -72,7 +72,8 @@ export default {
                 now_num: 10,// 当前行数
                 now_page: 1, // 当前页
                 pageNum: 15, // 总页数
-                totalRow: 150, //总条数
+                totalRow: 150, //总条数,
+                page_list: []
             },
             now_num: 10,
             now_page: 1,
@@ -83,7 +84,7 @@ export default {
             userSrv: new Server(),
             userToll: new Tool(),
             roleList: [],
-            addUser: new AddUser(),
+            addUser: new mainModel.AddUser(),
             ruleValidate: {
                 username: [
                     { required: true, message: '用户名不能为空', trigger: 'blur' },
@@ -120,13 +121,28 @@ export default {
     methods: {
         initUserData(){
             this.userSrv.getUserListData({pageSize: this.now_num, page:this.now_page, role: this.selectType}).then(
-                value => {
-                    console.log(value);
+                (value) => {
+                    if (value.code === '1000') {
+                        this.tableOption.content = value.data.contents;
+
+                        for (let i = 1; i<= value.data.totalPage; i++) {
+                            if (i ===  this.now_page) {
+                                this.pageOption.page_list.push( {name: i, bgc: '#A9B0B6', color: '#EDEEEF'})
+                            }else {
+                                this.pageOption.page_list.push({name: i, bgc: '#FFFFFF', color: '#6D6F71'})
+                            }
+                        }
+                        this.pageOption.pageNum = value.data.totalPage;
+                        this.pageOption.now_page = this.now_page;
+                        this.pageOption.now_num = this.now_num;
+                        this.pageOption.totalRow =value.data.totalRecord;
+                    }
                 }
             )
         },
         changeType(){
           console.log(this.selectType);
+          this.initUserData();
         },
         btnClick(data){
             switch(data) {
@@ -140,15 +156,13 @@ export default {
                     this.userSrv.addUserInfo({username: this.addUser.username, realname: this.addUser.realname, phone: this.addUser.phone, roleList: roleLists}).then(value => {
                         if (value.code === '200') {
                             this.addModal = false;
-                            this.addUser = new AddUser();
+                            this.addUser = new mainModel.AddUser();
                             this.userToll.toast('success', '请求成功');
                         }else {
                             this.userToll.toast('error', value.msg);
                         }
                     });
 
-                } else {
-                    this.userToll.toast('error', '请求失败');
                 }
             })
         },

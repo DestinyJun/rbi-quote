@@ -11,19 +11,19 @@ class ToolUtil {
         })
     }
     setItem(name , value){
-        sessionStorage.setItem(name, value)
+        localStorage.setItem(name, value)
     }
     getItem(name){
-        return sessionStorage.getItem(name)
+        return localStorage.getItem(name)
     }
     getObject(name){
-        return JSON.parse(sessionStorage[name] || '{}')
+        return JSON.parse(localStorage[name] || '{}')
     }
     setObject(name, value){
-        sessionStorage[name] = JSON.stringify(value)
+        localStorage[name] = JSON.stringify(value)
     }
     delitem(name){
-        sessionStorage.removeItem(name)
+        localStorage.removeItem(name)
     }
     setModal (type, title, content, callback) {
         switch (type) {

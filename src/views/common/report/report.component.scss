@@ -122,6 +122,20 @@
         top: 0;
       }
     }
+    /deep/ .ivu-modal-header {
+      background: #EDEEEE;
+      border-radius: 4px;
+    }
+    /deep/  .ivu-modal-footer {
+      background: #EDEEEE;
+      border-radius: 4px;
+    }
+    /deep/ .ivu-form-item-error-tip {
+      padding-top: 35px;
+    }
+    /deep/ .ivu-form-item{
+      text-align: right;
+    }
   }
 
 }

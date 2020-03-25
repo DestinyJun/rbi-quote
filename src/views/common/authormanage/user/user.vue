@@ -16,11 +16,6 @@
         <Select v-model="selectType" style="width:200px" @on-change="changeType">
           <Option v-for="item in roleList" :value="item.value" :key="item.value">{{ item.label }}</Option>
         </Select>
-        <!-- 审核状态-->
-  <!--      <div>-->
-  <!--        <span>{{dropData2.title}}：</span>-->
-  <!--        <span v-for="(item_text, index1) in dropData2.centent" :key="index1" :style="{'background': item_text.bgc,  'color':item_text.color}" @click="selectuseruser(index1)">{{item_text.name}}</span>-->
-  <!--      </div>-->
       </div>
       <div class="user-centent">
         <div class="user-search">

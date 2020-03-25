@@ -12,10 +12,15 @@ export default class Server {
     //TODO  报表模块
    //获取报告类型
     getReportTypeList(data){
-        return clientHttp.post('/systemplate/findByPage', data)
+        return clientHttp.post('/systemplate/findAll', data)
     }
+    // 获取分页数据信息
     getReportTableData(data){
         return clientHttp.post('/report/findByPageByAuditStatus', data)
+    }
+    // 填报的估价师信息
+    getReportAppraiserInfo(data){
+        return clientHttp.post('/singedUser/findByUuid', data)
     }
 
     //TODO 用户权限模块

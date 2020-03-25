@@ -20,7 +20,7 @@ axios.interceptors.request.use((config) => {
         if (config.url.includes('./user/login')) {
             config.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
         } else {
-            config.headers.post['accessToken'] = sessionStorage.getItem('accessToken')
+            config.headers.post['accessToken'] = localStorage.getItem('accessToken')
         }
     }
     return config;

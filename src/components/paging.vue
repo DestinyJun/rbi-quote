@@ -72,7 +72,7 @@
             }
         },
         updated() {
-            console.log(this.pageOption);
+            // console.log(this.pageOption);
             // this.pageOption.now_page = this.pageOption.now_page;
             // this.pageOption.now_num = this.pageOption.now_num;
             // this.pageOption.pageNum = this.pageOption.pageNum;
