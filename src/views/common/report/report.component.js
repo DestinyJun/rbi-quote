@@ -25,7 +25,6 @@ export default {
                 ]
             },
             searchData: '',
-            selecteds: [],
             // 分页数据
             pageOption: {
                 now_num: 10,// 当前行数
@@ -145,31 +144,98 @@ export default {
                     }
                 ],
                 content: [],
+                selectItem: []
             },
             // 模态框数据
             detailModal: false, //详情弹窗
             QRCodeModal: false, // 打印二维码弹窗
             addTypeReportModel: false, // 填报类型选择弹窗
             addReportModel: false, // 填写报告信息
+            UpdateReportModel: false, // 填写报告信息
 
             // 报告类型选择
             selRport: new mianModel.SelectReportType(),
             // 填写报告
-            addReport: new mianModel.AddReport(),
+            addReport: new mianModel.AddLocalReport(),
+            addSubmitReport: new mianModel.AddReport(),
 
             // 二维码内容
             codeUrl: 'http://www.gyrbi.com/quote',
             // 工具类
             reportTool: new Tool(),
             reportSrv: new serve(),
+            // 新增报告配置列表
+            addConfig: {
+                appraiserOneList: [],
+                appraiserTwoList: [],
+                reviewerOneList:  [],
+                reviewerTwoList:  [],
+                projectManager:  []
+            },
             // 报告选择的规则
             ruleValidate:{
                 reportType: [
                     { required: true, message: '请选择报告类型', trigger: 'change' }
                 ],
             },
+
             // 填写报告的规则
             ruleAddValidate: {
+                reportType: [
+                    { required: false, message: '请选择报告类型', trigger: 'change' },
+                ],
+                valuationPurpose: [
+                    { required: true, message: '请填写估价目的', trigger: 'change' },
+                ],
+                valuationResult: [
+                    { required: true, message: '请填写估价结果', trigger: 'change' },
+                ],
+                valuer1: [
+                    { required: true, message: '请选择估价师1', trigger: 'change' },
+                ],
+                valuer2: [
+                    { required: true, message: '请选择估价师2', trigger: 'change' },
+                ],
+                valuationDate: [
+                    { required: true, type: 'date', message: '请选择时间', trigger: 'change' }
+                ],
+                valuationValidityBegin: [
+                    {
+                        type: 'array',
+                        required: true,
+                        fields: {
+                            0: {type: 'date', required: true, message: '请输入起止日期'},
+                            1: {type: 'date', required: true, message: '请输入起止日期'}
+                        }
+                    }
+                ],
+                auditor2Uuid: [
+                    { required: true,  message: '请选择二级审核人', trigger: 'change' },
+                ],
+                auditor3Number: [
+                    { required: true,  message: '请选择三级审核人', trigger: 'change' }
+                ],
+                projectPrincipalNumber: [
+                    { required: true, message: '请选择项目负责人', trigger: 'change' }
+                ],
+                valuationObject: [
+                    { required: true, message: '请填写估价对象', trigger: 'change' },
+                ],
+                valuationObjectAddress: [
+                    { required: true, message: '请填写估价对象地址', trigger: 'change' },
+                ],
+                mandatorName: [
+                    { required: true, message: '请填写委托人', trigger: 'change' },
+                ],
+                mandatorIdentityCard: [
+                    { required: true, message: '请填写委托人信用代码', trigger: 'change' },
+                ],
+                cost: [
+                    { required: true, message: '请填写费用', trigger: 'change' },
+                ],
+                excerpt: [
+                    { required: false, message: '请填写摘录', trigger: 'change' },
+                ]
 
             }
         }
@@ -190,7 +256,7 @@ export default {
         });
     },
     methods: {
-        //初始化
+        // 初始化列表
         initReportData(){
           this.reportSrv.getReportTableData({auditStatus: this.auditName, tableName: this.selectReportName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
                 this.pageOption.page_list = [];
@@ -250,7 +316,6 @@ export default {
         searchReportData(){
             console.log(this.searchData);
         },
-
         // 获取分页组件中当前页条数
         getPageDate(data){
             this.now_num = data.num_Size;
@@ -261,7 +326,6 @@ export default {
             }
             this.initReportData();
         },
-
         // 展示详情弹窗
         showDetailDialog(){
             this.detailModal = true;
@@ -272,30 +336,193 @@ export default {
         },
         // 显示填报选择弹窗
         showAddRepotrt(){
-            // this.addTypeReportModel = true;
-            this.addReportModel = true;
+            this.addTypeReportModel = true;
+            // this.addReportModel = true;
         },
-
         // 确认选择报告类型
         selectReport(name) {
-
-
             this.$refs[name].validate(valid => {
                 if (valid) {
-                    // this.reportSrv.getReportAppraiserInfo({uuid: ''}).then( v => {
-                    //     console.log(v);
-                    //     if (v.code === '1000') {
-                    //         this.addTypeReportModel = false;
-                    //         this.addReportModel = true;
-                    //     }else {
-                    //         this.reportTool.toast('error', v.msg)
-                    //     }
-                    // });
-
+                    // this.getAddAppraiserLlist('', this.addConfig.appraiserOneList);
+                    this.addTypeReportModel = false;
+                    this.addReportModel = true;
                 }
             })
+        },
+        // 选择估价师
+        addRoportSelectAutor(name){
+            switch (name) {
+                case 'valuer1':
+                     // 查询估价师2得人员
+                    if (this.addConfig.appraiserOneList.length === 0){
+                        this.getAddAppraiserLlist(this.addReport.valuer2, this.addConfig.appraiserOneList);
+                    }
+                    break;
+                case 'valuer2':
+                    if (this.addConfig.appraiserTwoList.length === 0){
+                        this.getAddAppraiserLlist(this.addReport.valuer1, this.addConfig.appraiserTwoList);
+                    }
+                    // if (this.addConfig.appraiserOneList === []){
+                    //     this.reportTool.toast('info', '请先选择估价师1')
+                    // }else {
+                    //     console.log(23);
+                    //     this.getAddReveiwConfigInfo();
+                    // }
+                    // this.addConfig.appraiserOneList = [];
+                    // this.getAddAppraiserLlist(this.addReport.valuer2, this.addConfig.appraiserOneList);
+                    break;
+                default:
+                    break;
+            }
+        },
+        // 估价师改变时
+        addReportChangeAutor(name){
+            switch (name) {
+                case 'valuer1':
+                    // 查询估价师2得人员
+                    if (this.addReport.valuer1 === this.addReport.valuer2){
+                        this.addConfig.appraiserTwoList = [];
+                        this.addConfig.reviewerOneList = [];
+                        this.getAddAppraiserLlist(this.addReport.valuer1, this.addConfig.appraiserTwoList);
+
+                    }else {
+                        if (this.addReport.valuer2 !== ''){
+                            this.getAddReveiwConfigInfo()
+                        }
+                    }
+                    break;
+                case 'valuer2':
+                    console.log(456);
+                    if (this.addReport.valuer1 === this.addReport.valuer2){
+                        this.addConfig.appraiserOneList = [];
+                        this.addConfig.reviewerOneList = [];
+                        this.getAddAppraiserLlist(this.addReport.valuer2, this.addConfig.appraiserOneList);
+                    }else {
+                        if (this.addReport.valuer1 !== ''){
+                            this.getAddReveiwConfigInfo()
+                        }
+                    }
+                    // this.getAddAppraiserLlist(this.addReport.valuer2, this.addConfig.appraiserOneList);
+                    break;
+                default:
+                    break;
+            }
+        },
+        // 二级审核人改变时
+        changeReviewerData(){
+            this.getAddReveiwAndProjectAutorInfo(0, this.addConfig.projectManager);
+            this.getAddReveiwAndProjectAutorInfo(3, this.addConfig.reviewerTwoList);
+        },
+        // 查询估价师
+        getAddAppraiserLlist(id, list){
+
+            this.reportSrv.getReportAppraiserInfo({uuid: id}).then( v => {
+                console.log(v);
+                if (v.code === '1000') {
+                    v.data.forEach(val => {
+                        list.push({label: val.signedName, value: val.uuid})
+                    });
+                }else {
+                    this.reportTool.toast('error', v.msg)
+                }
+            });
+        },
+       // 查询二级审核人员
+        getAddReveiwConfigInfo(){
+            this.reportSrv.getReviewerTowUser({uuidV1: this.addReport.valuer1, uuidV2: this.addReport.valuer2}).then(res => {
+                if (res.code === '1000'){
+                    res.data.forEach(val => {
+                        this.addConfig.reviewerOneList.push({label: val.realname, value: val.uuid})
+                    });
+                }else {
+                    this.reportTool.toast('error', res.msg)
+                }
+            })
+
+        },
+       // 查询三级审核人或者项目负责人
+        getAddReveiwAndProjectAutorInfo(id, listData){
+           this.reportSrv.getReviewerTreeUser({uuid: id, uuidV1: this.addReport.valuer1, uuidV2: this.addReport.valuer2}).then(v=> {
+               if(v.code === '1000') {
+                   v.data.forEach(val => {
+                       listData.push({label: val.signedName, value: val.signedNumber})
+                   })
+
+               }
+           })
+        },
+        // 提交报告
+        addUploadReport(name){
+            this.$refs[name].validate(valid => {
+               if(valid){
+                   for (let key in this.addReport){
+                       this.addSubmitReport[key] = this.addReport[key];
+                   }
+                   this.addSubmitReport.mandatorName = this.addSubmitReport.mandatorName + this.addSubmitReport.sex;
+                   this.addSubmitReport.valuationDate =  this.setTimeFomart(this.addSubmitReport.valuationDate);
+                   this.addSubmitReport.valuationValidityBegin = this.setTimeFomart(this.addReport.valuationValidityBegin[0]);
+                   this.addSubmitReport.valuationValidityEnd = this.setTimeFomart(this.addReport.valuationValidityBegin[1]);
+                   this.setValueToLable(this.addSubmitReport.auditor2Uuid, this.addConfig.reviewerOneList, (data) => {
+                       this.addSubmitReport.auditor2 = data;
+                   });
+                   this.setValueToLable(this.addSubmitReport.auditor3Number, this.addConfig.reviewerTwoList, (data) => {
+                       this.addSubmitReport.auditor3 = data;
+                   });
+                   this.setValueToLable(this.addSubmitReport.projectPrincipalNumber, this.addConfig.projectManager, (data) => {
+                       this.addSubmitReport.projectPrincipal = data;
+                   });
+                   this.addSubmitReport.reportType = this.selRport.reportType;
+                   delete this.addSubmitReport.sex;
+                   this.reportSrv.addReport(this.addSubmitReport).then(value => {
+                       if(value.code === '1000') {
+                           this.addSubmitReport = new mianModel.AddReport();
+                           this.addReport = new mianModel.SelectReportType();
+                           this.selRport =  new mianModel.SelectReportType();
+                           for (let key in this.addConfig){
+                               this.addConfig[key] = []
+                           }
+                           this.addReportModel = false;
+                           this.initReportData();
+                           this.reportTool.toast('success', value.msg);
+                       }else {
+                           this.reportTool.toast('error', value.msg);
+                       }
+                   })
+               }
+            })
+        },
+        // 时间转换
+        setTimeFomart(data){
+            let d = new Date(data);
+            return  d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+        },
+        // 值获取名字
+        setValueToLable(data, list, callback){
+            list.forEach(v => {
+                if (v.value === data){
+                    callback(v.label)
+                }
+            })
+        },
+        // 选择数据
+        selectTableItem(data){
+            this.selectItem = data;
+        },
+        // 现实修改弹窗
+        showUpdateReportModel(){
+            if (this.tableOption.selectItem.length === 0){
+                this.reportTool.toast('error', '请选择需要修改得项');
+            }else if (this.tableOption.selectItem.length === 1){
+                this.UpdateReportModel = true;
+            }else {
+                this.reportTool.toast('error', '只能选择一项进行修改');
+            }
+        },
+       //
+        closeUpdateModel(){
+            this.tableOption.selectItem = [];
+            this.UpdateReportModel = false;
         }
-       // 获取填报的估价师信息
 
     },
     components: {
@@ -303,5 +530,12 @@ export default {
         tables,
         QRCodes
     }
+
+//      login(){
+//           this.value.forEach(v => {
+//            let d = new Date(v)
+//           let youWant=d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+//            console.log(youWant)
+//           })
 
 }

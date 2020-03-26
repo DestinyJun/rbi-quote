@@ -30,7 +30,20 @@
                 content: {
                       type: Array,
                       default: []
+                },
+                selectItem: {
+                    type: Array
                 }
+            },
+
+        },
+        updated() {
+            console.log(this.tableOption);
+        },
+        mounted() {
+            console.log(this.tableOption);
+            if (this.tableOption.selectItem === []){
+                this.$refs.selection.selectAll(false);
             }
         },
         methods: {
@@ -52,8 +65,8 @@
                 // });
             },
             selectDataHandle(selection){
-                this.selecteds = selection;
-                console.log(this.selecteds)
+                this.tableOption.selectItem = selection;
+                this.$emit('selectTableItem', this.tableOption.selectItem);
             },
         }
     }

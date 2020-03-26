@@ -22,6 +22,18 @@ export default class Server {
     getReportAppraiserInfo(data){
         return clientHttp.post('/singedUser/findByUuid', data)
     }
+    // 二级审核人查询
+    getReviewerTowUser(data){
+        return clientHttp.post('/singedUser/findByUuidA2', data)
+    }
+    // 三级审核人 和 项目负责人 查询
+    getReviewerTreeUser(data){
+        return clientHttp.post('/singedUser/findByUuidAP', data)
+    }
+    // 三级审核人 和 项目负责人 查询
+    addReport(data){
+        return clientHttp.post('/report/insert', data)
+    }
 
     //TODO 用户权限模块
    //获取所有的角色权限

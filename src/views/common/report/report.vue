@@ -6,7 +6,7 @@
        </div>
       <div class="btn">
         <button @click="showAddRepotrt">填报</button>
-        <button>修改</button>
+        <button @click="showUpdateReportModel">修改</button>
         <button>删除</button>
       </div>
     </div>
@@ -27,7 +27,7 @@
          <Input suffix="ios-search" placeholder="请输入报表编号..." style="width: auto" v-model="searchData" @on-search="searchReportData" search />
        </div>
        <div class="report-table">
-         <tables :table-option="tableOption"></tables>
+         <tables :table-option="tableOption" @selectTableItem="selectTableItem" ></tables>
        </div>
        <div class="report-paging">
          <paging :page-option="pageOption" @getPageDate="getPageDate"></paging>
@@ -61,10 +61,10 @@
         <div style="text-align:center">
             <Form ref="selRport" style="text-align:center" :model="selRport" :rules="ruleValidate">
               <FormItem label="请选择报告类型：" prop="reportType" style="margin-left: 6vw">
-                <Col span="20">
+                <Col span="16">
                   <RadioGroup v-model="selRport.reportType">
                     <Col span="26"  v-for="(item, index) in reportTypeList.centent" :key="index" style="text-align: left">
-                      <Radio :label="item.value" style="margin: 0 0 10px 0">{{item.name}}</Radio>
+                      <Radio :label="item.name" style="margin: 0 0 10px 0">{{item.name}}</Radio>
                     </Col>
                   </RadioGroup>
                 </Col>
@@ -77,24 +77,24 @@
         </div>
       </Modal>
     <!-- 填写报告信息 -->
-      <Modal v-model="addReportModel" draggable scrollable :transfer="false"  width="800" :styles="{top: '250px'}">
+      <Modal v-model="addReportModel" draggable scrollable :transfer="false"  width="960" :styles="{top: '100px'}">
         <p slot="header" style="color:#1C1C1C;text-align:left; width: 60vw">
           <span>填报信息填写</span>
         </p>
         <div style="text-align:center;">
-          <Form ref="addReport" :model="addReport" :rules="ruleAddValidate" :label-width="100" :label-colon="true">
+          <Form ref="addReport" :model="addReport" :rules="ruleAddValidate"  :label-colon="true">
             <Row>
               <Col span="12">
-                <FormItem label="估价对象" prop="valuationObject" >
+                <FormItem label="估价对象" prop="valuationObject" :label-width="100">
                   <Col span="20">
-                    <Input v-model="addReport.valuationObject" placeholder="Enter your name"></Input>
+                    <Input v-model="addReport.valuationObject" placeholder="请输入估价对象"></Input>
                   </Col>
                 </FormItem>
               </Col>
               <Col span="12" >
-                <FormItem label="估价对象地址" prop="valuationObjectAddress" >
+                <FormItem label="估价对象地址" prop="valuationObjectAddress" :label-width="100">
                   <Col span="20" >
-                    <Input v-model="addReport.valuationObjectAddress" placeholder="Enter your name"></Input>
+                    <Input v-model="addReport.valuationObjectAddress" placeholder="请输入估价对象地址"></Input>
                   </Col>
                 </FormItem>
               </Col>
@@ -105,36 +105,36 @@
               </Col>
             </Row>
             <Row>
-              <Col span="9">
-                <FormItem label="估价目的" prop="valuationObject" >
+              <Col span="10">
+                <FormItem label="估价目的" prop="valuationPurpose" :label-width="100">
                   <Col span="22">
-                    <Input v-model="addReport.valuationObject" placeholder="Enter your name" style="display: inline-block"></Input>
+                    <Input v-model="addReport.valuationPurpose" placeholder="请输入估价目的" style="display: inline-block"></Input>
                   </Col>
                 </FormItem>
               </Col>
-              <Col span="9">
-                <FormItem label="估价结果" prop="valuationObjectAddress" >
+              <Col span="10">
+                <FormItem label="估价结果" prop="valuationResult" :label-width="100">
                   <Col span="22">
-                    <Input v-model="addReport.valuationObjectAddress" placeholder="Enter your name" style="display: inline-block"></Input>
+                    <Input v-model="addReport.valuationResult" placeholder="请输入估价结果" style="display: inline-block"></Input>
                   </Col>
                 </FormItem>
               </Col>
             </Row>
             <Row>
-              <Col span="9">
-                <FormItem label="估价师1" prop="valuer1" >
-                  <Col span="22" style="text-align: left">
-                    <Select v-model="valuer1">
-                      <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              <Col span="10">
+                <FormItem label="估价师1" prop="valuer1" :label-width="100">
+                  <Col span="22" style="text-align: left" >
+                    <Select v-model="addReport.valuer1"  @on-open-change="addRoportSelectAutor('valuer1')" @on-change="addReportChangeAutor('valuer1')">
+                      <Option v-for="(item, index) in addConfig.appraiserOneList" :value="item.value" :key="index" >{{ item.label }}</Option>
                     </Select>
                   </Col>
                 </FormItem>
               </Col>
-              <Col span="9">
-                <FormItem label="估价师2" prop="valuer2" >
+              <Col span="10">
+                <FormItem label="估价师2" prop="valuer2" :label-width="100">
                   <Col span="22" style="text-align: left">
-                    <Select v-model="valuer2" >
-                      <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                    <Select v-model="addReport.valuer2" @on-open-change="addRoportSelectAutor('valuer2')" @on-change="addReportChangeAutor('valuer2')">
+                      <Option v-for="item in addConfig.appraiserTwoList" :value="item.value" :key="item.value" >{{ item.label }}</Option>
                     </Select>
                   </Col>
                 </FormItem>
@@ -142,63 +142,59 @@
             </Row>
             <!--            -->
             <Row>
-              <Col span="9">
-                <FormItem label="价值时点" prop="valuer1" >
+              <Col span="10">
+                <FormItem label="价值时间" prop="valuationDate" :label-width="100">
+                  <Col span="30" style="text-align: left">
+                    <DatePicker type="date" placeholder="选择日期" format="yy-MM-dd" style="width: 92%" v-model="addReport.valuationDate"></DatePicker>
+                  </Col>
+                </FormItem>
+              </Col>
+              <Col span="10">
+                <FormItem label="估价有效期" prop="valuationValidityBegin" :label-width="100">
+                  <Col span="30" style="text-align: left">
+                    <DatePicker type="daterange" format="yy-MM-dd" placeholder="选择时间段" style="width: 92%" v-model="addReport.valuationValidityBegin"></DatePicker>
+                  </Col>
+                </FormItem>
+              </Col>
+            </Row>
+            <Row>
+              <Col span="10">
+                <FormItem label="二级审核人" prop="auditor2Uuid" :label-width="100">
                   <Col span="22" style="text-align: left">
-                    <Select v-model="valuer1" >
-                      <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                    <Select v-model="addReport.auditor2Uuid" @on-change="changeReviewerData">
+                      <Option v-for="item in addConfig.reviewerOneList" :value="item.value" :key="item.value" @on-change="addRoportSelectAutor('auditor2')">{{ item.label }}</Option>
                     </Select>
                   </Col>
                 </FormItem>
               </Col>
-              <Col span="9">
-                <FormItem label="估价有效期" prop="valuer2" >
+              <Col span="10">
+                <FormItem label="三级审核人" prop="auditor3Number" :label-width="100">
                   <Col span="22" style="text-align: left">
-                    <Select v-model="valuer2" >
-                      <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                    <Select v-model="addReport.auditor3Number" >
+                      <Option v-for="item in addConfig.reviewerTwoList" :value="item.value" :key="item.value" @on-change="addRoportSelectAutor('auditor3')">{{ item.label }}</Option>
                     </Select>
                   </Col>
                 </FormItem>
               </Col>
             </Row>
             <Row>
-              <Col span="9">
-                <FormItem label="价值时点" prop="valuer1" >
+              <Col span="10">
+                <FormItem label="项目负责人" prop="projectPrincipalNumber" :label-width="100">
                   <Col span="22" style="text-align: left">
-                    <Select v-model="valuer1" >
-                      <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                    <Select v-model="addReport.projectPrincipalNumber" >
+                      <Option v-for="item in addConfig.projectManager" :value="item.value" :key="item.value">{{ item.label }}</Option>
                     </Select>
                   </Col>
                 </FormItem>
               </Col>
-              <Col span="9">
-                <FormItem label="估价有效期" prop="valuer2" >
+              <Col span="10">
+                <FormItem label="估计费用" prop="cost" :label-width="100">
                   <Col span="22" style="text-align: left">
-                    <Select v-model="valuer2" >
-                      <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                    </Select>
+                    <Input v-model="addReport.cost" placeholder="请输入估计费用"></Input>
                   </Col>
-                </FormItem>
-              </Col>
-            </Row>
-            <Row>
-              <Col span="9">
-                <FormItem label="价值时点" prop="valuer1" >
-                  <Col span="22" style="text-align: left">
-                    <Select v-model="valuer1" >
-                      <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                    </Select>
+                  <Col span="2">
+                    <span>元</span>
                   </Col>
-                </FormItem>
-              </Col>
-              <Col span="9">
-                <FormItem label="估计费用" prop="valuer2" >
-                  <Col span="22" style="text-align: left">
-                    <Select v-model="valuer2" >
-                      <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                    </Select>
-                  </Col>
-                  元
                 </FormItem>
               </Col>
             </Row>
@@ -207,20 +203,207 @@
                 <span style="width: 98%; height: 1px; background: #DCDCDC;display: inline-block;margin: 0 0 3vh 0"></span>
               </Col>
             </Row>
-<!--            <FormItem label="请选择报告类型：" prop="reportType" style="margin-left: 6vw">-->
-<!--              <Col span="20">-->
-<!--                <RadioGroup v-model="selRport.reportType">-->
-<!--                  <Col span="26"  v-for="(item, index) in reportTypeList.centent" :key="index" style="text-align: left">-->
-<!--                    <Radio :label="item.value" style="margin: 0 0 10px 0">{{item.name}}</Radio>-->
-<!--                  </Col>-->
-<!--                </RadioGroup>-->
-<!--              </Col>-->
-<!--            </FormItem>-->
+            <Row>
+              <Col span="12">
+                <FormItem label="估价委托人姓名(取姓氏)" prop="mandatorName" :label-width="184">
+                  <Col span="10">
+                    <Input v-model="addReport.mandatorName" placeholder="请输入估价委托人姓名.."></Input>
+                  </Col>
+                  <Col span="10">
+                    <RadioGroup v-model="addReport.sex">
+                      <Radio label="先生">先生</Radio>
+                      <Radio label="女士">女士</Radio>
+                    </RadioGroup>
+                  </Col>
+                </FormItem>
+              </Col>
+              <Col span="12" >
+                <FormItem label="估价委托人身份证号/信用代码" prop="mandatorIdentityCard" :label-width="203">
+                  <Col span="20">
+                    <Input v-model="addReport.mandatorIdentityCard" placeholder="请输入委托人身份证号/信用代码"></Input>
+                  </Col>
+                </FormItem>
+              </Col>
+            </Row>
+            <Row>
+              <Col span="20" >
+                <FormItem label="报告摘录" prop="excerpt" :label-width="100">
+                  <Col span="18">
+                    <Input v-model="addReport.excerpt" maxlength="300" show-word-limit type="textarea" placeholder="报告摘录以及特征描述..."/>
+                  </Col>
+                </FormItem>
+              </Col>
+            </Row>
           </Form>
         </div>
         <div slot="footer" style="text-align: center">
-          <Button style="background-color:#3DA2F8;color: #fff;width: 6vw" @click="selectReport('selRport')">确认</Button>
-          <Button style="background: #FFFFFF;color: #2E3235;width: 6vw"  @click="addReportModel = false">取消</Button>
+          <Button style="background-color:#3DA2F8;color: #fff;width: 5vw" @click="addUploadReport('addReport')">上报</Button>
+          <Button style="background: #FFFFFF;color: #2E3235;width: 5vw"  @click="addReportModel = false">取消</Button>
+        </div>
+      </Modal>
+      <!-- 填写报告信息 -->
+      <Modal v-model="UpdateReportModel" draggable scrollable :transfer="false"  width="960" :styles="{top: '100px'}">
+        <p slot="header" style="color:#1C1C1C;text-align:left; width: 60vw">
+          <span>填报信息填写</span>
+        </p>
+        <div style="text-align:center;">
+          <Form ref="addReport" :model="addReport" :rules="ruleAddValidate"  :label-colon="true">
+            <Row>
+              <Col span="12">
+                <FormItem label="估价对象" prop="valuationObject" :label-width="100">
+                  <Col span="20">
+                    <Input v-model="addReport.valuationObject" placeholder="请输入估价对象"></Input>
+                  </Col>
+                </FormItem>
+              </Col>
+              <Col span="12" >
+                <FormItem label="估价对象地址" prop="valuationObjectAddress" :label-width="100">
+                  <Col span="20" >
+                    <Input v-model="addReport.valuationObjectAddress" placeholder="请输入估价对象地址"></Input>
+                  </Col>
+                </FormItem>
+              </Col>
+            </Row>
+            <Row>
+              <Col span="24">
+                <span style="width: 98%; height: 1px; background: #DCDCDC;display: inline-block;margin: 0 0 3vh 0"></span>
+              </Col>
+            </Row>
+            <Row>
+              <Col span="10">
+                <FormItem label="估价目的" prop="valuationPurpose" :label-width="100">
+                  <Col span="22">
+                    <Input v-model="addReport.valuationPurpose" placeholder="请输入估价目的" style="display: inline-block"></Input>
+                  </Col>
+                </FormItem>
+              </Col>
+              <Col span="10">
+                <FormItem label="估价结果" prop="valuationResult" :label-width="100">
+                  <Col span="22">
+                    <Input v-model="addReport.valuationResult" placeholder="请输入估价结果" style="display: inline-block"></Input>
+                  </Col>
+                </FormItem>
+              </Col>
+            </Row>
+            <Row>
+              <Col span="10">
+                <FormItem label="估价师1" prop="valuer1" :label-width="100">
+                  <Col span="22" style="text-align: left" >
+                    <Select v-model="addReport.valuer1"  @on-open-change="addRoportSelectAutor('valuer1')" @on-change="addReportChangeAutor('valuer1')">
+                      <Option v-for="(item, index) in addConfig.appraiserOneList" :value="item.value" :key="index" >{{ item.label }}</Option>
+                    </Select>
+                  </Col>
+                </FormItem>
+              </Col>
+              <Col span="10">
+                <FormItem label="估价师2" prop="valuer2" :label-width="100">
+                  <Col span="22" style="text-align: left">
+                    <Select v-model="addReport.valuer2" @on-open-change="addRoportSelectAutor('valuer2')" @on-change="addReportChangeAutor('valuer2')">
+                      <Option v-for="item in addConfig.appraiserTwoList" :value="item.value" :key="item.value" >{{ item.label }}</Option>
+                    </Select>
+                  </Col>
+                </FormItem>
+              </Col>
+            </Row>
+            <!--            -->
+            <Row>
+              <Col span="10">
+                <FormItem label="价值时间" prop="valuationDate" :label-width="100">
+                  <Col span="30" style="text-align: left">
+                    <DatePicker type="date" placeholder="选择日期" format="yy-MM-dd" style="width: 92%" v-model="addReport.valuationDate"></DatePicker>
+                  </Col>
+                </FormItem>
+              </Col>
+              <Col span="10">
+                <FormItem label="估价有效期" prop="valuationValidityBegin" :label-width="100">
+                  <Col span="30" style="text-align: left">
+                    <DatePicker type="daterange" format="yy-MM-dd" placeholder="选择时间段" style="width: 92%" v-model="addReport.valuationValidityBegin"></DatePicker>
+                  </Col>
+                </FormItem>
+              </Col>
+            </Row>
+            <Row>
+              <Col span="10">
+                <FormItem label="二级审核人" prop="auditor2Uuid" :label-width="100">
+                  <Col span="22" style="text-align: left">
+                    <Select v-model="addReport.auditor2Uuid" @on-change="changeReviewerData">
+                      <Option v-for="item in addConfig.reviewerOneList" :value="item.value" :key="item.value" @on-change="addRoportSelectAutor('auditor2')">{{ item.label }}</Option>
+                    </Select>
+                  </Col>
+                </FormItem>
+              </Col>
+              <Col span="10">
+                <FormItem label="三级审核人" prop="auditor3Number" :label-width="100">
+                  <Col span="22" style="text-align: left">
+                    <Select v-model="addReport.auditor3Number" >
+                      <Option v-for="item in addConfig.reviewerTwoList" :value="item.value" :key="item.value" @on-change="addRoportSelectAutor('auditor3')">{{ item.label }}</Option>
+                    </Select>
+                  </Col>
+                </FormItem>
+              </Col>
+            </Row>
+            <Row>
+              <Col span="10">
+                <FormItem label="项目负责人" prop="projectPrincipalNumber" :label-width="100">
+                  <Col span="22" style="text-align: left">
+                    <Select v-model="addReport.projectPrincipalNumber" >
+                      <Option v-for="item in addConfig.projectManager" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                    </Select>
+                  </Col>
+                </FormItem>
+              </Col>
+              <Col span="10">
+                <FormItem label="估计费用" prop="cost" :label-width="100">
+                  <Col span="22" style="text-align: left">
+                    <Input v-model="addReport.cost" placeholder="请输入估计费用"></Input>
+                  </Col>
+                  <Col span="2">
+                    <span>元</span>
+                  </Col>
+                </FormItem>
+              </Col>
+            </Row>
+            <Row>
+              <Col span="24">
+                <span style="width: 98%; height: 1px; background: #DCDCDC;display: inline-block;margin: 0 0 3vh 0"></span>
+              </Col>
+            </Row>
+            <Row>
+              <Col span="12">
+                <FormItem label="估价委托人姓名(取姓氏)" prop="mandatorName" :label-width="184">
+                  <Col span="10">
+                    <Input v-model="addReport.mandatorName" placeholder="请输入估价委托人姓名.."></Input>
+                  </Col>
+                  <Col span="10">
+                    <RadioGroup v-model="addReport.sex">
+                      <Radio label="先生">先生</Radio>
+                      <Radio label="女士">女士</Radio>
+                    </RadioGroup>
+                  </Col>
+                </FormItem>
+              </Col>
+              <Col span="12" >
+                <FormItem label="估价委托人身份证号/信用代码" prop="mandatorIdentityCard" :label-width="203">
+                  <Col span="20">
+                    <Input v-model="addReport.mandatorIdentityCard" placeholder="请输入委托人身份证号/信用代码"></Input>
+                  </Col>
+                </FormItem>
+              </Col>
+            </Row>
+            <Row>
+              <Col span="20" >
+                <FormItem label="报告摘录" prop="excerpt" :label-width="100">
+                  <Col span="18">
+                    <Input v-model="addReport.excerpt" maxlength="300" show-word-limit type="textarea" placeholder="报告摘录以及特征描述..."/>
+                  </Col>
+                </FormItem>
+              </Col>
+            </Row>
+          </Form>
+        </div>
+        <div slot="footer" style="text-align: center">
+          <Button style="background-color:#3DA2F8;color: #fff;width: 5vw" @click="addUploadReport('addReport')">上报</Button>
+          <Button style="background: #FFFFFF;color: #2E3235;width: 5vw"  @click="closeUpdateModel">取消</Button>
         </div>
       </Modal>
     </div>
