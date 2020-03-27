@@ -57,7 +57,7 @@ export default {
                                     },
                                     on: {
                                         click: () => {
-                                            this.reviewClick(params.index)
+                                            this.reviewPaawordClick(params.row.uuid)
                                         }
                                     }
                                 }, '密码重置')
@@ -75,16 +75,20 @@ export default {
                 totalRow: 150, //总条数,
                 page_list: []
             },
+            selectItem: [], // 选择数据
             now_num: 10,
             now_page: 1,
             searchUserData: '',
             // 模态框数据
             reviewModal: false,
             addModal: false,
+            updateModal: false,
+
             userSrv: new Server(),
-            userToll: new Tool(),
+            userTool: new Tool(),
             roleList: [],
             addUser: new mainModel.AddUser(),
+            updateUser: new mainModel.AddUser(),
             ruleValidate: {
                 username: [
                     { required: true, message: '用户名不能为空', trigger: 'blur' },
@@ -122,6 +126,7 @@ export default {
         initUserData(){
             this.userSrv.getUserListData({pageSize: this.now_num, page:this.now_page, role: this.selectType}).then(
                 (value) => {
+                    this.pageOption.page_list = [];
                     if (value.code === '1000') {
                         this.tableOption.content = value.data.contents;
 
@@ -141,38 +146,130 @@ export default {
             )
         },
         changeType(){
-          console.log(this.selectType);
+            console.log(123);
+          this.now_page= 1;
           this.initUserData();
         },
-        btnClick(data){
-            switch(data) {
-                case 'add': this.addModal = true;
-            }
+        addBtnClick(){
+            this.addModal = true;
         },
         addSure(name){
             this.$refs[name].validate((valid) => {
                 if (valid) {
                     const roleLists = `[${this.addUser.roleList}]`;
                     this.userSrv.addUserInfo({username: this.addUser.username, realname: this.addUser.realname, phone: this.addUser.phone, roleList: roleLists}).then(value => {
-                        if (value.code === '200') {
+                        if (value.code === '1000') {
                             this.addModal = false;
                             this.addUser = new mainModel.AddUser();
-                            this.userToll.toast('success', '请求成功');
+                            this.userTool.toast('success', '请求成功');
+                            this.initUserData();
                         }else {
-                            this.userToll.toast('error', value.msg);
+                            this.userTool.toast('error', value.msg);
                         }
                     });
 
                 }
             })
         },
-        getPageDate(){
-
+        getPageDate(data){
+            this.now_num = data.num_Size;
+            if (data.label === 'row'){
+                this.now_page = 1;
+            }else {
+                this.now_page = data.nowPage;
+            }
+            this.initUserData();
         },
         searchData(){
 
-        }
+        },
+        // 选择数据
+        selectTableItem(data){
+            this.selectItem = data;
+        },
+        // 现实修改弹窗
+        showUpdateReportModel(){
+            if (this.selectItem.length === 0){
+                this.userTool.toast('error', '请选择需要修改得项');
+            }else if (this.selectItem.length === 1){
+                for (let keys in this.updateUser){
+                    this.updateUser[keys] = this.selectItem[0][keys];
+                }
+                this.selectItem[0].roleCodeString =  this.selectItem[0].roleCodeString.slice(1,  this.selectItem[0].roleCodeString.length -1)
+                this.updateUser.roleList = [];
+                // 解析用户权限，显示到多选框上去
+                this.selectItem[0].roleCodeString.split(",").forEach(val => {
+                    this.roleList.forEach(v => {
+                        if (val.trim() === v.label.trim()){
+                            this.updateUser.roleList.push(v.value);
+                        }
+                    });
+                });
+                this.updateModal = true;
+            }else {
+                this.userTool.toast('error', '只能选择一项进行修改');
+            }
+        },
+        updateUserSubmit(name){
+            this.$refs[name].validate((valid) => {
+                if (valid) {
+                    const roleLists = `[${this.updateUser.roleList}]`;
+                    this.userSrv.updateUserInfo({uuid: this.selectItem[0].uuid, realname: this.updateUser.realname, phone: this.updateUser.phone, roleList: roleLists}).then(value => {
+                        if (value.code === '1000') {
+                            this.closeUpdateModel();
+                            this.userTool.toast('success', '请求成功');
+                            this.initUserData();
+                        }else {
+                            this.userTool.toast('error', value.msg);
+                        }
+                    });
 
+                }
+            })
+        },
+        // 取消选择，关闭弹窗
+        closeUpdateModel(){
+            // 调用子组件得方法
+            this.$refs.tables.clearSelect();
+            this.selectItem = [];
+            this.updateModal = false;
+            this.updateUser = new mainModel.AddUser();
+        },
+        // 重置密码
+        reviewPaawordClick(data){
+            console.log(data);
+            this.userTool.setModal('confirm', '重置提醒', '确认要重置密码吗', () => {
+                this.userSrv.resetUserPassword({uuid: data}).then(val => {
+                    console.log(val);
+                    if (val.code === '1000'){
+                        this.userTool.toast('success', val.msg);
+                        this.initUserData();
+                    }else {
+                        this.userTool.toast('error', val.msg);
+                    }
+                })
+            })
+        },
+        delUserInfo(){
+            if (this.selectItem.length === 0){
+                this.userTool.toast('error', '请选择需要删除得项');
+            }else if (this.selectItem.length === 1) {
+                this.userTool.setModal('confirm', '删除提醒', '确认要删除吗', () => {
+                    this.userSrv.delUserInfo({uuid: this.selectItem[0].uuid}).then(val => {
+                        if (val.code === '1000'){
+                            this.$refs.tables.clearSelect();
+                            this.selectItem = [];
+                            this.userTool.toast('success', val.msg);
+                            this.initUserData();
+                        }else {
+                            this.userTool.toast('error', val.msg);
+                        }
+                    })
+                })
+            }else {
+                this.userTool.toast('error', '只能选择一项进行删除');
+            }
+        }
     },
     components: {
         paging,

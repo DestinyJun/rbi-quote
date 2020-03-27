@@ -11,6 +11,7 @@
         <span style="color: #ffa489">{{ row.result }}</span>
       </template>
     </Table>
+<!--    <button @click="cancleSelect">123</button>-->
   </div>
 </template>
 
@@ -30,21 +31,9 @@
                 content: {
                       type: Array,
                       default: []
-                },
-                selectItem: {
-                    type: Array
                 }
             },
 
-        },
-        updated() {
-            console.log(this.tableOption);
-        },
-        mounted() {
-            console.log(this.tableOption);
-            if (this.tableOption.selectItem === []){
-                this.$refs.selection.selectAll(false);
-            }
         },
         methods: {
             rowClassName (row, index) {
@@ -68,6 +57,9 @@
                 this.tableOption.selectItem = selection;
                 this.$emit('selectTableItem', this.tableOption.selectItem);
             },
+            clearSelect(){
+                this.$refs.selection.selectAll(false);
+            }
         }
     }
 </script>

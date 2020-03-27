@@ -5,9 +5,9 @@
               <h2>用户权限</h2>
            </div>
            <div class="btn">
-             <button @click="btnClick('add')">添加</button>
-             <button @click="btnClick('modify')">修改</button>
-             <button @click="btnClick('delete')">删除</button>
+             <button @click="addBtnClick">添加</button>
+             <button @click="showUpdateReportModel">修改</button>
+             <button @click="delUserInfo">删除</button>
            </div>
       </div>
       <div class="user-select">
@@ -19,10 +19,10 @@
       </div>
       <div class="user-centent">
         <div class="user-search">
-          <Input suffix="ios-search" placeholder="请输入用户名..." style="width: auto" v-model="searchUserData" @on-search="searchData" search />
+          <Input suffix="ios-search"  placeholder="请输入用户名..." style="width: auto" v-model="searchUserData" @on-search="searchData" search />
         </div>
         <div class="user-table">
-          <tables :table-option="tableOption"></tables>
+          <tables :table-option="tableOption" ref="tables" @selectTableItem="selectTableItem"></tables>
         </div>
         <div class="user-paging">
           <paging :page-option="pageOption" @getPageDate="getPageDate"></paging>
@@ -30,11 +30,10 @@
       </div>
       <Modal v-model="addModal" draggable scrollable :transfer="false"  :styles="{top: '250px'}">
         <p slot="header" style="color:#1C1C1C;text-align:left">
-          <span>添加用户</span>
+          <span>用户添加</span>
         </p>
         <div style="text-align:center">
           <Form ref="addUser" :model="addUser" :rules="ruleValidate" :label-width="100" :label-colon="true">
-
             <FormItem label="用户名" prop="username" style="margin-left: 2vw">
               <Col span="16">
                 <Input  v-model="addUser.username" placeholder="请输入您的用户名"></Input>
@@ -64,6 +63,43 @@
         <div slot="footer" style="text-align: center">
           <Button style="background-color:#3DA2F8;color: #fff;width: 6vw" @click="addSure('addUser')">确认</Button>
           <Button style="background: #FFFFFF;color: #2E3235;width: 6vw"  @click="addModal = false">取消</Button>
+        </div>
+      </Modal>
+      <Modal v-model="updateModal" draggable scrollable :transfer="false"  :styles="{top: '250px'}">
+        <p slot="header" style="color:#1C1C1C;text-align:left">
+          <span>用户修改</span>
+        </p>
+        <div style="text-align:center">
+          <Form ref="updateUser" :model="updateUser" :rules="ruleValidate" :label-width="100" :label-colon="true">
+            <FormItem label="用户名" prop="username" style="margin-left: 2vw">
+              <Col span="16">
+                <Input disabled v-model="updateUser.username" placeholder="请输入您的用户名"></Input>
+              </Col>
+            </FormItem>
+            <FormItem label="真实姓名" prop="realname" style="margin-left: 2vw">
+              <Col span="16">
+                <Input  v-model="updateUser.realname" placeholder="请输入您的真实姓名"></Input>
+              </Col>
+            </FormItem>
+            <FormItem label="电话号码" prop="phone" style="margin-left: 2vw">
+              <Col span="16">
+                <Input v-model="updateUser.phone" placeholder="请输入您的电话号码"></Input>
+              </Col>
+            </FormItem>
+            <FormItem label="用户权限" prop="roleList" style="margin-left: 2vw">
+              <Col span="18">
+                <CheckboxGroup v-model="updateUser.roleList" disabled>
+                  <Col span="12"  v-for="(item, index) in roleList" :key="index" style="text-align: left">
+                    <Checkbox :label="item.value" style="margin: 0 0 10px 0">{{item.label}}</Checkbox>
+                  </Col>
+                </CheckboxGroup>
+              </Col>
+            </FormItem>
+          </Form>
+        </div>
+        <div slot="footer" style="text-align: center">
+          <Button style="background-color:#3DA2F8;color: #fff;width: 6vw" @click="updateUserSubmit('updateUser')">确认</Button>
+          <Button style="background: #FFFFFF;color: #2E3235;width: 6vw"  @click="closeUpdateModel">取消</Button>
         </div>
       </Modal>
     </div>

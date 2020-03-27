@@ -64,12 +64,22 @@ class AddLocalReport {
     phone = '';
     roleList = []
 }
+// TODO 签字人员模块
+class AddSigner {
+    constructor(){}
+    signedName = '';
+    signedNumber = '';
+    signedType = '';
+    signedLoginUser = '';
+    signedTypeName = ''
+}
 // export default AddUser
 const mainModel = {
     SelectReportType,
     AddUser,
     AddReport,
-    AddLocalReport
+    AddLocalReport,
+    AddSigner
 };
 
 export default mainModel;

@@ -66,4 +66,18 @@
 
     }
   }
+  /deep/ .ivu-modal-header {
+    background: #EDEEEE;
+    border-radius: 4px;
+  }
+  /deep/  .ivu-modal-footer {
+    background: #EDEEEE;
+    border-radius: 4px;
+  }
+  /deep/ .ivu-input-small {
+    height: 30px;
+  }
+  /deep/ .ivu-form-item-error-tip {
+    padding-top: 35px;
+  }
 }

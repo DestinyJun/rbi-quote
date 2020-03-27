@@ -25,6 +25,7 @@ export default {
                 ]
             },
             searchData: '',
+            selectItem: [], // 选择的数据
             // 分页数据
             pageOption: {
                 now_num: 10,// 当前行数
@@ -117,7 +118,7 @@ export default {
                                     },
                                     on: {
                                         click: () => {
-                                            this.showDetailDialog(params.index)
+                                            this.showDetailDialog(params.row)
                                         }
                                     }
                                 }, '详情'),
@@ -144,7 +145,6 @@ export default {
                     }
                 ],
                 content: [],
-                selectItem: []
             },
             // 模态框数据
             detailModal: false, //详情弹窗
@@ -158,7 +158,10 @@ export default {
             // 填写报告
             addReport: new mianModel.AddLocalReport(),
             addSubmitReport: new mianModel.AddReport(),
-
+            updateReport:  new mianModel.AddLocalReport(),
+            detailReport:  new mianModel.AddLocalReport(),
+            // 估价师总列表
+            appraiserTotalList: [],
             // 二维码内容
             codeUrl: 'http://www.gyrbi.com/quote',
             // 工具类
@@ -254,12 +257,13 @@ export default {
                 this.initReportData();
             }
         });
+        this.getAddAppraiserLlist('', this.appraiserTotalList);
     },
     methods: {
         // 初始化列表
         initReportData(){
           this.reportSrv.getReportTableData({auditStatus: this.auditName, tableName: this.selectReportName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
-                this.pageOption.page_list = [];
+              this.pageOption.page_list = [];
                 if (value.code  === '1000') {
                     this.tableOption.content = value.data.contents;
                     this.tableOption.content.forEach(v=> {
@@ -327,7 +331,20 @@ export default {
             this.initReportData();
         },
         // 展示详情弹窗
-        showDetailDialog(){
+        showDetailDialog(item){
+            for (let keys in this.detailReport){
+                this.detailReport[keys] = item[keys]
+            }
+            this.detailReport.valuationValidityBegin = `${item.valuationValidityBegin} - ${item.valuationValidityEnd}`;
+            this.detailReport.auditor3Number = item.auditor3;
+            this.detailReport.auditor2Uuid = item.auditor2;
+            this.setValueToLable( this.detailReport.valuer1, this.appraiserTotalList, (name) => {
+                this.detailReport.valuer1 = name;
+            });
+            this.setValueToLable( this.detailReport.valuer2, this.appraiserTotalList, (name) => {
+                this.detailReport.valuer2 = name;
+            });
+            this.detailReport.projectPrincipalNumber = item.projectPrincipal;
             this.detailModal = true;
         },
         // 打印二维码
@@ -350,17 +367,25 @@ export default {
             })
         },
         // 选择估价师
-        addRoportSelectAutor(name){
+        addRoportSelectAutor(name, type){
             switch (name) {
                 case 'valuer1':
                      // 查询估价师2得人员
                     if (this.addConfig.appraiserOneList.length === 0){
-                        this.getAddAppraiserLlist(this.addReport.valuer2, this.addConfig.appraiserOneList);
+                        if (type === 'add'){
+                            this.getAddAppraiserLlist(this.addReport.valuer2, this.addConfig.appraiserOneList);
+                        }else {
+                            this.getAddAppraiserLlist(this.updateReport.valuer2, this.addConfig.appraiserOneList);
+                        }
                     }
                     break;
                 case 'valuer2':
                     if (this.addConfig.appraiserTwoList.length === 0){
-                        this.getAddAppraiserLlist(this.addReport.valuer1, this.addConfig.appraiserTwoList);
+                        if (type === 'add'){
+                            this.getAddAppraiserLlist(this.addReport.valuer1, this.addConfig.appraiserTwoList);
+                        }else {
+                            this.getAddAppraiserLlist(this.updateReport.valuer1, this.addConfig.appraiserTwoList);
+                        }
                     }
                     // if (this.addConfig.appraiserOneList === []){
                     //     this.reportTool.toast('info', '请先选择估价师1')
@@ -376,30 +401,54 @@ export default {
             }
         },
         // 估价师改变时
-        addReportChangeAutor(name){
+        addReportChangeAutor(name, type){
             switch (name) {
                 case 'valuer1':
-                    // 查询估价师2得人员
-                    if (this.addReport.valuer1 === this.addReport.valuer2){
-                        this.addConfig.appraiserTwoList = [];
-                        this.addConfig.reviewerOneList = [];
-                        this.getAddAppraiserLlist(this.addReport.valuer1, this.addConfig.appraiserTwoList);
-
+                    if (type === 'add'){
+                        // 查询估价师2得人员
+                        if (this.addReport.valuer1 === this.addReport.valuer2){
+                            this.addConfig.appraiserTwoList = [];
+                            this.addConfig.reviewerOneList = [];
+                            this.getAddAppraiserLlist(this.addReport.valuer1, this.addConfig.appraiserTwoList);
+                        }else {
+                            if (this.addReport.valuer2 !== ''){
+                                this.getAddReveiwConfigInfo('add')
+                            }
+                        }
                     }else {
-                        if (this.addReport.valuer2 !== ''){
-                            this.getAddReveiwConfigInfo()
+                        // 查询估价师2得人员
+                        if (this.updateReport.valuer1 === this.updateReport.valuer2){
+                            this.addConfig.appraiserTwoList = [];
+                            this.addConfig.reviewerOneList = [];
+                            this.getAddAppraiserLlist(this.updateReport.valuer1, this.addConfig.appraiserTwoList);
+                        }else {
+                            if (this.updateReport.valuer2 !== ''){
+                                this.getAddReveiwConfigInfo('update')
+                            }
                         }
                     }
+
                     break;
                 case 'valuer2':
-                    console.log(456);
-                    if (this.addReport.valuer1 === this.addReport.valuer2){
-                        this.addConfig.appraiserOneList = [];
-                        this.addConfig.reviewerOneList = [];
-                        this.getAddAppraiserLlist(this.addReport.valuer2, this.addConfig.appraiserOneList);
+                    if (type === 'add') {
+                        if (this.addReport.valuer1 === this.addReport.valuer2) {
+                            this.addConfig.appraiserOneList = [];
+                            this.addConfig.reviewerOneList = [];
+                            this.getAddAppraiserLlist(this.addReport.valuer2, this.addConfig.appraiserOneList);
+                        } else {
+                            if (this.addReport.valuer1 !== '') {
+                                this.getAddReveiwConfigInfo('add')
+                            }
+                        }
                     }else {
-                        if (this.addReport.valuer1 !== ''){
-                            this.getAddReveiwConfigInfo()
+                        if (this.updateReport.valuer1 === this.updateReport.valuer2) {
+                            this.addConfig.appraiserOneList = [];
+                            this.addConfig.reviewerOneList = [];
+                            this.getAddAppraiserLlist(this.updateReport.valuer2, this.addConfig.appraiserOneList);
+                        } else {
+                            if (this.updateReport.valuer1 !== '') {
+                                this.getAddReveiwConfigInfo('update')
+                            }
                         }
                     }
                     // this.getAddAppraiserLlist(this.addReport.valuer2, this.addConfig.appraiserOneList);
@@ -410,12 +459,13 @@ export default {
         },
         // 二级审核人改变时
         changeReviewerData(){
+            this.addConfig.projectManager = [];
+            this.addConfig.reviewerTwoList = [];
             this.getAddReveiwAndProjectAutorInfo(0, this.addConfig.projectManager);
             this.getAddReveiwAndProjectAutorInfo(3, this.addConfig.reviewerTwoList);
         },
         // 查询估价师
         getAddAppraiserLlist(id, list){
-
             this.reportSrv.getReportAppraiserInfo({uuid: id}).then( v => {
                 console.log(v);
                 if (v.code === '1000') {
@@ -428,16 +478,31 @@ export default {
             });
         },
        // 查询二级审核人员
-        getAddReveiwConfigInfo(){
-            this.reportSrv.getReviewerTowUser({uuidV1: this.addReport.valuer1, uuidV2: this.addReport.valuer2}).then(res => {
-                if (res.code === '1000'){
-                    res.data.forEach(val => {
-                        this.addConfig.reviewerOneList.push({label: val.realname, value: val.uuid})
-                    });
-                }else {
-                    this.reportTool.toast('error', res.msg)
-                }
-            })
+        getAddReveiwConfigInfo(type){
+            this.addConfig.reviewerOneList = [];
+            if (type === 'add'){
+                this.reportSrv.getReviewerTowUser({uuidV1: this.addReport.valuer1, uuidV2: this.addReport.valuer2}).then(res => {
+                    console.log(res);
+                    if (res.code === '1000'){
+                        res.data.forEach(val => {
+                            this.addConfig.reviewerOneList.push({label: val.realname, value: val.uuid})
+                        });
+                    }else {
+                        this.reportTool.toast('error', res.msg)
+                    }
+                })
+            }else {
+                this.reportSrv.getReviewerTowUser({uuidV1: this.updateReport.valuer1, uuidV2: this.updateReport.valuer2}).then(res => {
+                   console.log(res);
+                    if (res.code === '1000'){
+                        res.data.forEach(val => {
+                            this.addConfig.reviewerOneList.push({label: val.realname, value: val.uuid})
+                        });
+                    }else {
+                        this.reportTool.toast('error', res.msg)
+                    }
+                })
+            }
 
         },
        // 查询三级审核人或者项目负责人
@@ -507,21 +572,62 @@ export default {
         // 选择数据
         selectTableItem(data){
             this.selectItem = data;
+            this.getAddAppraiserLlist(this.selectItem[0].valuer2, this.addConfig.appraiserOneList);
+            this.getAddAppraiserLlist(this.selectItem[0].valuer1, this.addConfig.appraiserTwoList);
+
+            this.getAddReveiwAndProjectAutorInfo(0, this.addConfig.projectManager);
+            this.getAddReveiwAndProjectAutorInfo(3, this.addConfig.reviewerTwoList);
         },
         // 现实修改弹窗
         showUpdateReportModel(){
-            if (this.tableOption.selectItem.length === 0){
+            if (this.selectItem.length === 0){
                 this.reportTool.toast('error', '请选择需要修改得项');
-            }else if (this.tableOption.selectItem.length === 1){
+            }else if (this.selectItem.length === 1){
+                console.log(this.selectItem);
+                for (let keys in this.updateReport){
+                    this.updateReport[keys] = this.selectItem[0][keys];
+                }
+                this.getAddReveiwConfigInfo('update');
+                this.updateReport.cost = this.updateReport.cost + '';
+                this.updateReport.valuationResult = this.updateReport.valuationResult + '';
+                this.updateReport.valuationValidityBegin= [
+                    this.selectItem[0].valuationValidityBegin,
+                    this.selectItem[0].valuationValidityEnd
+                ];
+                console.log(this.updateReport);
+                console.log(this.addConfig);
                 this.UpdateReportModel = true;
             }else {
                 this.reportTool.toast('error', '只能选择一项进行修改');
             }
         },
-       //
+       // 取消选择，关闭弹窗
         closeUpdateModel(){
-            this.tableOption.selectItem = [];
+            // 调用子组件得方法
+            this.$refs.tables.clearSelect();
+            this.selectItem = [];
             this.UpdateReportModel = false;
+        },
+
+       // 删除报告
+        deleteReport(){
+            if (this.selectItem.length === 0){
+                this.reportTool.toast('error', '请选择需要删除得项');
+            } else if (this.selectItem.length === 1) {
+                this.reportTool.setModal('confirm', '删除提醒', '您确认要删除该项吗?', () => {
+                    this.reportSrv.delReport({reportId: this.selectItem[0].reportId}).then(val => {
+                        if (val.code === '1000') {
+                            this.$refs.tables.clearSelect();
+                            this.selectItem = [];
+                            this.reportTool.toast('success', val.msg)
+                        } else{
+                            this.reportTool.toast('error', val.msg)
+                        }
+                    });
+                })
+            }else {
+                this.reportTool.toast('error', '只能选择一项进行删除');
+            }
         }
 
     },
