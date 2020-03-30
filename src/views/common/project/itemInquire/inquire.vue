@@ -11,7 +11,7 @@
        <!--       </div>-->
      </div>
      <div class="inquire-data">
-       <div class="inquire-item" v-for="(item,index) in itemData" :key="index">
+       <div class="inquire-item" v-for="item in itemData" :key="item.id">
          <div class="inquire-item-title">
            <span >{{item.label}}</span>
            <span :style="{'color': item.fcolor}">{{item.value}}</span>
@@ -44,14 +44,14 @@
      <div class="inquire-select">
        <!--      报告类型-->
        <div>
-         <span>{{dropData.title}}：</span>
-         <span v-for="(item_text, index1) in dropData.centent" :key="index1" :style="{'background': item_text.bgc, 'color':item_text.color}" @click="selectInquireType(index1)">{{item_text.name}}</span>
+         <span>{{reportTypeList.title}}：</span>
+         <span v-for="(item_text, index1) in reportTypeList.centent" :key="index1" :style="{'background': item_text.bgc, 'color':item_text.color}" @click="selectInquireType(index1)">{{item_text.name}}</span>
        </div>
        <!-- 审核状态-->
        <div style="display: flex; justify-content: space-between">
          <div >
            <span>{{dropData2.title}}：</span>
-           <span v-for="(item_text, index1) in dropData2.centent" :key="index1" :style="{'background': item_text.bgc,  'color':item_text.color}" @click="selectInquireReview(index1)">{{item_text.name}}</span>
+           <span v-for="(item_text, index2) in dropData2.centent" :key="index2" :style="{'background': item_text.bgc,  'color':item_text.color}" @click="selectInquireReview(index2)">{{item_text.name}}</span>
            <label style="margin-left: 2vw">
              时间范围：
              <DatePicker type="daterange" placement="bottom-end" placeholder="选择日期" style="width: 200px"></DatePicker>

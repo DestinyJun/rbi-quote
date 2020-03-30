@@ -1,18 +1,14 @@
 import paging from "../../../../components/paging";
 import tables from "../../../../components/table";
+import Tool from "../../../../utils/tool";
+import serve from "../../../../service/service";
 export default {
     name: 'inquire',
     data(){
         return {
-            dropData: {
+            reportTypeList: {
                 title: '报告类型',
-                centent: [
-                    {name: '全部', value: '1', bgc: '#FFFFFF', color: '#5D6063'},
-                    {name: '房地产估价报告', value: '1', bgc: '#EFEFEF',  color: '#C2C2C2'},
-                    {name: '房屋估价报告', value: '1',   bgc: '#EFEFEF',  color: '#C2C2C2'},
-                    {name: '资产估价报告', value: '1',  bgc: '#EFEFEF',  color: '#C2C2C2'},
-                    {name: '土地估价报告', value: '1',   bgc: '#EFEFEF',  color: '#C2C2C2'},
-                ]
+                centent: []
             },
             dropData2: {
                 title: '审核状态',
@@ -150,135 +146,90 @@ export default {
                         }
                     }
                 ],
-                content: [
-                    {
-                        name: '202015612312',
-                        type: '房地产估价',
-                        status: '未收费',
-                        autor: '张三',
-                        persion: '李四',
-                        address: '贵州省遵义市红花岗区和上海路亚园庭院1栋22-3号',
-                        result: '￥2016',
-                        flag: 1
-                    },
-                    {
-                        name: '202015612312',
-                        type: '房地产估价',
-                        status: '未收费',
-                        autor: '张三',
-                        persion: '李四',
-                        address: '贵州省遵义市红花岗区和上海路亚园庭院1栋22-3号',
-                        result: '￥2016',
-                        flag: 1
-                    },
-                    {
-                        name: 'Jim Green',
-                        type: '房地产估价',
-                        status: '审核未通过',
-                        autor: '张三',
-                        persion: '李四',
-                        address: '贵州省遵义市红花岗区和上海路亚园庭院1栋22-3号',
-                        result: '￥2016',
-                        flag: 1
-                    },
-                    {
-                        name: 'Joe Black',
-                        type: '房地产估价',
-                        status: '已完成',
-                        autor: '张三',
-                        address: '贵州省遵义市红花岗区和上海路亚园庭院1栋22-3号',
-                        persion: '李四',
-                        result: '￥2016',
-                        flag: 0
-                    },
-                    {
-                        name: 'Jon Snow',
-                        type: '房地产估价',
-                        status: '未二级审核',
-                        autor: '张三',
-                        address: '贵州省遵义市红花岗区和上海路亚园庭院1栋22-3号',
-                        persion: '李四',
-                        result: '￥2016',
-                        flag: 0
-                    },
-                    {
-                        name: 'Jon Snow',
-                        type: '房地产估价',
-                        status: '已完成',
-                        autor: '张三',
-                        address: '贵州省遵义市红花岗区和上海路亚园庭院1栋22-3号',
-                        persion: '李四',
-                        result: '￥2016',
-                        flag: 0
-                    },
-                    {
-                        name: 'Jon Snow',
-                        type: '房地产估价',
-                        status: '已完成',
-                        autor: '张三',
-                        address: '贵州省遵义市红花岗区和上海路亚园庭院1栋22-3号',
-                        persion: '李四',
-                        result: '￥2016',
-                        flag: 1
-                    },
-                    {
-                        name: 'Jon Snow',
-                        type: '房地产估价',
-                        status: '已完成',
-                        autor: '张三',
-                        address: '贵州省遵义市红花岗区和上海路亚园庭院1栋22-3号',
-                        persion: '李四',
-                        result: '￥2016',
-                        flag: 0
-                    },
-                    {
-                        name: 'Jon Snow',
-                        type: '房地产估价',
-                        status: '已完成',
-                        autor: '张三',
-                        address: '贵州省遵义市红花岗区和上海路亚园庭院1栋22-3号',
-                        persion: '李四',
-                        result: '￥2016',
-                        flag: 1
-                    },
-                    {
-                        name: 'Jon Snow',
-                        type: '房地产估价',
-                        status: '已完成',
-                        autor: '张三',
-                        address: '贵州省遵义市红花岗区和上海路亚园庭院1栋22-3号',
-                        persion: '李四',
-                        result: '￥2016',
-                        flag: 1
-                    },
-
-                ],
+                content: [],
             },
             // 分页数据
             pageOption: {
                 now_num: 10,// 当前行数
                 now_page: 1, // 当前页
-                pageNum: 15, // 总页数
-                totalRow: 150, //总条数
+                pageNum: 0, // 总页数
+                totalRow: 0, //总条数
+                page_list: []
             },
+            // 分页数据
+            now_page: 1,
+            now_num: 10,
+            auditName: 4,
+            selectReportName: '',
             searchInquireData: '',
             // 模态框数据
             inquireModal: false,
+            // 工具类
+            iquireTool: new Tool(),
+            iquireSrv: new serve(),
             itemData: [
-                {label: '报告总数', value: 456, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 456/500*100},
-                {label: '已完成数', value: 132, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 132/500*100},
-                {label: '未二级审核', value: 66, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 66/500*100},
-                {label: '未三级审核', value: 100, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 100/500*100},
+                {id: 3, label: '报告总数', value: 456, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 456/500*100},
+                {id: 4,label: '已完成数', value: 132, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 132/500*100},
+                {id: 5,label: '未二级审核', value: 66, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 66/500*100},
+                {id: 6,label: '未三级审核', value: 100, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 100/500*100},
             ],
             itemData1: [
-                {label: '已收费数', value: 132, fcolor: '#E17055', bgc:'#E17055', borhidden: false, bwidth: 132/500*100},
-                {label: '未收费数', value: 66, fcolor: '#E17055', bgc:'#E17055', borhidden: true, bwidth: 66/500*100},
+                {id: 1,label: '已收费数', value: 132, fcolor: '#E17055', bgc:'#E17055', borhidden: false, bwidth: 132/500*100},
+                {id: 2,label: '未收费数', value: 66, fcolor: '#E17055', bgc:'#E17055', borhidden: true, bwidth: 66/500*100},
             ]
         }
     },
+    created(){
+        this.iquireSrv.getReportTypeList({}).then(value => {
+            if (value.code === '1000') {
+                value.data.forEach((v, index) => {
+                    if (index === 1) {
+                        this.reportTypeList.centent.push({name: v.tempName, value: '1', bgc: '#FFFFFF',  color: '#5D6063'});
+                        this.selectReportName = v.tempName;
+                    }else{
+                        this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',  color: '#C2C2C2'})
+                    }
+                });
+                this.initMyReportData();
+            }else {
+                this.iquireTool.toast('error', value.msg)
+            }
+        });
+    },
     methods: {
-        getPageDate(){
-            // console.log(this.searchInquireData);
+        // 初始化列表
+        initMyReportData(){
+            this.iquireSrv.queryMyReportPageData({auditStatus: this.auditName, tableName: this.selectReportName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
+                console.log(value);
+                this.pageOption.page_list = [];
+                if (value.code  === '1000') {
+                    this.tableOption.content = value.data.contents;
+                    this.tableOption.content.forEach(v=> {
+                        this.dropData2.centent.forEach(val => {
+                            if (val.value === v.auditStatus) {
+                                v.auditStatus = val.name
+                            }
+                        })
+                    });
+                    for (let i = 1; i<= value.data.totalPage; i++) {
+                        if (i ===  this.now_page) {
+                            this.pageOption.page_list.push( {name: i, bgc: '#A9B0B6', color: '#EDEEEF'})
+                        }else {
+                            this.pageOption.page_list.push({name: i, bgc: '#FFFFFF', color: '#6D6F71'})
+                        }
+                    }
+                    this.pageOption.pageNum = value.data.totalPage;
+                    this.pageOption.now_page = this.now_page;
+                    this.pageOption.now_num = this.now_num;
+                    this.pageOption.totalRow =value.data.totalRecord;
+                }else {
+                    this.iquireTool.toast('error', value.msg)
+                }
+
+            })
+        },
+        getPageDate(data){
+            console.log(data);
         },
         // 选择报表类型
         selectInquireType(index){

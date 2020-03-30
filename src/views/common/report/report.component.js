@@ -160,6 +160,8 @@ export default {
             addSubmitReport: new mianModel.AddReport(),
             updateReport:  new mianModel.AddLocalReport(),
             detailReport:  new mianModel.AddLocalReport(),
+            //修改时需要的id
+            reportId: '',
             // 估价师总列表
             appraiserTotalList: [],
             // 二维码内容
@@ -232,6 +234,7 @@ export default {
                 ],
                 mandatorIdentityCard: [
                     { required: true, message: '请填写委托人信用代码', trigger: 'change' },
+                    { max: 18, min: 18, message: '号码不符合规范', trigger: 'change' }
                 ],
                 cost: [
                     { required: true, message: '请填写费用', trigger: 'change' },
@@ -263,6 +266,7 @@ export default {
         // 初始化列表
         initReportData(){
           this.reportSrv.getReportTableData({auditStatus: this.auditName, tableName: this.selectReportName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
+              console.log(value);
               this.pageOption.page_list = [];
                 if (value.code  === '1000') {
                     this.tableOption.content = value.data.contents;
@@ -272,19 +276,22 @@ export default {
                                 v.auditStatus = val.name
                             }
                         })
-                    })
-                }
-                for (let i = 1; i<= value.data.totalPage; i++) {
-                    if (i ===  this.now_page) {
-                        this.pageOption.page_list.push( {name: i, bgc: '#A9B0B6', color: '#EDEEEF'})
-                    }else {
-                        this.pageOption.page_list.push({name: i, bgc: '#FFFFFF', color: '#6D6F71'})
+                    });
+                    for (let i = 1; i<= value.data.totalPage; i++) {
+                        if (i ===  this.now_page) {
+                            this.pageOption.page_list.push( {name: i, bgc: '#A9B0B6', color: '#EDEEEF'})
+                        }else {
+                            this.pageOption.page_list.push({name: i, bgc: '#FFFFFF', color: '#6D6F71'})
+                        }
                     }
+                    this.pageOption.pageNum = value.data.totalPage;
+                    this.pageOption.now_page = this.now_page;
+                    this.pageOption.now_num = this.now_num;
+                    this.pageOption.totalRow =value.data.totalRecord;
+                }else {
+                    this.reportTool.toast('error', value.msg)
                 }
-                this.pageOption.pageNum = value.data.totalPage;
-                this.pageOption.now_page = this.now_page;
-                this.pageOption.now_num = this.now_num;
-                this.pageOption.totalRow =value.data.totalRecord;
+
             })
         },
         // 选择报表类型
@@ -387,14 +394,6 @@ export default {
                             this.getAddAppraiserLlist(this.updateReport.valuer1, this.addConfig.appraiserTwoList);
                         }
                     }
-                    // if (this.addConfig.appraiserOneList === []){
-                    //     this.reportTool.toast('info', '请先选择估价师1')
-                    // }else {
-                    //     console.log(23);
-                    //     this.getAddReveiwConfigInfo();
-                    // }
-                    // this.addConfig.appraiserOneList = [];
-                    // this.getAddAppraiserLlist(this.addReport.valuer2, this.addConfig.appraiserOneList);
                     break;
                 default:
                     break;
@@ -458,16 +457,25 @@ export default {
             }
         },
         // 二级审核人改变时
-        changeReviewerData(){
-            this.addConfig.projectManager = [];
-            this.addConfig.reviewerTwoList = [];
-            this.getAddReveiwAndProjectAutorInfo(0, this.addConfig.projectManager);
-            this.getAddReveiwAndProjectAutorInfo(3, this.addConfig.reviewerTwoList);
+        changeReviewerData(type){
+            if (type === 'add') {
+                this.addConfig.projectManager = [];
+                this.addConfig.reviewerTwoList = [];
+                console.log(this.addReport.valuer1);
+                this.getAddReveiwAndProjectAutorInfo(0, this.addConfig.projectManager, this.addReport.valuer1, this.addReport.valuer2 );
+                this.getAddReveiwAndProjectAutorInfo(3, this.addConfig.reviewerTwoList,  this.addReport.valuer1, this.addReport.valuer2 );
+            }else {
+                this.addConfig.projectManager = [];
+                this.addConfig.reviewerTwoList = [];
+                this.getAddReveiwAndProjectAutorInfo(0, this.addConfig.projectManager, this.updateReport.valuer1, this.updateReport.valuer2 );
+                this.getAddReveiwAndProjectAutorInfo(3, this.addConfig.reviewerTwoList,  this.updateReport.valuer1, this.updateReport.valuer2 );
+            }
+
+
         },
         // 查询估价师
         getAddAppraiserLlist(id, list){
             this.reportSrv.getReportAppraiserInfo({uuid: id}).then( v => {
-                console.log(v);
                 if (v.code === '1000') {
                     v.data.forEach(val => {
                         list.push({label: val.signedName, value: val.uuid})
@@ -482,7 +490,6 @@ export default {
             this.addConfig.reviewerOneList = [];
             if (type === 'add'){
                 this.reportSrv.getReviewerTowUser({uuidV1: this.addReport.valuer1, uuidV2: this.addReport.valuer2}).then(res => {
-                    console.log(res);
                     if (res.code === '1000'){
                         res.data.forEach(val => {
                             this.addConfig.reviewerOneList.push({label: val.realname, value: val.uuid})
@@ -493,7 +500,6 @@ export default {
                 })
             }else {
                 this.reportSrv.getReviewerTowUser({uuidV1: this.updateReport.valuer1, uuidV2: this.updateReport.valuer2}).then(res => {
-                   console.log(res);
                     if (res.code === '1000'){
                         res.data.forEach(val => {
                             this.addConfig.reviewerOneList.push({label: val.realname, value: val.uuid})
@@ -506,8 +512,8 @@ export default {
 
         },
        // 查询三级审核人或者项目负责人
-        getAddReveiwAndProjectAutorInfo(id, listData){
-           this.reportSrv.getReviewerTreeUser({uuid: id, uuidV1: this.addReport.valuer1, uuidV2: this.addReport.valuer2}).then(v=> {
+        getAddReveiwAndProjectAutorInfo(id, listData, uuid1, uuid2){
+           this.reportSrv.getReviewerTreeUser({uuid: id, uuidV1: uuid1, uuidV2: uuid2}).then(v=> {
                if(v.code === '1000') {
                    v.data.forEach(val => {
                        listData.push({label: val.signedName, value: val.signedNumber})
@@ -523,7 +529,9 @@ export default {
                    for (let key in this.addReport){
                        this.addSubmitReport[key] = this.addReport[key];
                    }
-                   this.addSubmitReport.mandatorName = this.addSubmitReport.mandatorName + this.addSubmitReport.sex;
+                   if (this.addSubmitReport.sex) {
+                       this.addSubmitReport.mandatorName = this.addSubmitReport.mandatorName + this.addSubmitReport.sex;
+                   }
                    this.addSubmitReport.valuationDate =  this.setTimeFomart(this.addSubmitReport.valuationDate);
                    this.addSubmitReport.valuationValidityBegin = this.setTimeFomart(this.addReport.valuationValidityBegin[0]);
                    this.addSubmitReport.valuationValidityEnd = this.setTimeFomart(this.addReport.valuationValidityBegin[1]);
@@ -541,7 +549,7 @@ export default {
                    this.reportSrv.addReport(this.addSubmitReport).then(value => {
                        if(value.code === '1000') {
                            this.addSubmitReport = new mianModel.AddReport();
-                           this.addReport = new mianModel.SelectReportType();
+                           this.addReport = new mianModel.AddLocalReport();
                            this.selRport =  new mianModel.SelectReportType();
                            for (let key in this.addConfig){
                                this.addConfig[key] = []
@@ -571,19 +579,22 @@ export default {
         },
         // 选择数据
         selectTableItem(data){
+            console.log(data);
             this.selectItem = data;
-            this.getAddAppraiserLlist(this.selectItem[0].valuer2, this.addConfig.appraiserOneList);
-            this.getAddAppraiserLlist(this.selectItem[0].valuer1, this.addConfig.appraiserTwoList);
 
-            this.getAddReveiwAndProjectAutorInfo(0, this.addConfig.projectManager);
-            this.getAddReveiwAndProjectAutorInfo(3, this.addConfig.reviewerTwoList);
         },
         // 现实修改弹窗
         showUpdateReportModel(){
             if (this.selectItem.length === 0){
                 this.reportTool.toast('error', '请选择需要修改得项');
             }else if (this.selectItem.length === 1){
-                console.log(this.selectItem);
+                this.selRport.reportType = this.selectItem[0].reportType;
+                this.reportId = this.selectItem[0].reportId;
+                this.getAddAppraiserLlist(this.selectItem[0].valuer2, this.addConfig.appraiserOneList);
+                this.getAddAppraiserLlist(this.selectItem[0].valuer1, this.addConfig.appraiserTwoList);
+
+                this.getAddReveiwAndProjectAutorInfo(0, this.addConfig.projectManager, this.selectItem[0].valuer1, this.selectItem[0].valuer2);
+                this.getAddReveiwAndProjectAutorInfo(3, this.addConfig.reviewerTwoList, this.selectItem[0].valuer1, this.selectItem[0].valuer2);
                 for (let keys in this.updateReport){
                     this.updateReport[keys] = this.selectItem[0][keys];
                 }
@@ -594,8 +605,6 @@ export default {
                     this.selectItem[0].valuationValidityBegin,
                     this.selectItem[0].valuationValidityEnd
                 ];
-                console.log(this.updateReport);
-                console.log(this.addConfig);
                 this.UpdateReportModel = true;
             }else {
                 this.reportTool.toast('error', '只能选择一项进行修改');
@@ -603,10 +612,56 @@ export default {
         },
        // 取消选择，关闭弹窗
         closeUpdateModel(){
+            this.selectItem = [];
+            this.addSubmitReport = new mianModel.AddReport();
+            this.updateReport = new mianModel.AddLocalReport();
+            this.selRport =  new mianModel.SelectReportType();
+            for (let key in this.addConfig){
+                this.addConfig[key] = []
+            }
             // 调用子组件得方法
             this.$refs.tables.clearSelect();
-            this.selectItem = [];
             this.UpdateReportModel = false;
+            this.addReportModel = false;
+        },
+       // 提交修改数据
+        updateReportInfo(name){
+            this.$refs[name].validate(valid => {
+                if (valid) {
+                    for (let key in this.updateReport){
+                        this.addSubmitReport[key] = this.updateReport[key];
+                    }
+                    if (this.addSubmitReport.sex) {
+                        this.addSubmitReport.mandatorName = this.addSubmitReport.mandatorName + this.addSubmitReport.sex;
+                    }
+                    // this.addSubmitReport.mandatorName = this.addSubmitReport.mandatorName + this.addSubmitReport.sex;
+                    this.addSubmitReport.valuationDate =  this.setTimeFomart(this.addSubmitReport.valuationDate);
+                    this.addSubmitReport.valuationValidityBegin = this.setTimeFomart(this.updateReport.valuationValidityBegin[0]);
+                    this.addSubmitReport.valuationValidityEnd = this.setTimeFomart(this.updateReport.valuationValidityBegin[1]);
+                    this.setValueToLable(this.addSubmitReport.auditor2Uuid, this.addConfig.reviewerOneList, (data) => {
+                        this.addSubmitReport.auditor2 = data;
+                    });
+                    this.setValueToLable(this.addSubmitReport.auditor3Number, this.addConfig.reviewerTwoList, (data) => {
+                        this.addSubmitReport.auditor3 = data;
+                    });
+                    this.setValueToLable(this.addSubmitReport.projectPrincipalNumber, this.addConfig.projectManager, (data) => {
+                        this.addSubmitReport.projectPrincipal = data;
+                    });
+                    this.addSubmitReport.reportType = this.selRport.reportType;
+                    this.addSubmitReport.reportId =  this.reportId;
+                    delete this.addSubmitReport.sex;
+                    console.log(this.addSubmitReport);
+                    this.reportSrv.updateReport(this.addSubmitReport).then(value => {
+                        if (value.code === '1000'){
+                            this.closeUpdateModel();
+                            this.initReportData();
+                            this.reportTool.toast('success', value.msg);
+                        }else {
+                            this.reportTool.toast('error', value.msg);
+                        }
+                    })
+                }
+            })
         },
 
        // 删除报告
@@ -636,12 +691,4 @@ export default {
         tables,
         QRCodes
     }
-
-//      login(){
-//           this.value.forEach(v => {
-//            let d = new Date(v)
-//           let youWant=d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-//            console.log(youWant)
-//           })
-
 }

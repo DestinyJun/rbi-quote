@@ -62,33 +62,6 @@ export default {
                         title: '类型',
                         key: 'signedTypeName',
                         align: 'center',
-                    },
-                    {
-                        title: '操作',
-                        key: 'action',
-                        width: 200,
-                        align: 'center',
-                        render: (h, params) => {
-                            return h('div', [
-                                h('Button', {
-                                    props: {
-                                        size: 'small',
-                                    },
-                                    style: {
-                                        fontSize: '12px',
-                                        width: '4vw',
-                                        background: '#3DA2F8',
-                                        color: '#DDEDFD',
-                                        border: 0
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.reviewPasswordClick(params.row.uuid)
-                                        }
-                                    }
-                                }, '密码重置')
-                            ]);
-                        }
                     }
                 ],
                 content: [],
@@ -161,7 +134,7 @@ export default {
                         console.log(this.singerConfig.signerUserList);
                         value.data.contents.forEach(v => {
                             // 值获取名字
-                           this.setValueToLable(v.sysCreateUser, this.singerConfig.signerUserList, (name) => {
+                           this.setValueToLable(v.signedLoginUser, this.singerConfig.signerUserList, (name) => {
                                v.sysCreateUser = name;
                            })
                         });
@@ -222,22 +195,8 @@ export default {
                       }else {
                           this.signerTool.toast('error', value.code);
                       }
-                      console.log();
                   })
                 }
-            })
-        },
-        reviewPasswordClick(data){
-            this.signerTool.setModal('confirm', '重置提醒', '确认要重置密码吗', () => {
-                this.signerSrv.resetUserPassword({uuid: data}).then(val => {
-                    console.log(val);
-                    if (val.code === '1000'){
-                        this.signerTool.toast('success', val.msg);
-                        this.initUserData();
-                    }else {
-                        this.signerTool.toast('error', val.msg);
-                    }
-                })
             })
         }
     },

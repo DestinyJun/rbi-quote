@@ -110,7 +110,21 @@
     }
     .review-paging {
       height: 6.8vh;
-
     }
+  }
+  /deep/ .ivu-modal-header {
+    background: #EDEEEE;
+    border-radius: 4px;
+  }
+  /deep/  .ivu-modal-footer {
+    background: #EDEEEE;
+    border-radius: 4px;
+  }
+  /deep/ .ivu-form-item-error-tip {
+    padding-top: 35px;
+  }
+  .effect {
+    border: 1px solid #ED4014;
+    border-radius: 4px
   }
 }

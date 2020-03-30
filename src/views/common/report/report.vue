@@ -206,7 +206,7 @@
 
       </Modal>
       <!-- 填报类型选择-->
-      <Modal v-model="addTypeReportModel" draggable scrollable :transfer="false"  :styles="{top: '250px'}">
+      <Modal v-model="addTypeReportModel" draggable scrollable :transfer="false"  :styles="{top: '250px'}" :closable="false">
         <p slot="header" style="color:#1C1C1C;text-align:left">
           <span>填报类型选择</span>
         </p>
@@ -229,7 +229,7 @@
         </div>
       </Modal>
       <!-- 填写报告信息 -->
-      <Modal v-model="addReportModel" draggable scrollable :transfer="false"  width="960" :styles="{top: '100px'}">
+      <Modal v-model="addReportModel" draggable scrollable :transfer="false"  width="960" :styles="{top: '100px'}" :closable="false">
         <p slot="header" style="color:#1C1C1C;text-align:left; width: 60vw">
           <span>填报信息填写</span>
         </p>
@@ -313,8 +313,8 @@
               <Col span="10">
                 <FormItem label="二级审核人" prop="auditor2Uuid" :label-width="100">
                   <Col span="22" style="text-align: left">
-                    <Select v-model="addReport.auditor2Uuid" @on-change="changeReviewerData">
-                      <Option v-for="item in addConfig.reviewerOneList" :value="item.value" :key="item.value" @on-change="addRoportSelectAutor('auditor2')">{{ item.label }}</Option>
+                    <Select v-model="addReport.auditor2Uuid" @on-change="changeReviewerData('add')">
+                      <Option v-for="item in addConfig.reviewerOneList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                     </Select>
                   </Col>
                 </FormItem>
@@ -323,7 +323,7 @@
                 <FormItem label="三级审核人" prop="auditor3Number" :label-width="100">
                   <Col span="22" style="text-align: left">
                     <Select v-model="addReport.auditor3Number" >
-                      <Option v-for="item in addConfig.reviewerTwoList" :value="item.value" :key="item.value" @on-change="addRoportSelectAutor('auditor3')">{{ item.label }}</Option>
+                      <Option v-for="item in addConfig.reviewerTwoList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                     </Select>
                   </Col>
                 </FormItem>
@@ -390,11 +390,11 @@
         </div>
         <div slot="footer" style="text-align: center">
           <Button style="background-color:#3DA2F8;color: #fff;width: 5vw" @click="addUploadReport('addReport')">上报</Button>
-          <Button style="background: #FFFFFF;color: #2E3235;width: 5vw"  @click="addReportModel = false">取消</Button>
+          <Button style="background: #FFFFFF;color: #2E3235;width: 5vw"  @click="closeUpdateModel">取消</Button>
         </div>
       </Modal>
       <!-- 修改报告信息 -->
-      <Modal v-model="UpdateReportModel" draggable scrollable :transfer="false"  width="960" :styles="{top: '100px'}">
+      <Modal v-model="UpdateReportModel" draggable scrollable :transfer="false"  width="960" :styles="{top: '100px'}" :closable="false">
         <p slot="header" style="color:#1C1C1C;text-align:left; width: 60vw">
           <span>填报信息填写</span>
         </p>
@@ -477,9 +477,9 @@
             <Row>
               <Col span="10">
                 <FormItem label="二级审核人" prop="auditor2Uuid" :label-width="100">
-                  <Col span="22" style="text-align: left">
-                    <Select v-model="updateReport.auditor2Uuid" @on-change="changeReviewerData">
-                      <Option v-for="item in addConfig.reviewerOneList" :value="item.value" :key="item.value" @on-change="addRoportSelectAutor('auditor2')">{{ item.label }}</Option>
+                  <Col span="22" style="text-align: left" @on-change="changeReviewerData('update')">
+                    <Select v-model="updateReport.auditor2Uuid">
+                      <Option v-for="item in addConfig.reviewerOneList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                     </Select>
                   </Col>
                 </FormItem>
@@ -488,7 +488,7 @@
                 <FormItem label="三级审核人" prop="auditor3Number" :label-width="100">
                   <Col span="22" style="text-align: left">
                     <Select v-model="updateReport.auditor3Number" >
-                      <Option v-for="item in addConfig.reviewerTwoList" :value="item.value" :key="item.value" @on-change="addRoportSelectAutor('auditor3')">{{ item.label }}</Option>
+                      <Option v-for="item in addConfig.reviewerTwoList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                     </Select>
                   </Col>
                 </FormItem>
@@ -554,7 +554,7 @@
           </Form>
         </div>
         <div slot="footer" style="text-align: center">
-          <Button style="background-color:#3DA2F8;color: #fff;width: 5vw" @click="addUploadReport('updateReport')">上报</Button>
+          <Button style="background-color:#3DA2F8;color: #fff;width: 5vw" @click="updateReportInfo('updateReport')">确认</Button>
           <Button style="background: #FFFFFF;color: #2E3235;width: 5vw"  @click="closeUpdateModel">取消</Button>
         </div>
       </Modal>

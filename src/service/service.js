@@ -42,7 +42,40 @@ export default class Server {
     delReport(data){
         return clientHttp.post('/report/deleteByReportId', data)
     }
+
+
+
+
+
+
+
     //TODO 报告审核模块
+
+    // 二级审核模块
+    getReportTwoAuditTypeList(data){
+        return clientHttp.post('/report/findByPageByAuditStatus2', data)
+    }
+    // 审核通过
+    reviewReportPass(data){
+        return clientHttp.post('/report/updateByReportIdYes', data)
+    }
+    // 审核不通过
+    reviewReportNoPass(data){
+        return clientHttp.post('/report/updateByReportIdNo', data)
+    }
+
+
+
+
+
+    // TODO 项目查询模块
+    queryMyReportPageData(data){
+        return clientHttp.post('/report/findByPageByAuditStatus', data)
+    }
+
+
+
+
 
     //TODO 用户权限模块
    //获取所有的角色权限
@@ -69,6 +102,8 @@ export default class Server {
     resetUserPassword(data){
         return clientHttp.post('/user/resetPassword', data)
     }
+
+
 
    //TODO 签字人员
 
