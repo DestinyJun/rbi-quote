@@ -11,15 +11,10 @@ export default {
                 title: '报告类型',
                 centent: []
             },
-            dropData2: {
+            // 报告状态列表
+            reportStatusList: {
                 title: '审核状态',
-                centent: [
-                    {name: '已完成', value: '1',  bgc: '#FFFFFF', color: '#5D6063'},
-                    {name: '未收费', value: '1' ,  bgc: '#EFEFEF',  color: '#C2C2C2'},
-                    {name: '未二级审核', value: '1',  bgc: '#EFEFEF',  color: '#C2C2C2'},
-                    {name: '未三级审核', value: '1',  bgc: '#EFEFEF',  color: '#C2C2C2'},
-                    {name: '审核未通过', value: '1',  bgc: '#EFEFEF',  color: '#C2C2C2'},
-                ]
+                centent: []
             },
             // 表格数据
             tableOption :{
@@ -94,15 +89,15 @@ export default {
                                     style: {
                                         fontSize: '12px',
                                         width: '4vw',
-                                        background: (params.row.auditStatus === '未二级审核')? '#3DA2F8': "#C9D0D6",
+                                        background: (params.row.auditStatus === '未三级审核')? '#3DA2F8': "#C9D0D6",
                                         color: '#fff'
                                     },
                                     attrs: {
-                                        disabled: (params.row.auditStatus !== '未二级审核')
+                                        disabled: (params.row.auditStatus !== '未三级审核')
                                     },
                                     on: {
                                         click: () => {
-                                            this.reviewThrClick(params.index)
+                                            this.reviewThrClick(params.row)
                                         }
                                     }
                                 }, '审核')
@@ -128,6 +123,8 @@ export default {
             searchreviewData: '',
             // 搜索数据
             searchThrData: '',
+            // 估价师列表
+            appraisalList: [],
             // 模态框数据
             reviewDetailModal: false,
             // 工具类
@@ -162,32 +159,63 @@ export default {
 
     },
     created(){
-        this.reviewThreeSrv.getReportTypeList({}).then(value => {
-            if (value.code === '1000') {
-                value.data.forEach((v, index) => {
-                    if (index === 1) {
-                        this.reportTypeList.centent.push({name: v.tempName, value: '1', bgc: '#FFFFFF',  color: '#5D6063'});
-                        this.selectReportName = v.tempName;
-                    }else{
-                        this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',  color: '#C2C2C2'})
-                    }
-                });
-                this.initReviewThreeData();
-            }else {
-                this.reviewThreeTool.toast('error', value.msg)
-            }
+        Promise.resolve(this.getReportType()).then(() => {
+            return Promise.resolve(this.getReportStatus())
+
+        }).then(() => {
+            Promise.resolve(this.initReviewThreeData())
         });
+        this.getAddAppraiserLlist('', this.appraisalList)
 
     },
     methods: {
+        // 获取类型
+        getReportType(){
+            return new Promise((resolve) => {
+                this.reviewThreeSrv.getReportTypeList({}).then(value => {
+                    console.log(value);
+                    if (value.code === '1000') {
+                        value.data.forEach((v, index) => {
+                            if (index === 1) {
+                                this.reportTypeList.centent.push({name: v.tempName, value: '1', bgc: '#FFFFFF',  color: '#5D6063'});
+                                this.selectReportName = v.tempName;
+                            }else{
+                                this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',  color: '#C2C2C2'})
+                            }
+                        });
+                        resolve();
+                    }
+                });
+            })
+        },
+        // 获取状态
+        getReportStatus(){
+            return new Promise((resolve) => {
+                this.reviewThreeSrv.getReportStatusList({}).then(value => {
+                    console.log(value);
+                    if (value.code === '1000') {
+                        value.data.forEach((v, index) => {
+                            if (index === 0) {
+                                this.reportStatusList.centent.push({name: v.statusName, value: v.statusCode, bgc: '#FFFFFF',  color: '#5D6063'});
+                                this.auditName = v.statusCode;
+                            }else{
+                                this.reportStatusList.centent.push({name: v.statusName, value:  v.statusCode, bgc: '#EFEFEF',  color: '#C2C2C2'})
+                            }
+                        });
+                        resolve()
+                    }
+                });
+            })
+        },
+        // 初始化列表
         initReviewThreeData(){
-            this.reviewThreeSrv.getReportTwoAuditTypeList({auditStatus: this.auditName, tableName: this.selectReportName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
+            this.reviewThreeSrv.getReportThreeAuditTypeList({auditStatus: this.auditName, tableName: this.selectReportName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
                 console.log(value);
                 this.pageOption.page_list = [];
                 if (value.code  === '1000') {
                     this.tableOption.content = value.data.contents;
                     this.tableOption.content.forEach(v=> {
-                        this.dropData2.centent.forEach(val => {
+                        this.reportStatusList.centent.forEach(val => {
                             if (val.value === v.auditStatus) {
                                 v.auditStatus = val.name
                             }
@@ -223,31 +251,64 @@ export default {
                 this.reportTypeList.centent[index].color = '#5D6063';
                 this.reportTypeList.centent[index].value = '1';
                 this.selectReportName = this.reportTypeList.centent[index].name;
+                this.now_page = 1;
                 this.initReviewThreeData();
             }
 
         },
         selectreviewReview(index){
-            this.dropData2.centent.forEach(val => {
+            this.reportStatusList.centent.forEach(val => {
                     val.bgc = '#EFEFEF';
                     val.color = '#C2C2C2';
                 }
             );
-            this.dropData2.centent[index].bgc = '#FFFFFF';
-            this.dropData2.centent[index].color = '#5D6063';
-            this.auditName = this.dropData2.centent[index].value;
+            this.reportStatusList.centent[index].bgc = '#FFFFFF';
+            this.reportStatusList.centent[index].color = '#5D6063';
+            this.auditName = this.reportStatusList.centent[index].value;
+            this.now_page = 1;
             this.initReviewThreeData();
+
+        },
+        // 查询估价师
+        getAddAppraiserLlist(id, list){
+            this.reportSrv.getReportAppraiserInfo({uuid: id}).then( v => {
+                if (v.code === '1000') {
+                    v.data.forEach(val => {
+                        list.push({label: val.signedName, value: val.uuid})
+                    });
+                }else {
+                    this.reportTool.toast('error', v.msg)
+                }
+            });
         },
         // 审核
-        reviewClick(data){
+        reviewThrClick(data){
+            console.log(data);
             this.reportId = data.reportId;
             for (let key in this.detailThreeReport){
                 this.detailThreeReport[key] = data[key]
             }
+            this.detailReport.auditor2Uuid = data.auditor2;
+            this.detailReport.auditor3Number = data.auditor3;
+            this.detailReport.projectPrincipalNumber = data.projectPrincipal;
+            this.appraisalList.forEach(val => {
+                if (this.detailReport.valuer1 === val.value){
+                    this.detailReport.valuer1 = val.label;
+                }
+                if (this.detailReport.valuer2 === val.value){
+                    this.detailReport.valuer2 = val.label;
+                }
+            })
             this.reviewDetailModal = true;
         },
         getPageDate(data){
-            console.log(data);
+            this.now_num = data.num_Size;
+            if (data.label === 'row'){
+                this.now_page = 1;
+            }else {
+                this.now_page = data.nowPage;
+            }
+            this.initReviewThreeData();
         },
         searchData(){
             console.log(this.searchData);
@@ -255,21 +316,23 @@ export default {
 
         // 审核通过
         reviewPasse(){
-            this.reviewThreeSrv.reviewReportPass({reportId: this.reportId}).then(val => {
-                if (val.code === '1000'){
-                    this.reviewThreeTool.toast('success', val.msg);
-                    this.closeModelAndClearData();
-                    this.initReviewData()
-                }else {
-                    this.reviewThreeTool.toast('error', val.msg);
-                }
+            this.reviewThreeTool.setRemind('审核', '审核通过', () => {
+                this.reviewThreeSrv.reviewReportPass({reportId: this.reportId}).then(val => {
+                    if (val.code === '1000'){
+                        this.reviewThreeTool.toast('success', val.msg);
+                        this.closeModelAndClearData();
+                        this.initReviewThreeData()
+                    }else {
+                        this.reviewThreeTool.toast('error', val.msg);
+                    }
+                })
             })
         },
         // 显示审核不通过弹窗
         reviewNoPasse(){
             console.log(234);
             this.reviewDetailModal = false;
-            this.reviewNoThreeModal = true;
+            this.reviewThreeNoModal = true;
         },
         // 选择不通过的理由
         changeReasonType(value){
@@ -322,7 +385,7 @@ export default {
                 if (val.code === '1000'){
                     this.reviewThreeTool.toast('success', val.msg);
                     this.closeModelAndClearData();
-                    this.initReviewData()
+                    this.initReviewThreeData()
                 }else {
                     this.reviewThreeTool.toast('error', val.msg);
                 }

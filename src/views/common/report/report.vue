@@ -18,8 +18,8 @@
        </div>
       <!-- 审核状态-->
       <div>
-        <span>{{dropData2.title}}：</span>
-        <span v-for="(item_text, index1) in dropData2.centent" :key="index1" :style="{'background': item_text.bgc,  'color':item_text.color}" @click="selectReportReview(index1)">{{item_text.name}}</span>
+        <span>{{reportStatusList.title}}：</span>
+        <span v-for="(item_text, index1) in reportStatusList.centent" :key="index1" :style="{'background': item_text.bgc,  'color':item_text.color}" @click="selectReportReview(index1)">{{item_text.name}}</span>
       </div>
     </div>
     <div class="report-centent">
@@ -174,7 +174,7 @@
                   <span>估价委托人身份证/信用代码：</span>
                 </Col>
                 <Col span="3" style="line-height: 3vh">
-                  <span style="display: inline-block;width: 320%;height: 3vh;border-radius: 3px;text-align: left">{{detailReport.mandatorIdentityCard}}</span>
+                  <span style="display: inline-block;width: 320%;height: 3vh;border-radius: 3px;text-align: left">...{{detailReport.mandatorIdentityCard.slice(detailReport.mandatorIdentityCard.length -5, detailReport.mandatorIdentityCard.length)}}</span>
                 </Col>
               </Col>
             </Row>
@@ -260,7 +260,10 @@
               <Col span="10">
                 <FormItem label="估价目的" prop="valuationPurpose" :label-width="100">
                   <Col span="22">
-                    <Input v-model="addReport.valuationPurpose" placeholder="请输入估价目的" style="display: inline-block"></Input>
+<!--                    <Input v-model="addReport.valuationPurpose" placeholder="请输入估价目的" style="display: inline-block"></Input>-->
+                    <Select v-model="addReport.valuationPurpose" style="text-align: left">
+                      <Option v-for="item in addConfig.purposeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                    </Select>
                   </Col>
                 </FormItem>
               </Col>
@@ -358,15 +361,15 @@
             <Row>
               <Col span="12">
                 <FormItem label="估价委托人姓名(取姓氏)" prop="mandatorName" :label-width="184">
-                  <Col span="10">
+                  <Col span="20">
                     <Input v-model="addReport.mandatorName" placeholder="请输入估价委托人姓名.."></Input>
                   </Col>
-                  <Col span="10">
-                    <RadioGroup v-model="addReport.sex">
-                      <Radio label="先生">先生</Radio>
-                      <Radio label="女士">女士</Radio>
-                    </RadioGroup>
-                  </Col>
+<!--                  <Col span="10">-->
+<!--                    <RadioGroup v-model="addReport.sex">-->
+<!--                      <Radio label="先生">先生</Radio>-->
+<!--                      <Radio label="女士">女士</Radio>-->
+<!--                    </RadioGroup>-->
+<!--                  </Col>-->
                 </FormItem>
               </Col>
               <Col span="12" >
@@ -425,7 +428,10 @@
               <Col span="10">
                 <FormItem label="估价目的" prop="valuationPurpose" :label-width="100">
                   <Col span="22">
-                    <Input v-model="updateReport.valuationPurpose" placeholder="请输入估价目的" style="display: inline-block"></Input>
+                    <Select v-model="updateReport.valuationPurpose" style="text-align: left">
+                      <Option v-for="item in addConfig.purposeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                    </Select>
+<!--                    <Input v-model="updateReport.valuationPurpose" placeholder="请输入估价目的" style="display: inline-block"></Input>-->
                   </Col>
                 </FormItem>
               </Col>
@@ -523,15 +529,15 @@
             <Row>
               <Col span="12">
                 <FormItem label="估价委托人姓名(取姓氏)" prop="mandatorName" :label-width="184">
-                  <Col span="10">
+                  <Col span="20">
                     <Input v-model="updateReport.mandatorName" placeholder="请输入估价委托人姓名.."></Input>
                   </Col>
-                  <Col span="10">
-                    <RadioGroup v-model="updateReport.sex">
-                      <Radio label="先生">先生</Radio>
-                      <Radio label="女士">女士</Radio>
-                    </RadioGroup>
-                  </Col>
+<!--                  <Col span="10">-->
+<!--                    <RadioGroup v-model="updateReport.sex">-->
+<!--                      <Radio label="先生">先生</Radio>-->
+<!--                      <Radio label="女士">女士</Radio>-->
+<!--                    </RadioGroup>-->
+<!--                  </Col>-->
                 </FormItem>
               </Col>
               <Col span="12" >

@@ -51,7 +51,7 @@ class AddLocalReport {
     mandatorName = ''; //委托人
     mandatorIdentityCard = ''; //	委托人信用代码
     excerpt = ''; //摘录
-    sex = ''; // 性别
+    // sex = ''; // 性别
 }
 // export default SelectReportType
 

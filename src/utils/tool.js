@@ -65,5 +65,45 @@ class ToolUtil {
                     });
         }
     }
+    setRemind(title, message, callback){
+        Modal.confirm({
+            render: (h) => {
+                return h('div', [
+                    h('div', [
+                        h('span', {
+                            style: {
+                                color: '#000',
+                                fontSize: '18px',
+                                display: 'block',
+                                textAlign: 'center',
+                                marginBottom: '3vh'
+                            }
+                        },`${title}提醒`)
+                    ]),
+                    h('div', [
+                        h('Icon', {
+                            attrs: {
+                                type: 'ios-alert'
+                            },
+                            style: {
+                                color: '#FF9900',
+                                fontSize: '16px',
+                                marginRight: '4px'
+                            }
+                        }),
+                        h('span', {
+                            style: {
+                                color: '#000',
+                                fontSize: '16px'
+                            }
+                        },`您确定要${message}吗?`),
+                    ]),
+                ])
+            },
+            onOk: () => {
+                callback()
+            },
+        })
+    }
 }
 export default ToolUtil

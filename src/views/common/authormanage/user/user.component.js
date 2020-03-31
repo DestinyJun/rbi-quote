@@ -254,7 +254,7 @@ export default {
             if (this.selectItem.length === 0){
                 this.userTool.toast('error', '请选择需要删除得项');
             }else if (this.selectItem.length === 1) {
-                this.userTool.setModal('confirm', '删除提醒', '确认要删除吗', () => {
+                this.userTool.setRemind('删除', '删除', ()=>{
                     this.userSrv.delUserInfo({uuid: this.selectItem[0].uuid}).then(val => {
                         if (val.code === '1000'){
                             this.$refs.tables.clearSelect();
@@ -265,7 +265,7 @@ export default {
                             this.userTool.toast('error', val.msg);
                         }
                     })
-                })
+                });
             }else {
                 this.userTool.toast('error', '只能选择一项进行删除');
             }

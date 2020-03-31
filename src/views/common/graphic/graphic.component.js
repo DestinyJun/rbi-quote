@@ -1,11 +1,18 @@
 import pie from '../../../components/echarts/pie'
 import bar from '../../../components/echarts/bar'
+import Server from '../../../service/service'
+import Tool from '../../../utils/tool'
 export default {
     name: 'graphic',
     data(){
         return {
+            // 选择项目负责人
             selectAutor: '',
             autorList: [],
+            // 选择报告类型
+            reportType:'',
+            reportTypeList: [],
+
             searchGraphicData: '',
             dataPiefir:{
                 listData:[
@@ -44,12 +51,36 @@ export default {
                     ],
                 colorList: ['#51AAF6',"#51AAF6","#51AAF6","#70CDDA","#51AAF6","#51AAF6","#51AAF6","#51AAF6","#51AAF6","#51AAF6","#51AAF6","#51AAF6"],
                 min: 40
-            }
+            },
+            graphicSrv: new Server(),
+            graphicTool: new Tool(),
         }
     },
+    created() {
+        this.getProjectMangerList();
+    },
     methods: {
+        // 获取项目负责人
+        getProjectMangerList(){
+            this.graphicSrv.getProjectManager({}).then(res => {
+                if (res.code === '1000'){
+                    res.data.principal.forEach(val => {
+                        this.autorList.push({label: val.projectPrincipal, value: val.projectPrincipalUuid})
+                    });
+                    res.data.template.forEach(val => {
+                        this.reportTypeList.push({label: val.tempName, value: val.uuid})
+                    });
+                    console.log(this.reportTypeList);
+                }else {
+                    this.graphicTool.toast('error', res.msg)
+                }
+            })
+        },
         changeAutor(){
             console.log(this.selectAutor);
+        },
+        changeReportType(){
+            console.log(123);
         },
         searchData(){}
     },

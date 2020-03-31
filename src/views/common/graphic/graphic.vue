@@ -36,6 +36,12 @@
             <div style="text-align: left;padding: 2vh 1vw;font-size: 18px;font-weight: 600;position: absolute">
               项目进度占比统计
             </div>
+            <div style="text-align: left;padding: 2vh 1vw;position: absolute;right: 3vh;z-index: 9999">
+              <span>报告类型：</span>
+              <Select v-model="reportType" style="width:200px" @on-change="changeReportType">
+                <Option v-for="item in reportTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              </Select>
+            </div>
             <pie :data="dataPiesec"></pie>
           </div>
         </div>
@@ -43,6 +49,7 @@
           <div style="text-align: left;padding: 4vh 1vw;font-size: 22px;font-weight: 600;">
             近一年各月项目总数统计
           </div>
+
           <div style="z-index: 9999;text-align: right;margin-right: 2vw">
             <span style="color: #000">
               选择年份：

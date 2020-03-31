@@ -50,8 +50,8 @@
        <!-- 审核状态-->
        <div style="display: flex; justify-content: space-between">
          <div >
-           <span>{{dropData2.title}}：</span>
-           <span v-for="(item_text, index2) in dropData2.centent" :key="index2" :style="{'background': item_text.bgc,  'color':item_text.color}" @click="selectInquireReview(index2)">{{item_text.name}}</span>
+           <span>{{reportStatusList.title}}：</span>
+           <span v-for="(item_text, index2) in reportStatusList.centent" :key="index2" :style="{'background': item_text.bgc,  'color':item_text.color}" @click="selectInquireReview(index2)">{{item_text.name}}</span>
            <label style="margin-left: 2vw">
              时间范围：
              <DatePicker type="daterange" placement="bottom-end" placeholder="选择日期" style="width: 200px"></DatePicker>

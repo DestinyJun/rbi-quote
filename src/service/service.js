@@ -14,6 +14,10 @@ export default class Server {
     getReportTypeList(data){
         return clientHttp.post('/systemplate/findAll', data)
     }
+    //获取报告类型
+    getReportStatusList(data){
+        return clientHttp.post('/report/allStatus', data)
+    }
     // 获取分页数据信息
     getReportTableData(data){
         return clientHttp.post('/report/findByPageByAuditStatus', data)
@@ -21,6 +25,10 @@ export default class Server {
     // 填报的估价师信息
     getReportAppraiserInfo(data){
         return clientHttp.post('/singedUser/findByUuid', data)
+    }
+    // 查询估价目的
+    getReportPurposeOfValuation(data){
+        return clientHttp.post('/findValuationPurpose', data)
     }
     // 二级审核人查询
     getReviewerTowUser(data){
@@ -47,8 +55,6 @@ export default class Server {
 
 
 
-
-
     //TODO 报告审核模块
 
     // 二级审核模块
@@ -64,6 +70,10 @@ export default class Server {
         return clientHttp.post('/report/updateByReportIdNo', data)
     }
 
+    // 三级级审核模块
+    getReportThreeAuditTypeList(data){
+        return clientHttp.post('/report/findByPageByAuditStatus3', data)
+    }
 
 
 
@@ -75,7 +85,11 @@ export default class Server {
 
 
 
-
+    // TODO 图像统计
+    // 获取项目负人
+    getProjectManager(data){
+        return clientHttp.post('/statistics/principal', data)
+    }
 
     //TODO 用户权限模块
    //获取所有的角色权限

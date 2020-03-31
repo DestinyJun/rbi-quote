@@ -10,16 +10,10 @@ export default {
                 title: '报告类型',
                 centent: []
             },
-            dropData2: {
+            // 报告状态列表
+            reportStatusList: {
                 title: '审核状态',
-                centent: [
-                    {name: '全部', value: '1',  bgc: '#EFEFEF',  color: '#C2C2C2'},
-                    {name: '已完成', value: '1',  bgc: '#FFFFFF', color: '#5D6063'},
-                    {name: '未收费', value: '1' ,  bgc: '#EFEFEF',  color: '#C2C2C2'},
-                    {name: '未二级审核', value: '1',  bgc: '#EFEFEF',  color: '#C2C2C2'},
-                    {name: '未三级审核', value: '1',  bgc: '#EFEFEF',  color: '#C2C2C2'},
-                    {name: '审核未通过', value: '1',  bgc: '#EFEFEF',  color: '#C2C2C2'},
-                ]
+                centent: []
             },
             // 表格数据
             tableOption :{
@@ -32,42 +26,42 @@ export default {
                     },
                     {
                         title: '报告编号',
-                        key: 'name',
+                        key: 'reportId',
                         align: 'left',
                         width: 180,
                     },
                     {
                         title: '报告类型',
-                        key: 'type',
+                        key: 'reportType',
                         align: 'center',
                         width: 180,
                     },
                     {
                         title: '审核状态',
-                        key: 'status',
+                        key: 'auditStatus',
                         align: 'center',
                         width: 180,
                     },
                     {
                         title: '估价委托人',
-                        key: 'autor',
+                        key: 'mandatorName',
                         align: 'center',
                         width: 180,
                     },
                     {
                         title: '估价对象',
-                        key: 'address',
+                        key: 'valuationObject',
                         align: 'center',
                     },
                     {
                         title: '项目负责人',
-                        key: 'persion',
+                        key: 'projectPrincipal',
                         align: 'center',
                         width: 140,
                     },
                     {
                         title: '估价结果',
-                        key: 'result',
+                        key: 'valuationResult',
                         align: 'right',
                         width: 140,
                         render: (h, params) => {
@@ -180,23 +174,52 @@ export default {
         }
     },
     created(){
-        this.iquireSrv.getReportTypeList({}).then(value => {
-            if (value.code === '1000') {
-                value.data.forEach((v, index) => {
-                    if (index === 1) {
-                        this.reportTypeList.centent.push({name: v.tempName, value: '1', bgc: '#FFFFFF',  color: '#5D6063'});
-                        this.selectReportName = v.tempName;
-                    }else{
-                        this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',  color: '#C2C2C2'})
-                    }
-                });
-                this.initMyReportData();
-            }else {
-                this.iquireTool.toast('error', value.msg)
-            }
+        Promise.resolve(this.getReportType()).then(() => {
+            return Promise.resolve(this.getReportStatus())
+
+        }).then(() => {
+            Promise.resolve(this.initMyReportData())
         });
     },
     methods: {
+        // 获取类型
+        getReportType(){
+            return new Promise((resolve) => {
+                this.iquireSrv.getReportTypeList({}).then(value => {
+                    console.log(value);
+                    if (value.code === '1000') {
+                        value.data.forEach((v, index) => {
+                            if (index === 1) {
+                                this.reportTypeList.centent.push({name: v.tempName, value: '1', bgc: '#FFFFFF',  color: '#5D6063'});
+                                this.selectReportName = v.tempName;
+                            }else{
+                                this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',  color: '#C2C2C2'})
+                            }
+                        });
+                        resolve();
+                    }
+                });
+            })
+        },
+        // 获取状态
+        getReportStatus(){
+            return new Promise((resolve) => {
+                this.iquireSrv.getReportStatusList({}).then(value => {
+                    console.log(value);
+                    if (value.code === '1000') {
+                        value.data.forEach((v, index) => {
+                            if (index === 0) {
+                                this.reportStatusList.centent.push({name: v.statusName, value: v.statusCode, bgc: '#FFFFFF',  color: '#5D6063'});
+                                this.auditName = v.statusCode;
+                            }else{
+                                this.reportStatusList.centent.push({name: v.statusName, value:  v.statusCode, bgc: '#EFEFEF',  color: '#C2C2C2'})
+                            }
+                        });
+                        resolve()
+                    }
+                });
+            })
+        },
         // 初始化列表
         initMyReportData(){
             this.iquireSrv.queryMyReportPageData({auditStatus: this.auditName, tableName: this.selectReportName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
@@ -205,8 +228,8 @@ export default {
                 if (value.code  === '1000') {
                     this.tableOption.content = value.data.contents;
                     this.tableOption.content.forEach(v=> {
-                        this.dropData2.centent.forEach(val => {
-                            if (val.value === v.auditStatus) {
+                        this.reportStatusList.centent.forEach(val => {
+                            if (val.value === v.auditStatus.toString()) {
                                 v.auditStatus = val.name
                             }
                         })
@@ -228,28 +251,43 @@ export default {
 
             })
         },
+        // 获取当前页数据
         getPageDate(data){
-            console.log(data);
+            this.now_num = data.num_Size;
+            if (data.label === 'row'){
+                this.now_page = 1;
+            }else {
+                this.now_page = data.nowPage;
+            }
+            this.initMyReportData();
         },
         // 选择报表类型
         selectInquireType(index){
-            this.dropData.centent.forEach(val => {
-                    val.bgc = '#EFEFEF';
-                    val.color = '#C2C2C2';
-                }
-            );
-            this.dropData.centent[index].bgc = '#FFFFFF';
-            this.dropData.centent[index].color = '#5D6063';
+            if (this.selectReportName !== this.reportTypeList.centent[index].name){
+                this.reportTypeList.centent.forEach(val => {
+                        val.bgc = '#EFEFEF';
+                        val.color = '#C2C2C2';
+                        val.value = '0';
+                    }
+                );
+                this.reportTypeList.centent[index].bgc = '#FFFFFF';
+                this.reportTypeList.centent[index].color = '#5D6063';
+                this.reportTypeList.centent[index].value = '1';
+                this.selectReportName = this.reportTypeList.centent[index].name;
+                this.initMyReportData();
+            }
         },
         // 选择审核状态
         selectInquireReview(index){
-            this.dropData2.centent.forEach(val => {
+            this.reportStatusList.centent.forEach(val => {
                     val.bgc = '#EFEFEF';
                     val.color = '#C2C2C2';
                 }
             );
-            this.dropData2.centent[index].bgc = '#FFFFFF';
-            this.dropData2.centent[index].color = '#5D6063';
+            this.reportStatusList.centent[index].bgc = '#FFFFFF';
+            this.reportStatusList.centent[index].color = '#5D6063';
+            this.auditName = this.reportStatusList.centent[index].value;
+            this.initMyReportData();
         },
         searchData(){
             console.log(this.searchInquireData);

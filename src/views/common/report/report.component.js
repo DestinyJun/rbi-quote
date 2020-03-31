@@ -14,15 +14,9 @@ export default {
                     centent: []
              },
             // 报告状态列表
-            dropData2: {
+            reportStatusList: {
                 title: '审核状态',
-                centent: [
-                    {name: '已完成', value: 4,  bgc: '#FFFFFF', color: '#5D6063'},
-                    {name: '未收费', value: 3 ,  bgc: '#EFEFEF',  color: '#C2C2C2'},
-                    {name: '未二级审核', value: 0,  bgc: '#EFEFEF',  color: '#C2C2C2'},
-                    {name: '未三级审核', value: 2,  bgc: '#EFEFEF',  color: '#C2C2C2'},
-                    {name: '审核未通过', value: 1,  bgc: '#EFEFEF',  color: '#C2C2C2'},
-                ]
+                centent: []
             },
             searchData: '',
             selectItem: [], // 选择的数据
@@ -37,7 +31,7 @@ export default {
             // 分页数据
             now_page: 1,
             now_num: 10,
-            auditName: 4,
+            auditName: '',
             selectReportName: '',
             // 表格数据
             tableOption :{
@@ -175,7 +169,8 @@ export default {
                 appraiserTwoList: [],
                 reviewerOneList:  [],
                 reviewerTwoList:  [],
-                projectManager:  []
+                projectManager:  [],
+                purposeList: []
             },
             // 报告选择的规则
             ruleValidate:{
@@ -247,22 +242,53 @@ export default {
         }
     },
     created(){
-        this.reportSrv.getReportTypeList({}).then(value => {
-            if (value.code === '1000') {
-                value.data.forEach((v, index) => {
-                    if (index === 1) {
-                        this.reportTypeList.centent.push({name: v.tempName, value: '1', bgc: '#FFFFFF',  color: '#5D6063'});
-                        this.selectReportName = v.tempName;
-                    }else{
-                        this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',  color: '#C2C2C2'})
-                    }
-                });
-                this.initReportData();
-            }
+        Promise.resolve(this.getReportType()).then(() => {
+            return Promise.resolve(this.getReportStatus())
+
+        }).then(() => {
+            Promise.resolve(this.initReportData())
         });
         this.getAddAppraiserLlist('', this.appraiserTotalList);
     },
     methods: {
+        // 获取类型
+        getReportType(){
+           return new Promise((resolve) => {
+               this.reportSrv.getReportTypeList({}).then(value => {
+                   console.log(value);
+                   if (value.code === '1000') {
+                       value.data.forEach((v, index) => {
+                           if (index === 1) {
+                               this.reportTypeList.centent.push({name: v.tempName, value: '1', bgc: '#FFFFFF',  color: '#5D6063'});
+                               this.selectReportName = v.tempName;
+                           }else{
+                               this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',  color: '#C2C2C2'})
+                           }
+                       });
+                       resolve();
+                   }
+               });
+           })
+        },
+        // 获取状态
+        getReportStatus(){
+           return new Promise((resolve) => {
+               this.reportSrv.getReportStatusList({}).then(value => {
+                   console.log(value);
+                   if (value.code === '1000') {
+                       value.data.forEach((v, index) => {
+                           if (index === 0) {
+                               this.reportStatusList.centent.push({name: v.statusName, value: v.statusCode, bgc: '#FFFFFF',  color: '#5D6063'});
+                               this.auditName = v.statusCode;
+                           }else{
+                               this.reportStatusList.centent.push({name: v.statusName, value:  v.statusCode, bgc: '#EFEFEF',  color: '#C2C2C2'})
+                           }
+                       });
+                       resolve()
+                   }
+               });
+           })
+        },
         // 初始化列表
         initReportData(){
           this.reportSrv.getReportTableData({auditStatus: this.auditName, tableName: this.selectReportName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
@@ -271,7 +297,7 @@ export default {
                 if (value.code  === '1000') {
                     this.tableOption.content = value.data.contents;
                     this.tableOption.content.forEach(v=> {
-                        this.dropData2.centent.forEach(val => {
+                        this.reportStatusList.centent.forEach(val => {
                             if (val.value === v.auditStatus) {
                                 v.auditStatus = val.name
                             }
@@ -313,14 +339,14 @@ export default {
         },
         // 选择审核状态
         selectReportReview(index){
-            this.dropData2.centent.forEach(val => {
+            this.reportStatusList.centent.forEach(val => {
                     val.bgc = '#EFEFEF';
                     val.color = '#C2C2C2';
                 }
             );
-            this.dropData2.centent[index].bgc = '#FFFFFF';
-            this.dropData2.centent[index].color = '#5D6063';
-            this.auditName = this.dropData2.centent[index].value;
+            this.reportStatusList.centent[index].bgc = '#FFFFFF';
+            this.reportStatusList.centent[index].color = '#5D6063';
+            this.auditName = this.reportStatusList.centent[index].value;
             this.initReportData();
         },
         // 搜索事件
@@ -360,8 +386,26 @@ export default {
         },
         // 显示填报选择弹窗
         showAddRepotrt(){
+            // 查询估价目的
+            this.getReportPurpose();
             this.addTypeReportModel = true;
+
             // this.addReportModel = true;
+        },
+        // 获取估价目的的列表
+        getReportPurpose(){
+            // 查询估价目的
+            this.reportSrv.getReportPurposeOfValuation({}).then(res => {
+                // console.log(res);
+                if (res.code === '1000') {
+                    res.data.forEach(val => {
+                        this.addConfig.purposeList.push({label: val.valuationPurpose, value: val.valuationPurpose})
+                    })
+
+                }else {
+                    this.reportTool.toast('error', res.msg)
+                }
+            });
         },
         // 确认选择报告类型
         selectReport(name) {
@@ -529,9 +573,9 @@ export default {
                    for (let key in this.addReport){
                        this.addSubmitReport[key] = this.addReport[key];
                    }
-                   if (this.addSubmitReport.sex) {
-                       this.addSubmitReport.mandatorName = this.addSubmitReport.mandatorName + this.addSubmitReport.sex;
-                   }
+                   // if (this.addSubmitReport.sex) {
+                   //     this.addSubmitReport.mandatorName = this.addSubmitReport.mandatorName + this.addSubmitReport.sex;
+                   // }
                    this.addSubmitReport.valuationDate =  this.setTimeFomart(this.addSubmitReport.valuationDate);
                    this.addSubmitReport.valuationValidityBegin = this.setTimeFomart(this.addReport.valuationValidityBegin[0]);
                    this.addSubmitReport.valuationValidityEnd = this.setTimeFomart(this.addReport.valuationValidityBegin[1]);
@@ -590,15 +634,19 @@ export default {
             }else if (this.selectItem.length === 1){
                 this.selRport.reportType = this.selectItem[0].reportType;
                 this.reportId = this.selectItem[0].reportId;
-                this.getAddAppraiserLlist(this.selectItem[0].valuer2, this.addConfig.appraiserOneList);
-                this.getAddAppraiserLlist(this.selectItem[0].valuer1, this.addConfig.appraiserTwoList);
-
-                this.getAddReveiwAndProjectAutorInfo(0, this.addConfig.projectManager, this.selectItem[0].valuer1, this.selectItem[0].valuer2);
-                this.getAddReveiwAndProjectAutorInfo(3, this.addConfig.reviewerTwoList, this.selectItem[0].valuer1, this.selectItem[0].valuer2);
                 for (let keys in this.updateReport){
                     this.updateReport[keys] = this.selectItem[0][keys];
                 }
+                // 获取估价目的
+                this.getReportPurpose();
+                // 获取估价师
+                this.getAddAppraiserLlist(this.selectItem[0].valuer2, this.addConfig.appraiserOneList);
+                this.getAddAppraiserLlist(this.selectItem[0].valuer1, this.addConfig.appraiserTwoList);
+                // 获取二级审核人
                 this.getAddReveiwConfigInfo('update');
+                // 获取三级审核人以及项目负责人
+                this.getAddReveiwAndProjectAutorInfo(0, this.addConfig.projectManager, this.selectItem[0].valuer1, this.selectItem[0].valuer2);
+                this.getAddReveiwAndProjectAutorInfo(3, this.addConfig.reviewerTwoList, this.selectItem[0].valuer1, this.selectItem[0].valuer2);
                 this.updateReport.cost = this.updateReport.cost + '';
                 this.updateReport.valuationResult = this.updateReport.valuationResult + '';
                 this.updateReport.valuationValidityBegin= [
@@ -631,9 +679,9 @@ export default {
                     for (let key in this.updateReport){
                         this.addSubmitReport[key] = this.updateReport[key];
                     }
-                    if (this.addSubmitReport.sex) {
-                        this.addSubmitReport.mandatorName = this.addSubmitReport.mandatorName + this.addSubmitReport.sex;
-                    }
+                    // if (this.addSubmitReport.sex) {
+                    //     this.addSubmitReport.mandatorName = this.addSubmitReport.mandatorName + this.addSubmitReport.sex;
+                    // }
                     // this.addSubmitReport.mandatorName = this.addSubmitReport.mandatorName + this.addSubmitReport.sex;
                     this.addSubmitReport.valuationDate =  this.setTimeFomart(this.addSubmitReport.valuationDate);
                     this.addSubmitReport.valuationValidityBegin = this.setTimeFomart(this.updateReport.valuationValidityBegin[0]);
