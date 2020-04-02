@@ -107,27 +107,32 @@
 
 
     }
-    div:last-child {
-      span {
-        display: inline-block;
-        width: 5vw;
-        border: 1px solid #EAEAEA;
-        text-align: center;
-        font-size: 12px;
-        padding: 0.3vh 0;
+    .inquire-select-status{
+      display: flex;
+      justify-content: space-between;
+      .select-status{
+        span {
+          display: inline-block;
+          width: 5vw;
+          border: 1px solid #EAEAEA;
+          text-align: center;
+          font-size: 12px;
+          padding: 0.3vh 0;
+        }
+        span:first-child {
+          display: inline;
+          border: 0;
+          margin-right: 1vw;
+          font-weight: 600;
+        }
+        span:nth-child(2) {
+          border-radius: 15px  0 0 15px;
+        }
+        span:nth-child(6) {
+          border-radius: 0 15px 15px 0;
+        }
       }
-      span:first-child {
-        display: inline;
-        border: 0;
-        margin-right: 1vw;
-        font-weight: 600;
-      }
-      span:nth-child(2) {
-        border-radius: 15px  0 0 15px;
-      }
-      span:nth-child(7) {
-        border-radius: 0 15px 15px 0;
-      }
+
       /deep/ .ivu-input {
         border-radius: 20px;
         height: 26px;

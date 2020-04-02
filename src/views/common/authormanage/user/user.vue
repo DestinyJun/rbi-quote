@@ -7,7 +7,7 @@
            <div class="btn">
              <button @click="addBtnClick">添加</button>
              <button @click="showUpdateReportModel">修改</button>
-             <button @click="delUserInfo">删除</button>
+             <button @click="delUserInfo">锁定</button>
            </div>
       </div>
       <div class="user-select">

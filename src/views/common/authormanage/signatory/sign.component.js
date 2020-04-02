@@ -82,6 +82,7 @@ export default {
             searchSignData: '',
             // 模态框数据
             addModal: false,
+            updateModal: false,
             signerSrv: new Server(),
             signerTool: new Tool(),
             singerConfig: {
@@ -158,6 +159,20 @@ export default {
         searchData(){
 
         },
+        // 取消选择，关闭弹窗
+        closeUpdateModel(){
+            // 调用子组件得方法
+            this.$refs.tables.clearSelect();
+            this.selectItem = [];
+            this.updateModal = false;
+            this.addModal = false;
+            this.updateUser = new mainModel.AddUser();
+            this.addSigner = new mainModel.AddUser();
+        },
+        // 选择数据
+        selectTableItem(data){
+            this.selectItem = data;
+        },
         getPageDate(data){
             this.now_num = data.num_Size;
             if (data.label === 'row'){
@@ -188,9 +203,8 @@ export default {
                   });
                   this.signerSrv.addSigner(this.addSigner).then(value => {
                       if (value.code === '1000'){
-                          this.addModal = false;
-                          this. addSigner = new mainModel.AddSigner();
                           this.initSignerData();
+                          this.closeUpdateModel();
                           this.signerTool.toast('success', value.code);
                       }else {
                           this.signerTool.toast('error', value.code);
@@ -198,6 +212,63 @@ export default {
                   })
                 }
             })
+        },
+        // 修改签字人员
+        showUpdateSignerModal(){
+            if (this.selectItem.length === 0 ) {
+                this.signerTool.toast('error', '操作错误，请选择一项进行修改');
+            }else if (this.selectItem.length === 1) {
+                   for (let keys in this.updateSigner){
+                       this.updateSigner[keys] = this.selectItem[0][keys]
+                   }
+                   this.singerConfig.signerTypeList.forEach(value => {
+                      if (value.label === this.updateSigner.signedTypeName){
+                          this.updateSigner.signedType = value.value;
+                        }
+                   });
+                   this.updateSigner.uuid = this.selectItem[0].uuid;
+                   this.updateModal = true;
+            }else {
+                this.signerTool.toast('error', '操作错误，只能选择一项进行修改');
+            }
+        },
+        updateSignerInfo(name){
+            this.$refs[name].validate(valid => {
+                if (valid){
+                    this.setValueToLable(this.updateSigner.signedType, this.singerConfig.signerTypeList,
+                    (data) => {
+                        this.updateSigner.signedTypeName = data;
+                    });
+                    this.signerSrv.updateSignerInfo(this.updateSigner).then(value => {
+                        if (value.code === '1000'){
+                            this.initSignerData();
+                            this.closeUpdateModel();
+                            this.signerTool.toast('success', value.code);
+                        }else {
+                            this.signerTool.toast('error', value.code);
+                        }
+                    })
+                }
+            })
+        },
+        // 删除签字人员
+        delSingerInfo(){
+            if (this.selectItem.length === 0 ) {
+                this.signerTool.toast('error', '操作错误，请选择一项进行删除');
+            }else if (this.selectItem.length === 1){
+                this.signerTool.setRemind('删除', '删除', () => {
+                    this.signerSrv.delSigner({uuid: this.selectItem[0].uuid}).then(res => {
+                        if (res.code === '1000') {
+                            this.initSignerData();
+                            this.signerTool.toast('success', res.msg);
+                        }else {
+                            this.signerTool.toast('error', res.msg);
+                        }
+                    })
+                })
+            }else {
+                this.signerTool.toast('error', '操作错误，只能选择一项进行删除');
+            }
         }
     },
     components: {

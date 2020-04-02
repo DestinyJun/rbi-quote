@@ -88,19 +88,19 @@ export default {
                                     style: {
                                         fontSize: '12px',
                                         width: '3vw',
-                                        background: (params.row.flag  !== 1)? '#3DA2F8': "#C9D0D6",
+                                        background: (params.row.auditStatus  === '未缴费')? '#3DA2F8': "#C9D0D6",
                                         color: '#fff',
                                         border: 0
                                     },
                                     attrs: {
-                                        disabled: (params.row.flag === 1)
+                                        disabled: (params.row.auditStatus === '未缴费')
                                     },
                                     on: {
                                         click: () => {
                                             this.inquireClick(params.index)
                                         }
                                     }
-                                }, (params.row.flag  !== 1)? '未完成': '已完成'),
+                                }, (params.row.auditStatus  !== '未缴费')? '未完成': '已完成'),
                                 h('Button', {
                                     props: {
                                         size: 'small',
@@ -158,18 +158,23 @@ export default {
             searchInquireData: '',
             // 模态框数据
             inquireModal: false,
+            // 已收费数据
+            notChargedData: 0,
+            // 未收费数据
+            ChargedData: 0,
+            searchTime: [],
             // 工具类
             iquireTool: new Tool(),
             iquireSrv: new serve(),
             itemData: [
-                {id: 3, label: '报告总数', value: 456, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 456/500*100},
-                {id: 4,label: '已完成数', value: 132, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 132/500*100},
-                {id: 5,label: '未二级审核', value: 66, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 66/500*100},
-                {id: 6,label: '未三级审核', value: 100, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 100/500*100},
+                {id: 3, label: '报告总数', value: 0, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 0},
+                {id: 4,label: '已完成数', value: 0, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 0},
+                {id: 5,label: '未二级审核', value: 0, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 0},
+                {id: 6,label: '未三级审核', value: 0, fcolor: '#55ABF8', bgc:'#3DA2F8', borhidden: true, bwidth: 0},
             ],
             itemData1: [
-                {id: 1,label: '已收费数', value: 132, fcolor: '#E17055', bgc:'#E17055', borhidden: false, bwidth: 132/500*100},
-                {id: 2,label: '未收费数', value: 66, fcolor: '#E17055', bgc:'#E17055', borhidden: true, bwidth: 66/500*100},
+                {id: 1,label: '已收费数', value: 0, fcolor: '#E17055', bgc:'#E17055', borhidden: false, bwidth: 0},
+                {id: 2,label: '未收费数', value: 0, fcolor: '#E17055', bgc:'#E17055', borhidden: true, bwidth: 0},
             ]
         }
     },
@@ -180,6 +185,8 @@ export default {
         }).then(() => {
             Promise.resolve(this.initMyReportData())
         });
+        this.getReportNum();
+        this.getReportCost();
     },
     methods: {
         // 获取类型
@@ -220,9 +227,43 @@ export default {
                 });
             })
         },
+        // 获取给所有报告的数量
+        getReportNum(){
+            this.iquireSrv.getMyReportEveryStausNum({}).then(
+                value => {
+                    console.log(value);
+                    if (value.code === '1000'){
+                        this.setItemDataNum(this.itemData[0], value.data.count, value.data.count);
+                        this.setItemDataNum(this.itemData[1], value.data.count4, value.data.count);
+                        this.setItemDataNum(this.itemData[2], value.data.count0, value.data.count);
+                        this.setItemDataNum(this.itemData[3], value.data.count0, value.data.count);
+                        this.setItemDataNum(this.itemData[3], value.data.count2, value.data.count);
+                        this.setItemDataNum(this.itemData1[0], value.data.count4, value.data.count);
+                        this.setItemDataNum(this.itemData1[1], value.data.count3, value.data.count);
+                    }else {
+                        this.iquireTool.toast('error', value.msg)
+                    }
+
+                }
+            )
+        },  // 获取给所有报告的数量
+        getReportCost(){
+            this.iquireSrv.getMyReportCostData({}).then(
+                value => {
+                    console.log(value);
+                    if (value.code === '1000'){
+                        this.notChargedData = value.data.cost;
+                        this.ChargedData = value.data.costed;
+                    }else {
+                        this.iquireTool.toast('error', value.msg)
+                    }
+
+                }
+            )
+        },
         // 初始化列表
         initMyReportData(){
-            this.iquireSrv.queryMyReportPageData({auditStatus: this.auditName, tableName: this.selectReportName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
+            this.iquireSrv.queryMyReportPageData({auditStatus: this.auditName, tableName: this.selectReportName,timeBegin: '',timeEnd: '', pageNo: this.now_page , pageSize: this.now_num}).then(value => {
                 console.log(value);
                 this.pageOption.page_list = [];
                 if (value.code  === '1000') {
@@ -291,6 +332,10 @@ export default {
         },
         searchData(){
             console.log(this.searchInquireData);
+        },
+        setItemDataNum(data, num, maxNum){
+            data.value = num;
+            data.bwidth = num/maxNum *100;
         }
     },
     components: {

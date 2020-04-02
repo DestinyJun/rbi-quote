@@ -80,15 +80,23 @@ export default class Server {
 
     // TODO 项目查询模块
     queryMyReportPageData(data){
-        return clientHttp.post('/report/findByPageByAuditStatus', data)
+        return clientHttp.post('/report/findReadByPageByAuditStatus', data)
     }
-
+    getMyReportEveryStausNum(data){
+        return clientHttp.post('/report/findCountByAuditStatus', data)
+    }
+    getMyReportCostData(data){
+        return clientHttp.post('/report/findCost', data)
+    }
 
 
     // TODO 图像统计
     // 获取项目负人
     getProjectManager(data){
         return clientHttp.post('/statistics/principal', data)
+    }
+    judgeAuthorityOfUser(data){
+        return clientHttp.post('/statistics', data)
     }
 
     //TODO 用户权限模块
@@ -134,8 +142,12 @@ export default class Server {
         return clientHttp.post('/signed/add', data)
     }
     // 修改签字人员
-    updateSigner(data){
-        return clientHttp.post('/signed/add', data)
+    updateSignerInfo(data){
+        return clientHttp.post('/signed/update', data)
+    }
+    // 修改签字人员
+    delSigner(data){
+        return clientHttp.post('/signed/delete', data)
     }
 
 }

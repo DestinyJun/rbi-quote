@@ -12,6 +12,8 @@ export default {
             // 选择报告类型
             reportType:'',
             reportTypeList: [],
+            // 有无权限
+            isAuthority: false,
 
             searchGraphicData: '',
             dataPiefir:{
@@ -57,13 +59,23 @@ export default {
         }
     },
     created() {
-        this.getProjectMangerList();
+        this.graphicSrv.judgeAuthorityOfUser({}).then(
+            value => {
+                if (value.code === '1000') {
+                    this.getProjectMangerList();
+                    this.isAuthority = true;
+                }else {
+                    this.isAuthority = false;
+                }
+            });
     },
     methods: {
         // 获取项目负责人
         getProjectMangerList(){
             this.graphicSrv.getProjectManager({}).then(res => {
                 if (res.code === '1000'){
+                    this.reportTypeList = [{label: '全部', value: ''}];
+                    this.autorList = [{label: '全部', value: ''}];
                     res.data.principal.forEach(val => {
                         this.autorList.push({label: val.projectPrincipal, value: val.projectPrincipalUuid})
                     });

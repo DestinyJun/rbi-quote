@@ -10,7 +10,7 @@
        <!--         <button>删除</button>-->
        <!--       </div>-->
      </div>
-     <div class="inquire-data">
+     <div class="inquire-data" v-if="itemData[0].value !== 0">
        <div class="inquire-item" v-for="item in itemData" :key="item.id">
          <div class="inquire-item-title">
            <span >{{item.label}}</span>
@@ -33,11 +33,11 @@
        <div  class="inquire-item" style="position: absolute;width: 15vw">
          <div class="inquire-item-title" style="height: 3vh;margin-top: -1.4vh">
            <span style="font-size: 12px">未收费用(元):</span>
-           <span style="font-size: 22px;color: #AFAFAF">￥846,000</span>
+           <span style="font-size: 22px;color: #AFAFAF">￥{{notChargedData}}</span>
          </div>
          <div class="inquire-item-title" style="height: 3vh;">
-           <span style="font-size: 12px">未收费用(元):</span>
-           <span style="font-size: 22px;color: #E17055">￥1,229,500</span>
+           <span style="font-size: 12px">已收费用(元):</span>
+           <span style="font-size: 22px;color: #E17055">￥{{ChargedData}}</span>
          </div>
        </div>
      </div>
@@ -48,13 +48,13 @@
          <span v-for="(item_text, index1) in reportTypeList.centent" :key="index1" :style="{'background': item_text.bgc, 'color':item_text.color}" @click="selectInquireType(index1)">{{item_text.name}}</span>
        </div>
        <!-- 审核状态-->
-       <div style="display: flex; justify-content: space-between">
-         <div >
+       <div class="inquire-select-status">
+         <div class="select-status">
            <span>{{reportStatusList.title}}：</span>
            <span v-for="(item_text, index2) in reportStatusList.centent" :key="index2" :style="{'background': item_text.bgc,  'color':item_text.color}" @click="selectInquireReview(index2)">{{item_text.name}}</span>
            <label style="margin-left: 2vw">
              时间范围：
-             <DatePicker type="daterange" placement="bottom-end" placeholder="选择日期" style="width: 200px"></DatePicker>
+             <DatePicker type="daterange" placement="bottom-end" placeholder="选择日期" style="width: 200px" v-model="searchTime"></DatePicker>
            </label>
          </div>
          <div>
