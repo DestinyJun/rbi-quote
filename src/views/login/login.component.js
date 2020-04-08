@@ -65,13 +65,13 @@ export default {
                             if (Object.is(res.code ,'1000')){
                                 this.tool.toast('success', '登录成功!');
                                 this.$router.push('./home/report');
-                                this.tool.setItem('accessToken', res.data)
+                                this.tool.setItem('accessToken', res.data);
+                                this.getMenu();
                             }else {
                                 this.tool.toast('error', `${res.msg}`);
                             }
                         }
-                    ).catch((err) => {
-                        console.log(err);
+                    ).catch(() => {
                         this.tool.toast('error', '服务器处理异常，请检查网络是否连接!')
                     })
 
@@ -86,6 +86,11 @@ export default {
                 this.tool.delitem('Userform')
             }
 
+        },
+        getMenu(){
+            loginSrv.getMenuData({}).then(value => {
+                console.log(value);
+            })
         }
     }
 

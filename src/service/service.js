@@ -8,6 +8,9 @@ export default class Server {
     login(data){
       return clientHttp.post('/login',data);
     }
+    getMenuData(data){
+        return clientHttp.post('/sys/menu', data)
+    }
 
     //TODO  报告管理模块
    //获取报告类型

@@ -1,8 +1,13 @@
+// 自定义组件
 import paging from "../../../components/paging";
 import tables from "../../../components/table";
 import QRCodes from "../../../components/QRCode";
+import modal from '../../../components/model/dialog'
+// 服务
 import serve from "../../../service/service";
+// 工具类
 import Tool from '../../../utils/tool'
+// 实体类
 import mianModel from "../../../model/model";
 export default {
     name: 'report',
@@ -238,7 +243,8 @@ export default {
                     { required: false, message: '请填写摘录', trigger: 'change' },
                 ]
 
-            }
+            },
+            addOption: ''
         }
     },
     created(){
@@ -386,9 +392,101 @@ export default {
         },
         // 显示填报选择弹窗
         showAddRepotrt(){
+          console.log(123);
             // 查询估价目的
-            this.getReportPurpose();
-            this.addTypeReportModel = true;
+            // this.getReportPurpose();
+            // this.addTypeReportModel = true;
+          let obj = {};
+          let objRules = {};
+           const listData = [
+              {label: '填报信息填写',value: 'reportType' },
+              {label: '估价对象',value: 'valuationObject' },
+              {label: '估价目的',value: 'valuationPurpose' },
+              {label: '估价结果',value: 'valuationResult' },
+              {label: '估价师1',value: 'valuer1' },
+              {label: '估价师2',value: 'valuer2' },
+              {label: '时间',value: 'valuationDate' },
+              {label: '时间',value: 'valuationValidityBegin' },
+              {label: '二级审核人',value: 'auditor2Uuid' },
+             ];
+           listData.forEach(v => {
+             obj[v.value] = '';
+             objRules[v.value] = [
+               {required: true, message: '', trigger: 'change'}
+             ]
+           });
+           console.log(obj);
+           console.log(objRules);
+           this.addOption = {
+             width: 960,
+             hidden: true,
+             title: '添加信息',
+             style: {top: '100px'},
+             ruleValidate: {
+               reportType: [
+                 { required: true, message: '请选择报告类型', trigger: 'change' },
+               ],
+               valuationObject: [
+                 { required: true, message: '请填写估价目的', trigger: 'change' },
+               ],
+               valuer1: [
+                 { required: true, message: '请选择估价师1', trigger: 'change' },
+               ],
+
+             },
+             modelData: {
+               reportType: '',
+               valuationObject: '',
+               valuer1: ''
+             },
+             dataList:[
+               {styleType: 1, type: 'input', label: '填报信息填写', value:'reportType', placeholder: '请填写信息'},
+               {styleType: 1, type: 'input', label: '估价对象', value:'valuationObject', placeholder: '请填写信息'},
+               {styleType: 1, type: 'select', label: '估价对象', value:'valuer1', placeholder: '请填写信息', selList: [
+                   {label: '1231', value: 1},
+                   {label: '2123', value: 2},
+                   {label: '1233', value: 3},
+                   {label: '434', value: 4},
+                   {label: '434', value: 4},
+                   {label: '434', value: 4},
+                 ]},
+               {styleType: 2, type: 'select', label: '估价对象', value:'valuer1', placeholder: '请填写信息'},
+               {styleType: 2, type: 'select', label: '估价对象', value:'valuer1', placeholder: '请填写信息'},
+               {styleType: 2, type: 'select', label: '估价对象', value:'valuer1', placeholder: '请填写信息'},
+               {styleType: 2, type: 'date', label: '估价对象', value:'valuer1', placeholder: '请填写信息'},
+               {styleType: 2, type: 'date', label: '估价对象', value:'valuer1', placeholder: '请填写信息'},
+               // {styleType: 2, type: 'check', label: '估价对象', value:'valuer1', placeholder: '请填写信息', checkList: [
+               //     {label: '1231', value: 1},
+               //     {label: '2123', value: 2},
+               //     {label: '1233', value: 3},
+               //     {label: '434', value: 4},
+               //     {label: '434', value: 4},
+               //     {label: '434', value: 4},
+               //     {label: '434', value: 4},
+               //   ]},
+               // {styleType: 2, type: 'radio', label: '估价对象', value:'valuer1', placeholder: '请填写信息', radioList: [
+               //     {label: '1231', value: 1},
+               //     {label: '2123', value: 2},
+               //     {label: '1233', value: 3},
+               //     {label: '434', value: 4},
+               //     {label: '434', value: 4},
+               //     {label: '434', value: 4},
+               //     {label: '434', value: 4},
+               //   ]},
+               // {styleType: 2, type: 'radio', label: '估价对象', value:'valuer1', placeholder: '请填写信息', radioList: [
+               //     {label: '1231', value: 1},
+               //     {label: '2123', value: 2},
+               //     {label: '1233', value: 3},
+               //     {label: '434', value: 4},
+               //     {label: '434', value: 4},
+               //     {label: '434', value: 4},
+               //     {label: '434', value: 4},
+               //   ]},
+               {styleType: 3, type: 'select', label: '估价对象', value:'valuer1', placeholder: '请填写信息'},
+               {styleType: 3, type: 'select', label: '估价对象', value:'valuer1', placeholder: '请填写信息'},
+               {styleType: 4, type: 'textarea', label: '估价对象', value:'valuer1', placeholder: '请填写信息'},
+             ]
+           }
 
             // this.addReportModel = true;
         },
@@ -737,6 +835,7 @@ export default {
     components: {
         paging,
         tables,
-        QRCodes
+        QRCodes,
+        modal
     }
 }
