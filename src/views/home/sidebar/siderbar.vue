@@ -29,80 +29,84 @@
      </div>
   </div>
 </template>
-
 <script>
-    export default {
+  import ToolUtil from "../../../utils/tool";
+  export default {
         name: 'sidebar',
         data(){
             return{
-                MenuData: [
-                    {
-                        label: '报告管理',
-                        icon: 'iconguani',
-                        link: '/home/report',
-                        value: '1',
-                        children:[]
-                    },
-                    {
-                        label: '报告审核',
-                        icon: 'iconshenhe',
-                        link: '2',
-                        value: '2',
-                        ishidden: true,
-                        children:[
-                            {
-                                label: '二级审核',
-                                icon: 'iconquanxian',
-                                link: '/home/secreview?id=2',
-                                children:[]
-                            },
-                            {
-                                label: '三级审核',
-                                icon: 'iconquanxian',
-                                link: '/home/thrReview?id=2',
-                                children:[]
-                            }
-                        ]
-                    },
-                    {
-                        label: '项目查询',
-                        icon: 'iconxinfangchayue-copy',
-                        link: '/home/inquire?id=3',
-                        value: '3',
-                        children:[]
-                    },
-                    {
-                        label: '图形统计',
-                        icon: 'icontongji',
-                        link: '/home/graphic?id=4',
-                        value: '4',
-                        children:[]
-                    },
-                    {
-                        label: '权限管理',
-                        icon: 'iconweifashenhetongji',
-                        link: '123',
-                        value: '5',
-                        ishidden: true,
-                        children:[
-                            {
-                                label: '用户权限',
-                                icon: '',
-                                link: '/home/user?id=5',
-                                children:[]
-                            },
-                            {
-                                label: '签字人员权限',
-                                icon: '',
-                                link: '/home/sign?id=5',
-                                children:[]
-                            },
-                        ]
-                    },
-                ]
+                MenuData: [],
+                //       [
+                //         {
+                //           label: '报告管理',
+                //           icon: 'iconguani',
+                //           link: '/home/report',
+                //           value: '1',
+                //           children:[]
+                //         },
+                //   {
+                //     label: '报告审核',
+                //       icon: 'iconshenhe',
+                //     link: '2',
+                //     value: '2',
+                //     ishidden: true,
+                //     children:[
+                //     {
+                //       label: '二级审核',
+                //       icon: 'iconquanxian',
+                //       link: '/home/secreview?id=2',
+                //       children:[]
+                //     },
+                //     {
+                //       label: '三级审核',
+                //       icon: 'iconquanxian',
+                //       link: '/home/thrReview?id=2',
+                //       children:[]
+                //     }
+                //   ]
+                //   },
+                //   {
+                //     label: '项目查询',
+                //       icon: 'iconxinfangchayue-copy',
+                //     link: '/home/inquire?id=3',
+                //     value: '3',
+                //     children:[]
+                //   },
+                //   {
+                //     label: '图形统计',
+                //       icon: 'icontongji',
+                //     link: '/home/graphic?id=4',
+                //     value: '4',
+                //     children:[]
+                //   },
+                //   {
+                //     label: '权限管理',
+                //       icon: 'iconweifashenhetongji',
+                //     link: '123',
+                //     value: '5',
+                //     ishidden: true,
+                //     children:[
+                //     {
+                //       label: '用户权限',
+                //       icon: '',
+                //       link: '/home/user?id=5',
+                //       children:[]
+                //     },
+                //     {
+                //       label: '签字人员权限',
+                //       icon: '',
+                //       link: '/home/sign?id=5',
+                //       children:[]
+                //     },
+                //   ]
+                //   },
+                // ]
+                tool: new ToolUtil()
             }
         },
         created() {
+            this.MenuData = this.tool.getObject('MenuData');
+            // console.log(this.tool.getObject('MenuData'));
             this.MenuData.forEach( v => {
                 if(v.value === this.$route.query.id) {
                     v.ishidden = false;
@@ -112,7 +116,8 @@
         methods: {
             openThisMenuClick(index){
                 this.MenuData[index].ishidden = this.MenuData[index].ishidden !== true;
-            }
+            },
+
         }
     }
 </script>

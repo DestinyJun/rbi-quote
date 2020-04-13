@@ -1,6 +1,6 @@
 <template>
    <div class="graphic" id="graphic" >
-     <div v-if="isAuthority">
+     <div>
        <div class="graphic-title">
          <div class="title">
            <h2>图形统计</h2>
@@ -60,9 +60,6 @@
            <bar :data="data"></bar>
          </div>
        </div>
-     </div>
-     <div style="position: absolute; top: 45vh;left: 50vw" v-if="!isAuthority">
-      <h1 :hidden="isAuthority && false">您无权访问权限</h1>
      </div>
    </div>
 </template>

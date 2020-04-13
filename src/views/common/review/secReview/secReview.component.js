@@ -39,7 +39,7 @@ export default {
                     },
                     {
                         title: '审核状态',
-                        key: 'auditStatus',
+                        key: 'sysStatus',
                         align: 'center',
                         width: 180,
                     },
@@ -89,11 +89,11 @@ export default {
                                     style: {
                                         fontSize: '12px',
                                         width: '4vw',
-                                        background: (params.row.auditStatus === '未二级审核')? '#3DA2F8': "#C9D0D6",
+                                        background: (params.row.sysStatus === '未二级审核')? '#3DA2F8': "#C9D0D6",
                                         color: '#fff'
                                     },
                                     attrs: {
-                                        disabled: (params.row.auditStatus !== '未二级审核')
+                                        disabled: (params.row.sysStatus !== '未二级审核')
                                     },
                                     on: {
                                         click: () => {
@@ -161,7 +161,7 @@ export default {
         }).then(() => {
             Promise.resolve(this.initReviewData())
         });
-        this.getAppraiserLlist('', this.appraisalList);
+        // this.getAppraiserLlist('', this.appraisalList);
 
     },
     methods: {
@@ -169,14 +169,13 @@ export default {
         getReportType(){
             return new Promise((resolve) => {
                 this.reviewSrv.getReportTypeList({}).then(value => {
-                    console.log(value);
                     if (value.code === '1000') {
                         value.data.forEach((v, index) => {
                             if (index === 1) {
-                                this.reportTypeList.centent.push({name: v.tempName, value: '1', bgc: '#FFFFFF',  color: '#5D6063'});
-                                this.selectReportName = v.tempName;
+                                this.reportTypeList.centent.push({name: v.tempName, value: '1', bgc: '#FFFFFF',  color: '#5D6063', uuid: v.uuid});
+                                this.selectReportName = v.uuid;
                             }else{
-                                this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',  color: '#C2C2C2'})
+                                this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',  color: '#C2C2C2',  uuid: v.uuid})
                             }
                         });
                         resolve();
@@ -188,7 +187,6 @@ export default {
         getReportStatus(){
             return new Promise((resolve) => {
                 this.reviewSrv.getReportStatusList({}).then(value => {
-                    console.log(value);
                     if (value.code === '1000') {
                         value.data.forEach((v, index) => {
                             if (index === 0) {
@@ -205,15 +203,15 @@ export default {
         },
         // 初始化列表
         initReviewData(){
-            this.reviewSrv.getReportTwoAuditTypeList({auditStatus: this.auditName, tableName: this.selectReportName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
-                console.log(value);
+            this.reviewSrv.getReportTwoAuditTypeList({auditStatus: this.auditName, templateId: this.selectReportName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
                 this.pageOption.page_list = [];
                 if (value.code  === '1000') {
+                    console.log(value);
                     this.tableOption.content = value.data.contents;
                     this.tableOption.content.forEach(v=> {
                         this.reportStatusList.centent.forEach(val => {
-                            if (val.value === v.auditStatus) {
-                                v.auditStatus = val.name
+                            if (val.value === v.sysStatus.toString()) {
+                                v.sysStatus = val.name
                             }
                         })
                     });
@@ -236,7 +234,7 @@ export default {
         },
         // 选择报表类型
         selectReviewType(index){
-            if (this.selectReportName !== this.reportTypeList.centent[index].name){
+            if (this.selectReportName !== this.reportTypeList.centent[index].uuid){
                 this.reportTypeList.centent.forEach(val => {
                         val.bgc = '#EFEFEF';
                         val.color = '#C2C2C2';
@@ -246,7 +244,8 @@ export default {
                 this.reportTypeList.centent[index].bgc = '#FFFFFF';
                 this.reportTypeList.centent[index].color = '#5D6063';
                 this.reportTypeList.centent[index].value = '1';
-                this.selectReportName = this.reportTypeList.centent[index].name;
+                this.selectReportName = this.reportTypeList.centent[index].uuid;
+                console.log(this.selectReportName);
                 this.initReviewData();
             }
 
@@ -290,19 +289,6 @@ export default {
 
         searchData(){
             console.log(this.searchData);
-        },
-        // 获取估价师列表
-        getAppraiserLlist(id, list){
-            this.reviewSrv.getReportAppraiserInfo({uuid: id}).then( v => {
-                console.log(v);
-                if (v.code === '1000') {
-                    v.data.forEach(val => {
-                        list.push({label: val.signedName, value: val.uuid})
-                    });
-                }else {
-                    this.reportTool.toast('error', v.msg)
-                }
-            });
         },
         // 审核通过
         reviewPasse(){

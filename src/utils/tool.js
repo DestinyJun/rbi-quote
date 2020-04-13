@@ -65,6 +65,7 @@ class ToolUtil {
                     });
         }
     }
+    // 设置警告提示
     setRemind(title, message, callback){
         Modal.confirm({
             render: (h) => {
@@ -104,6 +105,11 @@ class ToolUtil {
                 callback()
             },
         })
+    }
+    // 时间状态转换
+    setTimeFomart(data){
+        let d = new Date(data);
+        return  d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
     }
 }
 export default ToolUtil

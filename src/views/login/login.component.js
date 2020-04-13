@@ -21,7 +21,6 @@ export default {
         };
         return{
             tool: new ToolUtil(),
-
             formCustom: {
                 username: '',
                 passwd: '',
@@ -64,7 +63,6 @@ export default {
                             console.log(res);
                             if (Object.is(res.code ,'1000')){
                                 this.tool.toast('success', '登录成功!');
-                                this.$router.push('./home/report');
                                 this.tool.setItem('accessToken', res.data);
                                 this.getMenu();
                             }else {
@@ -83,15 +81,18 @@ export default {
         },
         delItem(){
             if (this.formCustom.checkbox.length === 0){
-                this.tool.delitem('Userform')
+                this.tool.delitem('Userform');
+
             }
 
         },
         getMenu(){
-            loginSrv.getMenuData({}).then(value => {
-                console.log(value);
-            })
+          loginSrv.getMenuData({}).then(value => {
+            this.tool.setObject('MenuData', value);
+            this.$router.push('./home/report');
+          })
         }
+
     }
 
 }

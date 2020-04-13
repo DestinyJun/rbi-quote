@@ -37,6 +37,11 @@ export default {
                         key: 'phone',
                         align: 'center',
                     },
+										{
+											title: '用户状态',
+											key: 'status',
+											align: 'center',
+										},
                     {
                         title: '操作',
                         key: 'action',
@@ -52,7 +57,7 @@ export default {
                                         fontSize: '12px',
                                         width: '4vw',
                                         background: '#3DA2F8',
-                                        color: '#DDEDFD',
+                                        color: '#fff',
                                         border: 0
                                     },
                                     on: {
@@ -60,7 +65,28 @@ export default {
                                             this.reviewPaawordClick(params.row.uuid)
                                         }
                                     }
-                                }, '密码重置')
+                                }, '密码重置'),
+																h('Button', {
+																	props: {
+																		size: 'small',
+																	},
+																	style: {
+																		fontSize: '12px',
+																		width: '3vw',
+																		marginLeft: '10px',
+																		background: (params.row.status === '锁定')? '#3DA2F8': "#C9D0D6",
+																		color: '#fff',
+																		border: 0
+																	},
+																	attrs: {
+																		disabled: (params.row.status !== '锁定')
+																	},
+																	on: {
+																		click: () => {
+																			this.openClockClick(params.row.uuid)
+																		}
+																	}
+																}, '解锁')
                             ]);
                         }
                     }
@@ -129,7 +155,9 @@ export default {
                     this.pageOption.page_list = [];
                     if (value.code === '1000') {
                         this.tableOption.content = value.data.contents;
-
+                        this.tableOption.content.forEach(v => {
+                        	v.status = v.status === '0'? '正常': '锁定'
+												});
                         for (let i = 1; i<= value.data.totalPage; i++) {
                             if (i ===  this.now_page) {
                                 this.pageOption.page_list.push( {name: i, bgc: '#A9B0B6', color: '#EDEEEF'})
@@ -252,9 +280,9 @@ export default {
         },
         delUserInfo(){
             if (this.selectItem.length === 0){
-                this.userTool.toast('error', '请选择需要删除得项');
+                this.userTool.toast('error', '请选择需要锁定得项');
             }else if (this.selectItem.length === 1) {
-                this.userTool.setRemind('删除', '删除', ()=>{
+                this.userTool.setRemind('锁定', '锁定', ()=>{
                     this.userSrv.delUserInfo({uuid: this.selectItem[0].uuid}).then(val => {
                         if (val.code === '1000'){
                             this.$refs.tables.clearSelect();
@@ -269,7 +297,20 @@ export default {
             }else {
                 this.userTool.toast('error', '只能选择一项进行删除');
             }
-        }
+        },
+			openClockClick(data){
+				this.userTool.setModal('confirm', '解锁提醒', '确认要解锁用户吗', () => {
+					this.userSrv.openUserInfo({uuid: data}).then(val => {
+						console.log(val);
+						if (val.code === '1000'){
+							this.userTool.toast('success', val.msg);
+							this.initUserData();
+						}else {
+							this.userTool.toast('error', val.msg);
+						}
+					})
+				})
+			}
     },
     components: {
         paging,

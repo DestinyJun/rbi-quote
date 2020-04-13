@@ -165,7 +165,7 @@ export default {
         }).then(() => {
             Promise.resolve(this.initReviewThreeData())
         });
-        this.getAddAppraiserLlist('', this.appraisalList)
+        // this.getAddAppraiserLlist('', this.appraisalList)
 
     },
     methods: {
@@ -177,10 +177,10 @@ export default {
                     if (value.code === '1000') {
                         value.data.forEach((v, index) => {
                             if (index === 1) {
-                                this.reportTypeList.centent.push({name: v.tempName, value: '1', bgc: '#FFFFFF',  color: '#5D6063'});
-                                this.selectReportName = v.tempName;
+                                this.reportTypeList.centent.push({name: v.tempName, value: '1', bgc: '#FFFFFF',  color: '#5D6063',  uuid: v.uuid });
+                                this.selectReportName = v.uuid;
                             }else{
-                                this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',  color: '#C2C2C2'})
+                                this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',  color: '#C2C2C2',  uuid: v.uuid })
                             }
                         });
                         resolve();
@@ -209,8 +209,7 @@ export default {
         },
         // 初始化列表
         initReviewThreeData(){
-            this.reviewThreeSrv.getReportThreeAuditTypeList({auditStatus: this.auditName, tableName: this.selectReportName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
-                console.log(value);
+            this.reviewThreeSrv.getReportThreeAuditTypeList({auditStatus: this.auditName, templateId: this.selectReportName, pageNo: this.now_page , pageSize: this.now_num}).then(value => {
                 this.pageOption.page_list = [];
                 if (value.code  === '1000') {
                     this.tableOption.content = value.data.contents;
@@ -240,7 +239,7 @@ export default {
         },
         // 选择报表类型
         selectreviewType(index){
-            if (this.selectReportName !== this.reportTypeList.centent[index].name){
+            if (this.selectReportName !== this.reportTypeList.centent[index].uuid){
                 this.reportTypeList.centent.forEach(val => {
                         val.bgc = '#EFEFEF';
                         val.color = '#C2C2C2';
@@ -250,7 +249,7 @@ export default {
                 this.reportTypeList.centent[index].bgc = '#FFFFFF';
                 this.reportTypeList.centent[index].color = '#5D6063';
                 this.reportTypeList.centent[index].value = '1';
-                this.selectReportName = this.reportTypeList.centent[index].name;
+                this.selectReportName = this.reportTypeList.centent[index].uuid;
                 this.now_page = 1;
                 this.initReviewThreeData();
             }

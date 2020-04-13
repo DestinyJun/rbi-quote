@@ -17,13 +17,17 @@ export default class Server {
     getReportTypeList(data){
         return clientHttp.post('/systemplate/findAll', data)
     }
-    //获取报告类型
+    //获取报告状态
     getReportStatusList(data){
         return clientHttp.post('/report/allStatus', data)
     }
     // 获取分页数据信息
     getReportTableData(data){
         return clientHttp.post('/report/findByPageByAuditStatus', data)
+    }
+    // 获取添加时候的字段信息
+    getAddReportTableInfo(data){
+      return clientHttp.post('/getFields', data)
     }
     // 填报的估价师信息
     getReportAppraiserInfo(data){
@@ -43,7 +47,7 @@ export default class Server {
     }
     // 上传报告
     addReport(data){
-        return clientHttp.post('/report/insert', data)
+        return clientHttp.post('/report/add', data)
     }
     // 修改
     updateReport(data){
@@ -119,10 +123,14 @@ export default class Server {
     updateUserInfo(data){
         return clientHttp.post('/user/update', data)
     }
-    // 删除用户
+    // 锁定用户
     delUserInfo(data){
-        return clientHttp.post('/user/delete', data)
+        return clientHttp.post('/user/lock', data)
     }
+	// 锁定用户
+		openUserInfo(data){
+			return clientHttp.post('/user/unlock', data)
+		}
     // 重置密码
     resetUserPassword(data){
         return clientHttp.post('/user/resetPassword', data)

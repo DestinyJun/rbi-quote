@@ -54,11 +54,11 @@
            <span v-for="(item_text, index2) in reportStatusList.centent" :key="index2" :style="{'background': item_text.bgc,  'color':item_text.color}" @click="selectInquireReview(index2)">{{item_text.name}}</span>
            <label style="margin-left: 2vw">
              时间范围：
-             <DatePicker type="daterange" placement="bottom-end" placeholder="选择日期" style="width: 200px" v-model="searchTime"></DatePicker>
+             <DatePicker type="daterange" placement="bottom-end" placeholder="选择日期" style="width: 200px" v-model="searchTime" @on-change="changeTime"></DatePicker>
            </label>
          </div>
          <div>
-           <button style="background: #3DA2F8;border: 0;width: 4vw;padding: 3px;text-align:center;font-size:12px;color: #FFFFFF;border-radius: 2px;letter-spacing: 2px">
+           <button class="searchBtn" @click="searchInquireDataByTime">
              查询
            </button>
 
