@@ -9,40 +9,45 @@
 				<Scroll :height="dialogOption.height">
 					<div v-for="(item, index) in dialogOption.dataList" :key="index">
 						<Col span="12" v-if="item.styleType === 1">
-							<Col span="20" v-if="item.type === 'input'">
-								<Col span="6" style="line-height: 3vh;text-align: right">
-									<span>{{item.label}}：</span>
-								</Col>
-								<Col span="3" style="line-height: 3vh">
-									<span style="display: inline-block;width: 18vw;height: 3vh;text-align: left">{{item.label}}</span>
-								</Col>
+							<Col span="10" style="line-height: 3vh;text-align: right">
+								<span>{{item.label}}：</span>
+							</Col>
+							<Col span="12" style="line-height: 3vh">
+								<span style="display: inline-block;width: 18vw;height: 3vh;text-align: left;margin-left: 1vw;">{{item.label}}</span>
 							</Col>
 						</Col>
 					</div>
 					<div>
 						<Col span="24">
-								<span
-									style="width: 98%; height: 1px; background: #DCDCDC;display: inline-block;margin: 0 0 3vh 0"></span>
+							<span
+								style="width: 98%; height: 1px; background: #DCDCDC;display: inline-block;margin: 2vh 0 2vh 0;"></span>
 						</Col>
 					</div>
 					<div v-for="(item, index) in dialogOption.dataList" :key="index + 1000">
-						<Col span="10" v-if="item.styleType === 2">
-							<Col span="6" style="line-height: 3vh;text-align: right">
+						<Col span="12" v-if="item.styleType === 2">
+							<Col span="10" style="line-height: 3vh;text-align: right">
 								<span>{{item.label}}：</span>
 							</Col>
 							<Col span="12" style="line-height: 3vh">
 								<span
-									style="display: inline-block;padding:0 0 0 3px; width: 100%;height: 3vh;text-align: left;border-radius: 3px; border: 1px solid #EEEEEE">{{item.value}}</span>
+									style="display: inline-block;padding:0 0 0 3px; width: 100%;height: 3vh;margin-left: 1vw;text-align: left;">{{item.value}}</span>
 							</Col>
 						</Col>
 					</div>
+					<Col span="24">
+						<span style="width: 98%; height: 1px; background: #DCDCDC;display: inline-block;margin: 2vh 0 2vh 0"></span>
+					</Col>
 					<Row></Row>
 				</Scroll>
 				<!--        <Row></Row>-->
 			</div>
 			<div slot="footer" style="text-align: center">
-				<Button style="background-color:#3DA2F8;color: #fff;width: 5vw" @click="addUploadReport">上报</Button>
-				<Button style="background: #FFFFFF;color: #2E3235;width: 5vw" @click="clearData">取消</Button>
+				<button style="background-color:#3DA2F8;color: #fff;width: 5vw;height: 3vh;border: 0;box-shadow: 1px 1px 3px #999999" v-if="dialogOption.surebtn !== ''"
+								@click="sureClick">{{dialogOption.surebtn}}
+				</button>
+				<button style="background: #FFFFFF;color: #2E3235;width: 5vw;height: 3vh;border: 0;box-shadow: 1px 1px 3px #999999"
+								@click="closeModel">{{dialogOption.canclebtn}}
+				</button>
 			</div>
 		</Modal>
 	</div>
@@ -74,20 +79,33 @@
 					type: Boolean,
 					default: false
 				},
-				modelData: {
-					type: Object,
-					default: {}
-				},
 				dataList: {
 					type: Array,
 					default: []
 				},
-				modalType: {
+				surebtn: {
 					type: String,
 					default: ''
 				},
+				canclebtn: {
+					type: String,
+					default: ''
+				}
 			}
 		},
+		watch: {
+			dialogOption: (data) => {
+				console.log(data.canclebtn);
+			}
+		},
+		methods: {
+			closeModel() {
+				this.$emit('closeModel')
+			},
+			sureClick() {
+				this.$emit('sureClick')
+			}
+		}
 	}
 </script>
 

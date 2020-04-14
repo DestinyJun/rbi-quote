@@ -370,7 +370,6 @@ export default {
 			data.bwidth = num / maxNum * 100;
 		},
 		changeTime() {
-			console.log(this.searchTime);
 			this.startTime = this.searchTime[0] === '' ? '' : this.iquireTool.setTimeFomart(this.searchTime[0]);
 			this.endTime = this.searchTime[1] === '' ? '' : this.iquireTool.setTimeFomart(this.searchTime[1]);
 		}

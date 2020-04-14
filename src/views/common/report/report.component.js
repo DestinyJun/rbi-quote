@@ -3,6 +3,7 @@ import paging from "../../../components/paging";
 import tables from "../../../components/table";
 import QRCodes from "../../../components/QRCode";
 import modal from '../../../components/model/dialog'
+import detailModal from '../../../components/model/detailModal'
 // 服务
 import serve from "../../../service/service";
 // 工具类
@@ -151,11 +152,9 @@ export default {
 				content: [],
 			},
 			// 模态框数据
-			detailModal: false, //详情弹窗
+			detailOption: '', // 详情弹窗
 			QRCodeModal: false, // 打印二维码弹窗
 			addTypeReportModel: false, // 填报类型选择弹窗
-			addReportModel: false, // 填写报告信息
-			UpdateReportModel: false, // 填写报告信息
 
 			// 报告类型选择
 			selRport: new mianModel.SelectReportType(),
@@ -174,81 +173,11 @@ export default {
 			reportTool: new Tool(),
 			reportSrv: new serve(),
 			addList: [],
-			// 新增报告配置列表
-			addConfig: {
-				appraiserOneList: [],
-				appraiserTwoList: [],
-				reviewerOneList: [],
-				reviewerTwoList: [],
-				projectManager: [],
-				purposeList: []
-			},
 			// 报告选择的规则
 			ruleValidate: {
 				reportType: [
 					{required: true, message: '请选择报告类型', trigger: 'change'}
 				],
-			},
-
-			// 填写报告的规则
-			ruleAddValidate: {
-				reportType: [
-					{required: false, message: '请选择报告类型', trigger: 'change'},
-				],
-				valuationPurpose: [
-					{required: true, message: '请填写估价目的', trigger: 'change'},
-				],
-				valuationResult: [
-					{required: true, message: '请填写估价结果', trigger: 'change'},
-				],
-				valuer1: [
-					{required: true, message: '请选择估价师1', trigger: 'change'},
-				],
-				valuer2: [
-					{required: true, message: '请选择估价师2', trigger: 'change'},
-				],
-				valuationDate: [
-					{required: true, type: 'date', message: '请选择时间', trigger: 'change'}
-				],
-				valuationValidityBegin: [
-					{
-						type: 'array',
-						required: true,
-						fields: {
-							0: {type: 'date', required: true, message: '请输入起止日期'},
-							1: {type: 'date', required: true, message: '请输入起止日期'}
-						}
-					}
-				],
-				auditor2Uuid: [
-					{required: true, message: '请选择二级审核人', trigger: 'change'},
-				],
-				auditor3Number: [
-					{required: true, message: '请选择三级审核人', trigger: 'change'}
-				],
-				projectPrincipalNumber: [
-					{required: true, message: '请选择项目负责人', trigger: 'change'}
-				],
-				valuationObject: [
-					{required: true, message: '请填写估价对象', trigger: 'change'},
-				],
-				valuationObjectAddress: [
-					{required: true, message: '请填写估价对象地址', trigger: 'change'},
-				],
-				mandatorName: [
-					{required: true, message: '请填写委托人', trigger: 'change'},
-				],
-				mandatorIdentityCard: [
-					{required: true, message: '请填写委托人信用代码', trigger: 'change'},
-					{max: 18, min: 18, message: '号码不符合规范', trigger: 'change'}
-				],
-				cost: [
-					{required: true, message: '请填写费用', trigger: 'change'},
-				],
-				excerpt: [
-					{required: false, message: '请填写摘录', trigger: 'change'},
-				]
-
 			},
 			addOption: ''
 		}
@@ -389,7 +318,7 @@ export default {
 		},
 		// 搜索事件
 		searchReportData() {
-			console.log(this.searchData);
+
 		},
 		// 获取分页组件中当前页条数
 		getPageDate(data) {
@@ -402,21 +331,12 @@ export default {
 			this.initReportData();
 		},
 		// 展示详情弹窗
-		showDetailDialog(item) {
-			for (let keys in this.detailReport) {
-				this.detailReport[keys] = item[keys]
-			}
-			this.detailReport.valuationValidityBegin = `${item.valuationValidityBegin} - ${item.valuationValidityEnd}`;
-			this.detailReport.auditor3Number = item.auditor3;
-			this.detailReport.auditor2Uuid = item.auditor2;
-			this.setValueToLable(this.detailReport.valuer1, this.appraiserTotalList, (name) => {
-				this.detailReport.valuer1 = name;
+		showDetailDialog(data) {
+			this.reportSrv.queryDetailInfo({templateId: this.selectReportName, reportId: data.sysDocumentId}).then(res => {
+				if (res.code === '1000') {
+					this.setDetailReportInfo(res.data)
+				}
 			});
-			this.setValueToLable(this.detailReport.valuer2, this.appraiserTotalList, (name) => {
-				this.detailReport.valuer2 = name;
-			});
-			this.detailReport.projectPrincipalNumber = item.projectPrincipal;
-			this.detailModal = true;
 		},
 		// 打印二维码
 		printQRCode() {
@@ -427,28 +347,12 @@ export default {
 			// 查询估价目的
 			this.addTypeReportModel = true;
 		},
-		// 获取估价目的的列表
-		getReportPurpose() {
-			// 查询估价目的
-			this.reportSrv.getReportPurposeOfValuation({}).then(res => {
-				// console.log(res);
-				if (res.code === '1000') {
-					res.data.forEach(val => {
-						this.addConfig.purposeList.push({label: val.valuationPurpose, value: val.valuationPurpose})
-					})
-
-				} else {
-					this.reportTool.toast('error', res.msg)
-				}
-			});
-		},
 		// 确认选择报告类型
 		selectReport(name) {
 			this.$refs[name].validate(valid => {
 				if (valid) {
 					let uuid = '';
 					let tempName = '';
-					// this.getAddAppraiserLlist('', this.addConfig.appraiserOneList);
 					this.addTypeReportModel = false;
 					this.reportTypeList.centent.forEach(val => {
 						if (val.table === this.selRport.reportType) {
@@ -461,9 +365,12 @@ export default {
 						uuid: uuid,
 						tempName: tempName
 					}).then(res => {
+						console.log(res);
 						if (res.code === '1000') {
 							// this.addList = ;
 							this.setAddReportModalData(res.data)
+						} else {
+							this.reportTool.toast('error', `${res.msg},${res.data}`)
 						}
 					})
 				}
@@ -477,16 +384,11 @@ export default {
 			this.addList = data;
 			data.forEach(v => {
 				obj[v.key] = '';
-				if (v.type === 'date') {
-					objRules[v.key] = [
-						{required: v.required, type: 'date', message: v.label + '是必填项', trigger: 'change'}
-					]
-				} else {
-					objRules[v.key] = [
-						{required: v.required, message: v.label + '是必填项', trigger: 'change'}
-					]
-				}
+				objRules[v.key] = [
+					{required: v.required, message: v.label + '是必填项', trigger: 'change'}
+				]
 			});
+			console.log(objRules);
 			this.addOption = {
 				width: 960,
 				hidden: true,
@@ -511,16 +413,33 @@ export default {
 					}
 				})
 			}
-			this.reportSrv.addReport(model).then(value => {
-				if (value.code === '1000') {
-					this.selRport = new mianModel.SelectReportType();
-					this.addOption.hidden = false;
-					this.initReportData();
-					this.reportTool.toast('success', value.msg);
-				} else {
-					this.reportTool.toast('error', value.msg);
-				}
-			});
+			if (type === 'add') {
+				// 添加请求
+				this.reportSrv.addReport(model).then(value => {
+					if (value.code === '1000') {
+						this.selRport = new mianModel.SelectReportType();
+
+						this.initReportData();
+						this.closeUpdateModel();
+						this.reportTool.toast('success', value.msg);
+					} else {
+						this.reportTool.toast('error', value.msg);
+					}
+				});
+			} else {
+				model.sysDocumentId = this.selectItem[0].sysDocumentId;
+				// 修改请求
+				this.reportSrv.updateReport(model).then(value => {
+					if (value.code === '1000') {
+						this.closeUpdateModel();
+						this.initReportData();
+						this.reportTool.toast('success', value.msg);
+					} else {
+						this.reportTool.toast('error', value.msg);
+					}
+				})
+			}
+
 		},
 		// 时间转换
 		setTimeFomart(data) {
@@ -538,91 +457,90 @@ export default {
 		// 选择数据
 		selectTableItem(data) {
 			this.selectItem = data;
-
 		},
 		// 现实修改弹窗
 		showUpdateReportModel() {
 			if (this.selectItem.length === 0) {
 				this.reportTool.toast('error', '请选择需要修改得项');
 			} else if (this.selectItem.length === 1) {
-				this.selRport.reportType = this.selectItem[0].reportType;
-				this.reportId = this.selectItem[0].reportId;
-				for (let keys in this.updateReport) {
-					this.updateReport[keys] = this.selectItem[0][keys];
-				}
-				// 获取估价目的
-				this.getReportPurpose();
-				// 获取估价师
-				// this.getAddAppraiserLlist(this.selectItem[0].valuer2, this.addConfig.appraiserOneList);
-				// this.getAddAppraiserLlist(this.selectItem[0].valuer1, this.addConfig.appraiserTwoList);
-				// 获取二级审核人
-				this.getAddReveiwConfigInfo('update');
-				// 获取三级审核人以及项目负责人
-				this.getAddReveiwAndProjectAutorInfo(0, this.addConfig.projectManager, this.selectItem[0].valuer1, this.selectItem[0].valuer2);
-				this.getAddReveiwAndProjectAutorInfo(3, this.addConfig.reviewerTwoList, this.selectItem[0].valuer1, this.selectItem[0].valuer2);
-				this.updateReport.cost = this.updateReport.cost + '';
-				this.updateReport.valuationResult = this.updateReport.valuationResult + '';
-				this.updateReport.valuationValidityBegin = [
-					this.selectItem[0].valuationValidityBegin,
-					this.selectItem[0].valuationValidityEnd
-				];
-				this.UpdateReportModel = true;
+				this.getModelAllFielde(this.selectItem[0].sysDocumentId);
 			} else {
 				this.reportTool.toast('error', '只能选择一项进行修改');
+			}
+		},
+		// 获取修改报告的信息
+		getModelAllFielde(id) {
+			this.reportSrv.queryChageInfoByCode({templateId: this.selectReportName, reportId: id}).then(val => {
+				if (val.code === '1000') {
+					this.setChangeReportInfo(val.data)
+				}
+			})
+		},
+		// 设置修改弹窗信息
+		setChangeReportInfo(data) {
+			let obj = {};
+			let objRules = {};
+			this.addList = data;
+			data.forEach(v => {
+				obj[v.key] = v.value;
+				if (v.dataType === 'Number') {
+					objRules[v.key] = [
+						{required: v.required, type: 'number', message: v.label + '是必填项', trigger: 'change'}
+					]
+				} else {
+					if (v.type === 'date') {
+						objRules[v.key] = [
+							{required: v.required, message: v.label + '是必填项', trigger: 'change', pattern: /.+/}
+						]
+					} else {
+						objRules[v.key] = [
+							{required: v.required, message: v.label + '是必填项', trigger: 'change'}
+						]
+					}
+				}
+			});
+			console.log(objRules);
+			this.addOption = {
+				width: 960,
+				hidden: true,
+				height: data.length > 13 ? 600 : 300,
+				title: '修改信息',
+				style: {top: '100px', height: '90vh'},
+				ruleValidate: objRules,
+				modelData: obj,
+				dataList: data,
+				modalType: 'update',
+			};
+		},
+		// 设置详情弹窗
+		setDetailReportInfo(data) {
+			this.detailOption = {
+				width: 960,
+				hidden: true,
+				height: data.length > 20 ? 500 : 200,
+				title: '详情',
+				style: {top: '100px', height: '90vh'},
+				dataList: data,
+				surebtn: '确认',
+				canclebtn: '取消',
 			}
 		},
 		// 取消选择，关闭弹窗
 		closeUpdateModel() {
 			this.selectItem = [];
-			this.addSubmitReport = new mianModel.AddReport();
-			this.updateReport = new mianModel.AddLocalReport();
 			this.selRport = new mianModel.SelectReportType();
-			for (let key in this.addConfig) {
-				this.addConfig[key] = []
-			}
+			this.addOption.hidden = false;
+			this.addOption.ruleValidate = {};
+			this.addOption.modelData = {};
+			this.addOption.dataList = [];
+			this.addList = [];
 			// 调用子组件得方法
 			this.$refs.tables.clearSelect();
-			this.UpdateReportModel = false;
-			this.addReportModel = false;
 		},
-		// 提交修改数据
-		updateReportInfo(name) {
-			this.$refs[name].validate(valid => {
-				if (valid) {
-					for (let key in this.updateReport) {
-						this.addSubmitReport[key] = this.updateReport[key];
-					}
-					// if (this.addSubmitReport.sex) {
-					//     this.addSubmitReport.mandatorName = this.addSubmitReport.mandatorName + this.addSubmitReport.sex;
-					// }
-					// this.addSubmitReport.mandatorName = this.addSubmitReport.mandatorName + this.addSubmitReport.sex;
-					this.addSubmitReport.valuationDate = this.setTimeFomart(this.addSubmitReport.valuationDate);
-					this.addSubmitReport.valuationValidityBegin = this.setTimeFomart(this.updateReport.valuationValidityBegin[0]);
-					this.addSubmitReport.valuationValidityEnd = this.setTimeFomart(this.updateReport.valuationValidityBegin[1]);
-					this.setValueToLable(this.addSubmitReport.auditor2Uuid, this.addConfig.reviewerOneList, (data) => {
-						this.addSubmitReport.auditor2 = data;
-					});
-					this.setValueToLable(this.addSubmitReport.auditor3Number, this.addConfig.reviewerTwoList, (data) => {
-						this.addSubmitReport.auditor3 = data;
-					});
-					this.setValueToLable(this.addSubmitReport.projectPrincipalNumber, this.addConfig.projectManager, (data) => {
-						this.addSubmitReport.projectPrincipal = data;
-					});
-					this.addSubmitReport.reportType = this.selRport.reportType;
-					this.addSubmitReport.reportId = this.reportId;
-					delete this.addSubmitReport.sex;
-					// console.log(this.addSubmitReport);
-					this.reportSrv.updateReport(this.addSubmitReport).then(value => {
-						if (value.code === '1000') {
-							this.closeUpdateModel();
-							this.initReportData();
-							this.reportTool.toast('success', value.msg);
-						} else {
-							this.reportTool.toast('error', value.msg);
-						}
-					})
-				}
-			})
+		closeDetailModel() {
+			this.detailOption.hidden = false;
+			// this.detailOption.hidden = [];
+			this.detailOption.dataList = [];
 		},
 		// 删除报告
 		deleteReport() {
@@ -631,7 +549,7 @@ export default {
 			} else {
 				let data = [];
 				this.selectItem.forEach(val => {
-					 data.push({sysDocumentId: val.sysDocumentId})
+					data.push({sysDocumentId: val.sysDocumentId})
 				});
 				this.reportTool.setModal('confirm', '删除提醒', '您确认要删除该项吗?', () => {
 					this.reportSrv.delReport({
@@ -657,6 +575,7 @@ export default {
 		paging,
 		tables,
 		QRCodes,
-		modal
+		modal,
+		detailModal
 	}
 }

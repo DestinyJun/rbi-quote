@@ -51,12 +51,19 @@ export default class Server {
     }
     // 修改
     updateReport(data){
-        return clientHttp.post('/report/updateByReportId', data)
+        return clientHttp.post('/report/modify', data)
     }
     // 删除报告
     delReport(data){
         return clientHttp.post('/report/deleteByReportId', data)
     }
+    // 查询修改报告
+	 queryChageInfoByCode(data){
+		return clientHttp.post('/report/preModify', data)
+	 }
+	 queryDetailInfo(data){
+    	return clientHttp.post('/report/findOneByReportId', data)
+	 }
 
 
 

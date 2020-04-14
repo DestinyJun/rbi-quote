@@ -10,12 +10,12 @@
             <div v-for="(item, index) in dialogOption.dataList" :key="index" >
               <Col span="12" v-if="item.styleType === 1">
                 <FormItem :label="item.label" :prop="item.key" :label-width="100">
-                  <Col span="20" v-if="item.type === 'input'">
-                    <Input v-model="dialogOption.modelData[item.key]" :placeholder="item.placeholder" />
+                  <Col span="22" v-if="item.type === 'input'">
+                    <Input v-model="dialogOption.modelData[item.key]" :placeholder="item.placeholder"  :disabled="!item.disabled"/>
                   </Col>
-                  <Col span="20" v-if="item.type === 'select'">
+                  <Col span="22" v-if="item.type === 'select'">
                     <Select v-model="dialogOption.modelData[item.key]" style="text-align: left">
-                      <Option v-for="(select_item, selIndex) in item.list" :value="select_item.value" :key="selIndex">{{ select_item.label }}</Option>
+                      <Option v-for="(select_item, selIndex) in item.list" :value="select_item.value" :key="selIndex" :disabled="!item.disabled">{{ select_item.label }}</Option>
                     </Select>
                   </Col>
                 </FormItem>
@@ -27,33 +27,34 @@
               </Col>
             </div>
             <div v-for="(item, index) in dialogOption.dataList" :key="index + 1000" >
-              <Col span="10" v-if="item.styleType === 2">
+
+              <Col span="12" v-if="item.styleType === 2">
                 <FormItem :label="item.label" :prop="item.key" :label-width="100">
                   <!--输入框-->
                   <Col span="22" v-if="item.type === 'input'">
-                    <Input v-model="dialogOption.modelData[item.key]" :placeholder="item.placeholder"></Input>
+                    <Input v-model="dialogOption.modelData[item.key]" :placeholder="item.placeholder" :disabled="!item.disabled"></Input>
                   </Col>
                   <!--下拉框-->
                   <Col span="22" v-if="item.type === 'select'">
                     <Select v-model="dialogOption.modelData[item.key]" style="text-align: left">
-                      <Option v-for="(select_item, selIndex) in item.list" :value="select_item.value" :key="selIndex">{{ select_item.label }}</Option>
+                      <Option v-for="(select_item, selIndex) in item.list" :value="select_item.value" :key="selIndex" :disabled="!item.disabled">{{ select_item.label }}</Option>
                     </Select>
                   </Col>
                   <!--日期-->
                   <Col span="30" style="text-align: left" v-if="item.type === 'date'">
-                    <DatePicker type="date" :placeholder="item.placeholder"  style="width: 92%" v-model="dialogOption.modelData[item.key]"></DatePicker>
+                    <DatePicker  :placeholder="item.placeholder"  style="width: 92%" format="yyyy-MM-dd" v-model="dialogOption.modelData[item.key]"   @on-change="changeDateOfType($event, item.key)" :disabled="!item.disabled"></DatePicker>
                   </Col>
                   <Col span="22"  v-if="item.type === 'check'">
                     <CheckboxGroup v-model="dialogOption.modelData[item.key]" disabled>
                       <Col span="12"  v-for="(i, checkindex) in item.list" :key="checkindex" style="text-align: left">
-                        <Checkbox :label="i.value" >{{i.label}}</Checkbox>
+                        <Checkbox :label="i.value" :disabled="!item.disabled">{{i.label}}</Checkbox>
                       </Col>
                     </CheckboxGroup>
                   </Col>
                   <Col span="22" v-if="item.type === 'radio'">
                     <RadioGroup v-model="dialogOption.modelData[item.value]">
                       <Col span="12"  v-for="(i, radioindex) in item.list" :key="radioindex" style="text-align: left">
-                        <Radio :label="i.value" style="margin-left: 28px">{{i.label}}</Radio>
+                        <Radio :label="i.value" style="margin-left: 28px" :disabled="!item.disabled">{{i.label}}</Radio>
                       </Col>
                     </RadioGroup>
                   </Col>
@@ -67,22 +68,22 @@
               <Col span="12" v-if="item.styleType === 3">
                 <FormItem :label="item.label" :prop="item.key" :label-width="100">
                   <Col span="20" v-if="item.type === 'input'">
-                    <Input v-model="dialogOption.modelData[item.key]" :placeholder="item.placeholder"></Input>
+                    <Input v-model="dialogOption.modelData[item.key]" :placeholder="item.placeholder" :disabled="!item.disabled"></Input>
                   </Col>
                   <Col span="20" v-if="item.type === 'select'">
                     <Select v-model="dialogOption.modelData[item.key]" style="text-align: left">
-                      <Option v-for="(select_item, selIndex) in item.selList" :value="select_item.value" :key="selIndex">{{ select_item.label }}</Option>
+                      <Option v-for="(select_item, selIndex) in item.selList" :value="select_item.value" :disabled="!item.disabled" :key="selIndex">{{ select_item.label }}</Option>
                     </Select>
                   </Col>
                   <Col span="18" v-if="item.type === 'textarea'">
-                    <Input v-model="dialogOption.modelData[item.key]" maxlength="300" show-word-limit type="textarea" :placeholder="item.placeholder"/>
+                    <Input v-model="dialogOption.modelData[item.key]" maxlength="300" show-word-limit :disabled="!item.disabled" type="textarea" :placeholder="item.placeholder"/>
                   </Col>
                 </FormItem>
               </Col>
               <Col span="20" v-if="item.styleType === 4">
                 <FormItem :label="item.label" :prop="item.key" :label-width="100">
                   <Col span="18" v-if="item.type === 'textarea'">
-                    <Input v-model="dialogOption.modelData[item.key]" maxlength="300" show-word-limit type="textarea" :placeholder="item.placeholder"/>
+                    <Input v-model="dialogOption.modelData[item.key]" maxlength="300" :disabled="!item.disabled" show-word-limit type="textarea" :placeholder="item.placeholder"/>
                   </Col>
                 </FormItem>
               </Col>
@@ -148,10 +149,16 @@
           },
        }
     },
-    updated() {
-    },
-    methods:{
+		// 监听父组件传值
+		// watch:{
+		// 	dialogOption: (item) => {//箭头函数  不然会发生this改变
+		// 		console.log(item.modelData);
+		// 		console.log(item.dataList)
+		// 	}
+		// },
+		methods:{
 			addUploadReport(){
+				console.log(this.dialogOption.modelData);
 				this.$refs['modelData'].validate(valid => {
 					if (valid){
 						this.$emit('addUploadReport', this.dialogOption.modelData, this.dialogOption.modalType)
@@ -159,12 +166,20 @@
 				})
       },
 			clearData(){
-				this.dialogOption.hidden = false;
-				this.dialogOption.modelData = {};
-				this.dialogOption.ruleValidate = {};
-				this.dialogOption.dataList = [];
-      }
-    }
+				this.$emit('closeModel')
+      },
+			changeDateOfType(val, key){
+				let date = new Date(val);
+				this.dialogOption.modelData[key] = date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate();
+
+			}
+    },
+		filters: {
+    	setDateForString: function (data) {
+				let date = new Date(data);
+				return  date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate();
+			}
+		}
   }
 </script>
 
