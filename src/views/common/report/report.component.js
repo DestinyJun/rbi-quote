@@ -44,66 +44,159 @@ export default {
 			addReporFiledtList: [],
 			// 当前选中报告的名字
 			selectReportName: '',
+			// 选择的表名
+			selReportTable: '',
 			// 表格数据
 			tableOption: {
 				title: [
-					{
+
+					// {
+					// 	title: '报告编号',
+					// 	key: 'reportId',
+					// 	align: 'left',
+					// 	width: 180,
+					// },
+					// {
+					// 	title: '报告类型',
+					// 	key: 'reportType',
+					// 	align: 'center',
+					// 	width: 180,
+					// },
+					// {
+					// 	title: '审核状态',
+					// 	key: 'auditStatus',
+					// 	align: 'center',
+					// 	width: 180,
+					// },
+					// {
+					// 	title: '估价委托人',
+					// 	key: 'mandatorName',
+					// 	align: 'center',
+					// 	width: 180,
+					// },
+					// {
+					// 	title: '估价对象',
+					// 	key: 'valuationObject',
+					// 	align: 'center',
+					// },
+					// {
+					// 	title: '项目负责人',
+					// 	key: 'projectPrincipal',
+					// 	align: 'center',
+					// 	width: 140,
+					// },
+					// {
+					// 	title: '估价结果',
+					// 	key: 'valuationResult',
+					// 	align: 'right',
+					// 	width: 140,
+					// 	render: (h, params) => {
+					// 		return h('div', [
+					// 			h('span', {
+					// 				style: {
+					// 					color: '#EF9F20'
+					// 				},
+					// 			}, params.row.result)
+					// 		]);
+					// 	}
+					// },
+
+				],
+				content: [],
+			},
+			// 模态框数据
+			detailOption: '', // 详情弹窗
+			QRCodeModal: false, // 打印二维码弹窗
+			addTypeReportModel: false, // 填报类型选择弹窗
+
+			// 报告类型选择
+			selRport: new mianModel.SelectReportType(),
+			// 填写报告
+			addReport: new mianModel.AddLocalReport(),
+			addSubmitReport: new mianModel.AddReport(),
+			updateReport: new mianModel.AddLocalReport(),
+			detailReport: new mianModel.AddLocalReport(),
+			//修改时需要的id
+			reportId: '',
+			// 估价师总列表
+			appraiserTotalList: [],
+			// 二维码内容
+			codeUrl: 'http://www.gyrbi.com/quote',
+			// 工具类
+			reportTool: new Tool(),
+			reportSrv: new serve(),
+			addList: [],
+			// 报告选择的规则
+			ruleValidate: {
+				reportType: [
+					{required: true, message: '请选择报告类型', trigger: 'change'}
+				],
+			},
+			addOption: ''
+		}
+	},
+	created() {
+		Promise.resolve(this.getReportType()).then(() => {
+			return Promise.resolve(this.getReportStatus())
+		}).then(() => {
+			Promise.resolve(this.getTableTitle())
+		});
+		// this.getAddAppraiserLlist('', this.appraiserTotalList);
+	},
+	methods: {
+		// 获取类型
+		getReportType() {
+			return new Promise((resolve) => {
+				this.reportSrv.getReportTypeList({}).then(value => {
+					if (value.code === '1000') {
+
+						value.data.forEach((v, index) => {
+							if (index === 1) {
+								this.reportTypeList.centent.push({
+									name: v.tempName,
+									value: '1',
+									bgc: '#FFFFFF',
+									color: '#5D6063',
+									table: v.tempTable,
+									uuid: v.uuid
+								});
+								this.selectReportName = v.uuid;
+								this.selReportTable = v.tempTable;
+								this.selTable = v.statusCode;
+							} else {
+								this.reportTypeList.centent.push({
+									name: v.tempName,
+									value: '0',
+									bgc: '#EFEFEF',
+									color: '#C2C2C2',
+									table: v.tempTable,
+									uuid: v.uuid
+								})
+							}
+						});
+						resolve();
+					}else {
+						this.reportTool.toast('error', value.msg)
+					}
+				});
+			})
+		},
+		// 获取表头
+		getTableTitle(){
+       this.reportSrv.getTableTitleData({tempTable: this.selReportTable}).then(val => {
+       	if (val.code === '1000'){
+       		// console.log(val);
+					this.tableOption.title = [];
+					val.data.forEach(v=> {
+						this.tableOption.title.push(v)
+					});
+					this.tableOption.title.unshift({
 						type: 'selection',
 						width: 60,
 						align: 'center',
 						className: 'select-table'
-					},
-					{
-						title: '报告编号',
-						key: 'reportId',
-						align: 'left',
-						width: 180,
-					},
-					{
-						title: '报告类型',
-						key: 'reportType',
-						align: 'center',
-						width: 180,
-					},
-					{
-						title: '审核状态',
-						key: 'auditStatus',
-						align: 'center',
-						width: 180,
-					},
-					{
-						title: '估价委托人',
-						key: 'mandatorName',
-						align: 'center',
-						width: 180,
-					},
-					{
-						title: '估价对象',
-						key: 'valuationObject',
-						align: 'center',
-					},
-					{
-						title: '项目负责人',
-						key: 'projectPrincipal',
-						align: 'center',
-						width: 140,
-					},
-					{
-						title: '估价结果',
-						key: 'valuationResult',
-						align: 'right',
-						width: 140,
-						render: (h, params) => {
-							return h('div', [
-								h('span', {
-									style: {
-										color: '#EF9F20'
-									},
-								}, params.row.result)
-							]);
-						}
-					},
-					{
+					});
+					this.tableOption.title.push(	{
 						title: '操作',
 						key: 'action',
 						width: 200,
@@ -147,82 +240,13 @@ export default {
 								}, '打印二维码')
 							]);
 						}
-					}
-				],
-				content: [],
-			},
-			// 模态框数据
-			detailOption: '', // 详情弹窗
-			QRCodeModal: false, // 打印二维码弹窗
-			addTypeReportModel: false, // 填报类型选择弹窗
-
-			// 报告类型选择
-			selRport: new mianModel.SelectReportType(),
-			// 填写报告
-			addReport: new mianModel.AddLocalReport(),
-			addSubmitReport: new mianModel.AddReport(),
-			updateReport: new mianModel.AddLocalReport(),
-			detailReport: new mianModel.AddLocalReport(),
-			//修改时需要的id
-			reportId: '',
-			// 估价师总列表
-			appraiserTotalList: [],
-			// 二维码内容
-			codeUrl: 'http://www.gyrbi.com/quote',
-			// 工具类
-			reportTool: new Tool(),
-			reportSrv: new serve(),
-			addList: [],
-			// 报告选择的规则
-			ruleValidate: {
-				reportType: [
-					{required: true, message: '请选择报告类型', trigger: 'change'}
-				],
-			},
-			addOption: ''
-		}
-	},
-	created() {
-		Promise.resolve(this.getReportType()).then(() => {
-			return Promise.resolve(this.getReportStatus())
-		}).then(() => {
-			Promise.resolve(this.initReportData())
-		});
-		// this.getAddAppraiserLlist('', this.appraiserTotalList);
-	},
-	methods: {
-		// 获取类型
-		getReportType() {
-			return new Promise((resolve) => {
-				this.reportSrv.getReportTypeList({}).then(value => {
-					if (value.code === '1000') {
-						value.data.forEach((v, index) => {
-							if (index === 1) {
-								this.reportTypeList.centent.push({
-									name: v.tempName,
-									value: '1',
-									bgc: '#FFFFFF',
-									color: '#5D6063',
-									table: v.tempTable,
-									uuid: v.uuid
-								});
-								this.selectReportName = v.uuid;
-								this.selTable = v.statusCode;
-							} else {
-								this.reportTypeList.centent.push({
-									name: v.tempName,
-									value: '0',
-									bgc: '#EFEFEF',
-									color: '#C2C2C2',
-									table: v.tempTable,
-									uuid: v.uuid
-								})
-							}
-						});
-						resolve();
-					}
-				});
-			})
+					});
+					this.initReportData();
+					console.log(this.tableOption.title);
+				}else {
+					this.reportTool.toast('error', val.msg)
+				}
+			 })
 		},
 		// 获取状态
 		getReportStatus() {
@@ -248,6 +272,8 @@ export default {
 							}
 						});
 						resolve()
+					}else {
+						this.reportTool.toast('error', value.msg)
 					}
 				});
 			})
@@ -265,8 +291,8 @@ export default {
 					this.tableOption.content = value.data.contents;
 					this.tableOption.content.forEach(v => {
 						this.reportStatusList.centent.forEach(val => {
-							if (val.value === v.auditStatus) {
-								v.auditStatus = val.name
+							if (val.value === v.sysStatus.toString()) {
+								v.sysStatus = val.name
 							}
 						})
 					});
@@ -300,7 +326,8 @@ export default {
 				this.reportTypeList.centent[index].color = '#5D6063';
 				this.reportTypeList.centent[index].value = '1';
 				this.selectReportName = this.reportTypeList.centent[index].uuid;
-				this.initReportData();
+				this.selReportTable = this.reportTypeList.centent[index].table;
+				this.getTableTitle();
 			}
 
 		},
@@ -335,6 +362,8 @@ export default {
 			this.reportSrv.queryDetailInfo({templateId: this.selectReportName, reportId: data.sysDocumentId}).then(res => {
 				if (res.code === '1000') {
 					this.setDetailReportInfo(res.data)
+				}else {
+					this.reportTool.toast('error', res.msg)
 				}
 			});
 		},
@@ -384,15 +413,26 @@ export default {
 			this.addList = data;
 			data.forEach(v => {
 				obj[v.key] = '';
-				objRules[v.key] = [
-					{required: v.required, message: v.label + '是必填项', trigger: 'change'}
-				]
+				if (v.dataType === 'Number') {
+					objRules[v.key] = [
+						{required: v.required,type: 'number', message: v.label + '是必填项', trigger: 'blur'}
+					]
+				} else {
+					if (v.type === 'date') {
+						objRules[v.key] = [
+							{required: v.required, message: v.label + '是必填项', trigger: 'change', pattern: /.+/}
+						]
+					} else {
+						objRules[v.key] = [
+							{required: v.required, message: v.label + '是必填项', trigger: 'change'}
+						]
+					}
+				}
 			});
-			console.log(objRules);
 			this.addOption = {
 				width: 960,
 				hidden: true,
-				height: data.length > 13 ? 600 : 300,
+				height: data.length > 13 ? 600 : data.length < 8 ? 300: 500 ,
 				title: '添加信息',
 				style: {top: '100px', height: '90vh'},
 				ruleValidate: objRules,
@@ -478,6 +518,7 @@ export default {
 		},
 		// 设置修改弹窗信息
 		setChangeReportInfo(data) {
+			console.log(data);
 			let obj = {};
 			let objRules = {};
 			this.addList = data;
@@ -485,7 +526,7 @@ export default {
 				obj[v.key] = v.value;
 				if (v.dataType === 'Number') {
 					objRules[v.key] = [
-						{required: v.required, type: 'number', message: v.label + '是必填项', trigger: 'change'}
+						{required: v.required,type: 'number', message: v.label + '是必填项', trigger: 'blur'}
 					]
 				} else {
 					if (v.type === 'date') {
@@ -503,7 +544,7 @@ export default {
 			this.addOption = {
 				width: 960,
 				hidden: true,
-				height: data.length > 13 ? 600 : 300,
+				height: data.length > 13 ? 600 : data.length < 8 ? 300: 500 ,
 				title: '修改信息',
 				style: {top: '100px', height: '90vh'},
 				ruleValidate: objRules,
@@ -517,7 +558,7 @@ export default {
 			this.detailOption = {
 				width: 960,
 				hidden: true,
-				height: data.length > 20 ? 500 : 200,
+				height: data.length > 15 ? 500 : 300,
 				title: '详情',
 				style: {top: '100px', height: '90vh'},
 				dataList: data,

@@ -36,7 +36,7 @@
     height: 10vh;
     background: #FFFFFF;
     text-align: left;
-    padding: 1.5vh 2vw;
+    padding: 4vh 2vw;
     div:first-child {
       margin-bottom: 1.4vh;
       span {
@@ -61,29 +61,29 @@
       }
 
     }
-    div:last-child {
-      span {
-        display: inline-block;
-        width: 5vw;
-        border: 1px solid #EAEAEA;
-        text-align: center;
-        font-size: 12px;
-        padding: 0.3vh 0;
-      }
-      span:first-child {
-        display: inline;
-        border: 0;
-        margin-right: 1vw;
-        font-weight: 600;
-      }
-      span:nth-child(2) {
-        border-radius: 15px  0 0 15px;
-      }
-      span:last-child {
-        border-radius: 0 15px 15px 0;
-      }
-
-    }
+    //div:last-child {
+    //  span {
+    //    display: inline-block;
+    //    width: 5vw;
+    //    border: 1px solid #EAEAEA;
+    //    text-align: center;
+    //    font-size: 12px;
+    //    padding: 0.3vh 0;
+    //  }
+    //  span:first-child {
+    //    display: inline;
+    //    border: 0;
+    //    margin-right: 1vw;
+    //    font-weight: 600;
+    //  }
+    //  span:nth-child(2) {
+    //    border-radius: 15px  0 0 15px;
+    //  }
+    //  span:last-child {
+    //    border-radius: 0 15px 15px 0;
+    //  }
+    //
+    //}
   }
   /*内容*/
   .review-centent {

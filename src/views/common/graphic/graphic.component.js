@@ -8,33 +8,33 @@ export default {
 	data() {
 		return {
 			// 选择项目负责人
-			selectAutor: '',
-			autorList: [],
-			// 选择报告类型
-			reportType: '',
+			selectAutor: '0',
 			reportTypeList: [],
+			// 选择报告类型
+			reportType: '0',
+			autorList: [],
+
+      colorList: [
+				{color: "#3DA2F8"},
+				{color: "#60CAD8"},
+				{color: "#AEE5FF"},
+				{color: "#FAB1A0"},
+				{color: "#FDCB6E"},
+			],
 			searchGraphicData: '',
 			dataPiefir: {
-				listData: [
-					{value: 535, legendname: '房地产评估报告', name: "房地产评估报告", itemStyle: {color: "#3DA2F8"}},
-					{value: 310, legendname: '房屋评估报告', name: "房屋评估报告", itemStyle: {color: "#60CAD8"}},
-					{value: 234, legendname: '资产评估报告', name: "资产评估报告", itemStyle: {color: "#AEE5FF"}},
-					{value: 154, legendname: '土地评估报告', name: "土地评估报告", itemStyle: {color: "#FAB1A0"}},
-					{value: 254, legendname: '土地评估报告1', name: "土地评估报告1", itemStyle: {color: "#FDCB6E"}},
-				],
+				listData: [],
 				height: '37vh',
-				total: '1233'
+				total: 0
 			},
 			dataPiesec: {
-				listData: [
-					{value: 535, legendname: '房地产评估报告', name: "房地产评估报告", itemStyle: {color: "#3DA2F8"}},
-					{value: 310, legendname: '房屋评估报告', name: "房屋评估报告", itemStyle: {color: "#60CAD8"}},
-					{value: 234, legendname: '资产评估报告', name: "资产评估报告", itemStyle: {color: "#AEE5FF"}},
-					{value: 154, legendname: '土地评估报告', name: "土地评估报告", itemStyle: {color: "#FDCB6E"}},
-				],
+				listData: [],
 				height: '38vh',
-				total: '1233'
+				total: 0
 			},
+			showFirPie: false,
+			showSecPie: false,
+
 			data: {
 				barData: [{"name": "1月", "value": 56.65},
 					{"name": "2月", "value": 87.8,},
@@ -57,16 +57,9 @@ export default {
 		}
 	},
 	created() {
-		// this.graphicSrv.judgeAuthorityOfUser({}).then(
-		//
-		// 	value => {
-		// 		if (value.code === '1000') {
-		// 			this.isAuthority = true;
-		// 		} else {
-		// 			this.isAuthority = false;
-		// 		}
-		// 	});
 		this.getProjectMangerList();
+		this.getPieDataForType();
+		this.getPieDataForSchedule();
 
 	},
 	methods: {
@@ -75,25 +68,58 @@ export default {
 			this.graphicSrv.getProjectManager({}).then(res => {
 				console.log(res);
 				if (res.code === '1000') {
-					this.reportTypeList = [{label: '全部', value: ''}];
-					this.autorList = [{label: '全部', value: ''}];
+					this.reportTypeList = [{label: '全部', value: '0'}];
+					this.autorList = [{label: '全部', value: '0'}];
 					res.data.principal.forEach(val => {
-						this.autorList.push({label: val.projectPrincipal, value: val.projectPrincipalUuid})
+						this.autorList.push({label: val.sysPrincipalName, value: val.sysPrincipalId})
 					});
 					res.data.template.forEach(val => {
-						this.reportTypeList.push({label: val.tempName, value: val.uuid})
+						this.reportTypeList.push({label: val.tempName, value: val.tempTable})
 					});
-					console.log(this.reportTypeList);
 				} else {
 					this.graphicTool.toast('error', res.msg)
 				}
 			})
 		},
+		getPieDataForType(){
+			console.log(this.reportType);
+			this.graphicSrv.getPieData({uuid: this.selectAutor, reportType: this.reportType}).then(val => {
+					if (val.code === '1000') {
+						this.dataPiesec.listData = [];
+						this.dataPiesec.total = 0;
+						val.data.forEach((v, index) => {
+							this.dataPiesec.total = this.dataPiesec.total + v.count;
+							this.dataPiesec.listData.push({value: v.count, legendname: v.status, name: v.status, itemStyle: this.colorList[index]},)
+						});
+						this.showSecPie = true;
+						this.$refs.dataPie2.drawPie();
+					}else {
+						this.graphicTool.toast('error', val.msg)
+					}
+				});
+
+		},
+		getPieDataForSchedule(){
+			this.graphicSrv.getPieData({uuid: this.selectAutor}).then(val => {
+				if (val.code === '1000') {
+					this.dataPiefir.listData = [];
+					this.dataPiefir.total= 0;
+					val.data.forEach((v, index) => {
+						this.dataPiefir.total = this.dataPiefir.total + v.count;
+						this.dataPiefir.listData.push({value: v.count, legendname: v.status, name: v.status, itemStyle: this.colorList[index]},)
+					});
+					this.showFirPie = true;
+					this.$refs.dataPie1.drawPie();
+				}else {
+					this.graphicTool.toast('error', val.msg)
+				}
+			});
+		},
 		changeAutor() {
-			console.log(this.selectAutor);
+			this.getPieDataForSchedule();
 		},
 		changeReportType() {
-			console.log(123);
+			this.getPieDataForType();
 		},
 		searchData() {
 		}

@@ -31,19 +31,19 @@
                  <span style="color: #47A6F8;font-size: 28px;margin-top: 1vh">496</span>
                </div>
              </div>
-             <pie :data="dataPiefir"></pie>
+             <pie :piedata="dataPiefir" v-if="showFirPie" ref="dataPie1"/>
            </div>
            <div class="second-pie">
              <div style="text-align: left;padding: 2vh 1vw;font-size: 18px;font-weight: 600;position: absolute">
-               项目进度占比统计
+							 项目进度占比统计
              </div>
              <div style="text-align: left;padding: 2vh 1vw;position: absolute;right: 3vh;z-index: 9999">
                <span>报告类型：</span>
-               <Select v-model="reportType" style="width:200px" @on-change="changeReportType">
+               <Select v-model="reportType" style="width:200px;text-align: center" @on-change="changeReportType">
                  <Option v-for="item in reportTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                </Select>
              </div>
-             <pie :data="dataPiesec"></pie>
+             <pie :piedata="dataPiesec" v-if="showSecPie" ref="dataPie2"/>
            </div>
          </div>
          <div class="content-right">
@@ -55,9 +55,9 @@
             <span style="color: #000">
               选择年份：
             </span>
-             <DatePicker type="year" placeholder="选择年份" style="width: 200px"></DatePicker>
+             <DatePicker type="year" placeholder="选择年份" style="width: 200px" />
            </div>
-           <bar :data="data"></bar>
+           <bar :data="data" />
          </div>
        </div>
      </div>

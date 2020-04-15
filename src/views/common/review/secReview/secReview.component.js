@@ -20,93 +20,7 @@ export default {
 			},
 			// 表格数据
 			tableOption: {
-				title: [
-					{
-						type: 'selection',
-						width: 60,
-						align: 'center',
-						className: 'select-table'
-					},
-					{
-						title: '报告编号',
-						key: 'reportId',
-						align: 'left',
-						width: 180,
-					},
-					{
-						title: '报告类型',
-						key: 'reportType',
-						align: 'center',
-						width: 180,
-					},
-					{
-						title: '审核状态',
-						key: 'sysStatus',
-						align: 'center',
-						width: 180,
-					},
-					{
-						title: '估价委托人',
-						key: 'mandatorName',
-						align: 'center',
-						width: 180,
-					},
-					{
-						title: '估价对象',
-						key: 'valuationObject',
-						align: 'center',
-					},
-					{
-						title: '项目负责人',
-						key: 'projectPrincipal',
-						align: 'center',
-						width: 140,
-					},
-					{
-						title: '估价结果',
-						key: 'valuationResult',
-						align: 'right',
-						width: 140,
-						render: (h, params) => {
-							return h('div', [
-								h('span', {
-									style: {
-										color: '#EF9F20'
-									},
-								}, params.row.result)
-							]);
-						}
-					},
-					{
-						title: '操作',
-						key: 'action',
-						width: 200,
-						align: 'center',
-						render: (h, params) => {
-							return h('div', [
-								h('Button', {
-									props: {
-										size: 'small',
-									},
-									style: {
-										fontSize: '12px',
-										width: '4vw',
-										background: (params.row.sysStatus === '未二级审核') ? '#3DA2F8' : "#C9D0D6",
-										color: '#fff'
-									},
-									attrs: {
-										disabled: (params.row.sysStatus !== '未二级审核')
-									},
-									on: {
-										click: () => {
-											this.reviewClick(params.row)
-										}
-									}
-								}, '审核')
-							]);
-						}
-					}
-				],
+				title: [],
 				content: [],
 			},
 			// 分页数据
@@ -122,9 +36,10 @@ export default {
 			now_num: 10,
 			auditName: '',
 			selectReportName: '',
+			selReportTable: '',
 			searchreviewData: '',
 			// 模态框数据
-			reviewModal: false,
+			reviewNoModal: false,
 			// 工具类
 			reviewTool: new Tool(),
 			reviewSrv: new serve(),
@@ -161,10 +76,9 @@ export default {
 			return Promise.resolve(this.getReportStatus())
 
 		}).then(() => {
-			Promise.resolve(this.initReviewData())
+			Promise.resolve(this.getTableTitle())
 		});
 		// this.getAppraiserLlist('', this.appraisalList);
-
 	},
 	methods: {
 		// 获取类型
@@ -172,6 +86,7 @@ export default {
 			return new Promise((resolve) => {
 				this.reviewSrv.getReportTypeList({}).then(value => {
 					if (value.code === '1000') {
+						console.log(value);
 						value.data.forEach((v, index) => {
 							if (index === 1) {
 								this.reportTypeList.centent.push({
@@ -179,20 +94,25 @@ export default {
 									value: '1',
 									bgc: '#FFFFFF',
 									color: '#5D6063',
+									table: v.tempTable,
 									uuid: v.uuid
 								});
 								this.selectReportName = v.uuid;
+								this.selReportTable = v.tempTable;
 							} else {
 								this.reportTypeList.centent.push({
 									name: v.tempName,
 									value: '0',
 									bgc: '#EFEFEF',
 									color: '#C2C2C2',
+									table: v.tempTable,
 									uuid: v.uuid
 								})
 							}
 						});
 						resolve();
+					} else {
+						this.reviewTool.toast('error', value.msg)
 					}
 				});
 			})
@@ -202,8 +122,8 @@ export default {
 			return new Promise((resolve) => {
 				this.reviewSrv.getReportStatusList({}).then(value => {
 					if (value.code === '1000') {
-						value.data.forEach((v, index) => {
-							if (index === 0) {
+						value.data.forEach((v) => {
+							if (v.statusName ===  '未二级审核') {
 								this.reportStatusList.centent.push({
 									name: v.statusName,
 									value: v.statusCode,
@@ -221,8 +141,61 @@ export default {
 							}
 						});
 						resolve()
+					} else {
+						this.reviewTool.toast('error', value.msg)
 					}
 				});
+			})
+		},
+		// 获取表头
+		getTableTitle(){
+			this.reviewSrv.getTableTitleData({tempTable: this.selReportTable}).then(val => {
+				console.log(val);
+				if (val.code === '1000'){
+					this.tableOption.title = [];
+					val.data.forEach(v=> {
+						this.tableOption.title.push(v)
+					});
+					this.tableOption.title.unshift({
+						type: 'selection',
+						width: 60,
+						align: 'center',
+						className: 'select-table'
+					});
+					this.tableOption.title.push({
+						title: '操作',
+						key: 'action',
+						width: 200,
+						align: 'center',
+						render: (h, params) => {
+							return h('div', [
+								h('Button', {
+									props: {
+										size: 'small',
+									},
+									style: {
+										fontSize: '12px',
+										width: '4vw',
+										background: (params.row.sysStatus === '未二级审核') ? '#3DA2F8' : "#C9D0D6",
+										color: '#fff'
+									},
+									attrs: {
+										disabled: (params.row.sysStatus !== '未二级审核')
+									},
+									on: {
+										click: () => {
+											this.reviewClick(params.row.sysDocumentId)
+										}
+									}
+								}, '审核')
+							]);
+						}
+					});
+					this.initReviewData();
+					console.log(this.tableOption.title);
+				} else {
+					this.reviewTool.toast('error', val.msg)
+				}
 			})
 		},
 		// 初始化列表
@@ -235,7 +208,6 @@ export default {
 			}).then(value => {
 				this.pageOption.page_list = [];
 				if (value.code === '1000') {
-					console.log(value);
 					this.tableOption.content = value.data.contents;
 					this.tableOption.content.forEach(v => {
 						this.reportStatusList.centent.forEach(val => {
@@ -274,7 +246,7 @@ export default {
 				this.reportTypeList.centent[index].color = '#5D6063';
 				this.reportTypeList.centent[index].value = '1';
 				this.selectReportName = this.reportTypeList.centent[index].uuid;
-				console.log(this.selectReportName);
+				this.selReportTable = this.reportTypeList.centent[index].table;
 				this.initReviewData();
 			}
 
@@ -293,27 +265,40 @@ export default {
 		},
 		// 审核
 		reviewClick(data) {
-			this.reportId = data.reportId;
-			for (let key in this.detailReport) {
-				this.detailReport[key] = data[key]
+			this.reportId = data;
+			this.reviewSrv.queryDetailInfo({reportId: data, templateId: this.selectReportName}).then(
+				value => {
+					console.log(value);
+					if (value.code === '1000'){
+						this.setDetailReportInfo(value.data)
+					}else {
+						this.reviewTool.toast('error', value.message)
+					}
+				}
+			);
+		},
+		// 设置详情弹窗
+		setDetailReportInfo(data) {
+			this.detailOption = {
+				width: 960,
+				hidden: true,
+				height: data.length > 15 ? 500 : 300,
+				title: '详情',
+				style: {top: '100px', height: '90vh'},
+				dataList: data,
+				surebtn: '审核通过',
+				canclebtn: '审核不通过',
 			}
-			this.detailReport.auditor2Uuid = data.auditor2;
-			this.detailReport.auditor3Number = data.auditor3;
-			this.detailReport.projectPrincipalNumber = data.projectPrincipal;
-			this.appraisalList.forEach(val => {
-				if (this.detailReport.valuer1 === val.value) {
-					this.detailReport.valuer1 = val.label;
-				}
-				if (this.detailReport.valuer2 === val.value) {
-					this.detailReport.valuer2 = val.label;
-				}
-			});
-			this.reviewModal = true;
-
 		},
 		// 获取分页组件的数据
 		getPageDate(data) {
-			console.log(data);
+			this.now_num = data.num_Size;
+			if (data.label === 'row') {
+				this.now_page = 1;
+			} else {
+				this.now_page = data.nowPage;
+			}
+			this.initReviewData();
 		},
 
 		searchData() {
@@ -322,10 +307,11 @@ export default {
 		// 审核通过
 		reviewPasse() {
 			this.reviewTool.setRemind('审核通过', '审核通过', () => {
-				this.reviewSrv.reviewReportPass({reportId: this.reportId}).then(val => {
+				this.reviewSrv.reviewReportPass({sysTemplateId: this.selectReportName, sysDocumentId: this.reportId}).then(val => {
 					if (val.code === '1000') {
 						this.reviewTool.toast('success', val.msg);
 						this.closeModelAndClearData();
+						this.detailOption.hidden = false;
 						this.initReviewData()
 					} else {
 						this.reviewTool.toast('error', val.msg);
@@ -335,13 +321,10 @@ export default {
 		},
 		// 显示审核不通过弹窗
 		reviewNoPasse() {
-			console.log(234);
-			this.reviewModal = false;
 			this.reviewNoModal = true;
 		},
 		// 选择不通过的理由
 		changeReasonType(value) {
-			console.log(value);
 			this.effectFrom.effectType = false;
 			if (value === '其他') {
 				this.showOther = true;
@@ -376,12 +359,12 @@ export default {
 
 		},
 		closeDetailModel(){
-
+			this.detailOption.hidden = false;
+			this.reviewNoModal = true;
 		},
 		// 关闭弹窗并且清除数据
 		closeModelAndClearData() {
 			this.detailReport = new mianModel.AddLocalReport();
-			this.reviewModal = false;
 			this.reviewNoModal = false;
 			this.effectFrom = false;
 			this.showOther = false;
@@ -389,8 +372,7 @@ export default {
 		},
 		// 审核不通过的请求
 		reviewNoPassRequest(id, reason) {
-			this.reviewSrv.reviewReportNoPass({reportId: id, auditReason: reason}).then(val => {
-				console.log(val);
+			this.reviewSrv.reviewReportNoPass({sysTemplateId:this.selectReportName, sysDocumentId: id, auditReason: reason}).then(val => {
 				if (val.code === '1000') {
 					this.reviewTool.toast('success', val.msg);
 					this.closeModelAndClearData();

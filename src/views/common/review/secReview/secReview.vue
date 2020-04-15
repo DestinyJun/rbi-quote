@@ -17,10 +17,10 @@
          <span v-for="(item_text, index1) in reportTypeList.centent" :key="index1" :style="{'background': item_text.bgc, 'color':item_text.color}" @click="selectReviewType(index1)">{{item_text.name}}</span>
        </div>
        <!-- 审核状态-->
-       <div>
-         <span>{{reportStatusList.title}}：</span>
-         <span v-for="(item_text, index1) in reportStatusList.centent" :key="index1" :style="{'background': item_text.bgc,  'color':item_text.color}" @click="selectReview(index1)">{{item_text.name}}</span>
-       </div>
+<!--       <div>-->
+<!--         <span>{{reportStatusList.title}}：</span>-->
+<!--         <span v-for="(item_text, index1) in reportStatusList.centent" :key="index1" :style="{'background': item_text.bgc,  'color':item_text.color}" @click="selectReview(index1)">{{item_text.name}}</span>-->
+<!--       </div>-->
      </div>
      <div class="review-centent">
        <div class="review-search">
@@ -35,7 +35,7 @@
      </div>
      <div class="review-modal">
        <!-- 详情-->
-			<detail-modal :dialog-option="detailOption" @closeModel="closeDetailModel" />
+			<detail-modal :dialog-option="detailOption" @closeModel="closeDetailModel" @sureClick="reviewPasse"/>
 <!--       <Modal v-model="reviewModal" draggable scrollable :transfer="false"  width="960" :styles="{top: '150px'}">-->
 <!--         <p slot="header" style="color:#1C1C1C;text-align:left">-->
 <!--           <span>填报详情</span>-->

@@ -34,6 +34,7 @@
         created() {
         },
         updated() {
+
         },
         methods: {
             drawBar (){

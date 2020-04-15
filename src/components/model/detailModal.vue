@@ -1,7 +1,7 @@
 <template>
 	<div id="detailModal">
 		<Modal v-model="dialogOption.hidden" draggable scrollable :transfer="false" :width="dialogOption.width"
-					 :styles="dialogOption.style" :closable="false">
+					 :styles="dialogOption.style" >
 			<p slot="header" style="color:#1C1C1C;text-align:left; width: 60vw">
 				<span>{{dialogOption.title}}</span>
 			</p>

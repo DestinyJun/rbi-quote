@@ -2,6 +2,7 @@ import paging from "../../../../components/paging";
 import tables from "../../../../components/table";
 import Tool from "../../../../utils/tool";
 import serve from "../../../../service/service";
+import detailModal from '../../../../components/model/detailModal'
 
 export default {
 	name: 'inquire',
@@ -18,130 +19,73 @@ export default {
 			},
 			// 表格数据
 			tableOption: {
-				title: [
-					{
-						type: 'selection',
-						width: 60,
-						align: 'center',
-						className: 'select-table'
-					},
-					{
-						title: '报告编号',
-						key: 'reportId',
-						align: 'left',
-						width: 180,
-					},
-					{
-						title: '报告类型',
-						key: 'reportType',
-						align: 'center',
-						width: 180,
-					},
-					{
-						title: '审核状态',
-						key: 'auditStatus',
-						align: 'center',
-						width: 180,
-					},
-					{
-						title: '估价委托人',
-						key: 'mandatorName',
-						align: 'center',
-						width: 180,
-					},
-					{
-						title: '估价对象',
-						key: 'valuationObject',
-						align: 'center',
-					},
-					{
-						title: '项目负责人',
-						key: 'projectPrincipal',
-						align: 'center',
-						width: 140,
-					},
-					{
-						title: '估价结果',
-						key: 'valuationResult',
-						align: 'right',
-						width: 140,
-						render: (h, params) => {
-							return h('div', [
-								h('span', {
-									style: {
-										color: '#EF9F20'
-									},
-								}, params.row.result)
-							]);
-						}
-					},
-					{
-						title: '操作',
-						key: 'action',
-						width: 240,
-						align: 'center',
-						render: (h, params) => {
-							return h('div', [
-								h('Button', {
-									props: {
-										size: 'small',
-									},
-									style: {
-										fontSize: '12px',
-										width: '3vw',
-										background: (params.row.auditStatus === '未缴费') ? '#3DA2F8' : "#C9D0D6",
-										color: '#fff',
-										border: 0
-									},
-									attrs: {
-										disabled: (params.row.auditStatus === '未缴费')
-									},
-									on: {
-										click: () => {
-											this.inquireClick(params.index)
-										}
-									}
-								}, (params.row.auditStatus !== '未缴费') ? '未完成' : '已完成'),
-								h('Button', {
-									props: {
-										size: 'small',
-									},
-									style: {
-										fontSize: '12px',
-										width: '2.4vw',
-										background: '#3DA2F8',
-										color: '#fff',
-										margin: '0 4px',
-										border: 0
-									},
-									on: {
-										click: () => {
-											this.inquireClick(params.index)
-										}
-									}
-								}, '详情'),
-								h('Button', {
-									props: {
-										size: 'small',
-									},
-									style: {
-										fontSize: '12px',
-										width: '4vw',
-										background: '#3DA2F8',
-										color: '#fff',
-										border: 0
-									},
-									on: {
-										click: () => {
-											this.inquireClick(params.index)
-										}
-									}
-								}, '打印二维码')
-							]);
-						}
-					}
-				],
+				title: [],
 				content: [],
+			},
+			tableBtn: {
+				title: '操作',
+				key: 'action',
+				width: 240,
+				align: 'center',
+				render: (h, params) => {
+					return h('div', [
+						h('Button', {
+							props: {
+								size: 'small',
+							},
+							style: {
+								fontSize: '12px',
+								width: '3vw',
+								background: (params.row.sysStatus === '未缴费') ? '#3DA2F8' : "#C9D0D6",
+								color: '#fff',
+								border: 0
+							},
+							attrs: {
+								disabled: (params.row.sysStatus !== '未缴费')
+							},
+							on: {
+								click: () => {
+									this.inquireSetCompleteClick(params.row.sysDocumentId)
+								}
+							}
+						}, (params.row.auditStatus !== '已缴费') ? '未完成' : '已完成'),
+						h('Button', {
+							props: {
+								size: 'small',
+							},
+							style: {
+								fontSize: '12px',
+								width: '2.4vw',
+								background: '#3DA2F8',
+								color: '#fff',
+								margin: '0 4px',
+								border: 0
+							},
+							on: {
+								click: () => {
+									this.inquireGetDetailReportClick(params.row.sysDocumentId)
+								}
+							}
+						}, '详情'),
+						h('Button', {
+							props: {
+								size: 'small',
+							},
+							style: {
+								fontSize: '12px',
+								width: '4vw',
+								background: '#3DA2F8',
+								color: '#fff',
+								border: 0
+							},
+							on: {
+								click: () => {
+									this.inquireClick(params.index)
+								}
+							}
+						}, '打印二维码')
+					]);
+				}
 			},
 			// 分页数据
 			pageOption: {
@@ -151,11 +95,13 @@ export default {
 				totalRow: 0, //总条数
 				page_list: []
 			},
+			detailOption: '',
 			// 分页数据
 			now_page: 1,
 			now_num: 10,
 			auditName: 4,
 			selectReportName: '',
+			selReportTable: '',
 			searchInquireData: '',
 			startTime: '',
 			endTime: '',
@@ -186,7 +132,7 @@ export default {
 			return Promise.resolve(this.getReportStatus())
 
 		}).then(() => {
-			Promise.resolve(this.initMyReportData())
+			Promise.resolve(this.getTableTitle())
 		});
 		this.getReportNum();
 		this.getReportCost();
@@ -196,20 +142,21 @@ export default {
 		getReportType() {
 			return new Promise((resolve) => {
 				this.iquireSrv.getReportTypeList({}).then(value => {
-					// console.log(value);
 					if (value.code === '1000') {
-						value.data.forEach((v, index) => {
-							if (index === 1) {
+						value.data.forEach(v => {
+							if (v.tempName === '房屋评价报告') {
 								this.reportTypeList.centent.push({
 									name: v.tempName,
 									value: '1',
 									bgc: '#FFFFFF',
 									color: '#5D6063',
-									uuid: v.uuid
+									uuid: v.uuid,
+									table: v.tempTable,
 								});
 								this.selectReportName = v.uuid;
+								this.selReportTable = v.tempTable;
 							} else {
-								this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF', color: '#C2C2C2', uuid: v.uuid})
+								this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',		table: v.tempTable, color: '#C2C2C2', uuid: v.uuid})
 							}
 						});
 						resolve();
@@ -221,7 +168,6 @@ export default {
 		getReportStatus() {
 			return new Promise((resolve) => {
 				this.iquireSrv.getReportStatusList({}).then(value => {
-					// console.log(value);
 					if (value.code === '1000') {
 						value.data.forEach((v, index) => {
 							if (index === 0) {
@@ -270,7 +216,6 @@ export default {
 		getReportCost() {
 			this.iquireSrv.getMyReportCostData({}).then(
 				value => {
-					// console.log(value);
 					if (value.code === '1000') {
 						this.notChargedData = value.data.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 						this.ChargedData = value.data.costed.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -280,6 +225,27 @@ export default {
 
 				}
 			)
+		},
+		// 获取表头
+		getTableTitle() {
+			this.iquireSrv.getTableTitleData({tempTable: this.selReportTable}).then(val => {
+				if (val.code === '1000') {
+					this.tableOption.title = [];
+					val.data.forEach(v => {
+						this.tableOption.title.push(v)
+					});
+					this.tableOption.title.unshift({
+						type: 'selection',
+						width: 60,
+						align: 'center',
+						className: 'select-table'
+					});
+					this.tableOption.title.push(this.tableBtn);
+					this.initMyReportData();
+				} else {
+					this.reviewTool.toast('error', val.msg)
+				}
+			})
 		},
 		// 初始化列表
 		initMyReportData() {
@@ -291,14 +257,13 @@ export default {
 				pageNo: this.now_page,
 				pageSize: this.now_num
 			}).then(value => {
-				// console.log(value);
 				this.pageOption.page_list = [];
 				if (value.code === '1000') {
 					this.tableOption.content = value.data.contents;
 					this.tableOption.content.forEach(v => {
 						this.reportStatusList.centent.forEach(val => {
-							if (val.value === v.auditStatus.toString()) {
-								v.auditStatus = val.name
+							if (val.value === v.sysStatus.toString()) {
+								v.sysStatus = val.name
 							}
 						})
 					});
@@ -342,7 +307,8 @@ export default {
 				this.reportTypeList.centent[index].color = '#5D6063';
 				this.reportTypeList.centent[index].value = '1';
 				this.selectReportName = this.reportTypeList.centent[index].uuid;
-				this.initMyReportData();
+				this.selReportTable = this.reportTypeList.centent[index].table;
+				this.getTableTitle();
 			}
 		},
 		// 选择审核状态
@@ -356,6 +322,48 @@ export default {
 			this.reportStatusList.centent[index].color = '#5D6063';
 			this.auditName = this.reportStatusList.centent[index].value;
 			this.initMyReportData();
+		},
+		// 未完成按钮事件  设置完成
+		inquireSetCompleteClick(data){
+			this.iquireSrv.reviewReportPass({sysTemplateId: this.selectReportName, sysDocumentId: data}).then(
+				value => {
+					console.log(value);
+					if (value.code === '1000') {
+						this.initMyReportData();
+					} else {
+						this.iquireTool.toast('error', value.message)
+					}
+				}
+			);
+		},
+		// 详情按钮 ，查看详情
+		inquireGetDetailReportClick(data){
+			this.iquireSrv.queryDetailInfo({reportId: data, templateId: this.selectReportName}).then(
+				value => {
+					console.log(value);
+					if (value.code === '1000'){
+						this.setDetailReportInfo(value.data)
+					}else {
+						this.reviewTool.toast('error', value.message)
+					}
+				}
+			);
+		},
+		// 设置详情弹窗
+		setDetailReportInfo(data) {
+			this.detailOption = {
+				width: 960,
+				hidden: true,
+				height: data.length > 15 ? 500 : 300,
+				title: '详情',
+				style: {top: '100px', height: '90vh'},
+				dataList: data,
+				surebtn: '',
+				canclebtn: '取消',
+			}
+		},
+		closeDetailModel(){
+			this.detailOption.hidden = false;
 		},
 		// 搜索
 		searchData() {
@@ -376,6 +384,7 @@ export default {
 	},
 	components: {
 		paging,
-		tables
+		tables,
+		detailModal
 	}
 }

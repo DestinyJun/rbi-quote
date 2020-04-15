@@ -77,6 +77,7 @@
          <paging :page-option="pageOption" @getPageDate="getPageDate"></paging>
        </div>
      </div>
+		 <detail-modal :dialog-option="detailOption" @closeModel="closeDetailModel" />
      <div class="inquire-modal">
        <Modal
            title="审核"

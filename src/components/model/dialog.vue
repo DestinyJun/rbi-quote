@@ -32,7 +32,8 @@
                 <FormItem :label="item.label" :prop="item.key" :label-width="100">
                   <!--输入框-->
                   <Col span="22" v-if="item.type === 'input'">
-                    <Input v-model="dialogOption.modelData[item.key]" :placeholder="item.placeholder" :disabled="!item.disabled"></Input>
+                    <Input v-model="dialogOption.modelData[item.key]" number :placeholder="item.placeholder" :disabled="!item.disabled" v-if="item.dataType === 'Number'"></Input>
+                    <Input v-model="dialogOption.modelData[item.key]"  :placeholder="item.placeholder" :disabled="!item.disabled" v-if="item.dataType !== 'Number'"></Input>
                   </Col>
                   <!--下拉框-->
                   <Col span="22" v-if="item.type === 'select'">
@@ -68,7 +69,7 @@
               <Col span="12" v-if="item.styleType === 3">
                 <FormItem :label="item.label" :prop="item.key" :label-width="100">
                   <Col span="20" v-if="item.type === 'input'">
-                    <Input v-model="dialogOption.modelData[item.key]" :placeholder="item.placeholder" :disabled="!item.disabled"></Input>
+                    <Input v-model="dialogOption.modelData[item.key]"  :placeholder="item.placeholder" :disabled="!item.disabled"></Input>
                   </Col>
                   <Col span="20" v-if="item.type === 'select'">
                     <Select v-model="dialogOption.modelData[item.key]" style="text-align: left">
@@ -152,7 +153,6 @@
 		// 监听父组件传值
 		// watch:{
 		// 	dialogOption: (item) => {//箭头函数  不然会发生this改变
-		// 		console.log(item.modelData);
 		// 		console.log(item.dataList)
 		// 	}
 		// },
@@ -162,6 +162,8 @@
 				this.$refs['modelData'].validate(valid => {
 					if (valid){
 						this.$emit('addUploadReport', this.dialogOption.modelData, this.dialogOption.modalType)
+					}else {
+						console.log(item.modelData);
 					}
 				})
       },
