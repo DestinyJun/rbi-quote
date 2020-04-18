@@ -382,7 +382,7 @@ export default {
 			this.reviewThreeSrv.reviewReportNoPass({
 				sysTemplateId: this.selectReportName,
 				sysDocumentId: id,
-				auditReason: reason
+				sysReason: reason
 			}).then(val => {
 				console.log(val);
 				if (val.code === '1000') {

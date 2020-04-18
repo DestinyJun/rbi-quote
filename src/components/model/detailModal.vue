@@ -13,7 +13,7 @@
 								<span>{{item.label}}：</span>
 							</Col>
 							<Col span="12" style="line-height: 3vh">
-								<span style="display: inline-block;width: 18vw;height: 3vh;text-align: left;margin-left: 1vw;">{{item.label}}</span>
+								<span style="display: inline-block;width: 18vw;height: 3vh;text-align: left;margin-left: 1vw;">{{item.value}}</span>
 							</Col>
 						</Col>
 					</div>
@@ -37,6 +37,17 @@
 					<Col span="24">
 						<span style="width: 98%; height: 1px; background: #DCDCDC;display: inline-block;margin: 2vh 0 2vh 0"></span>
 					</Col>
+					<div v-for="(item, index) in dialogOption.dataList" :key="index + 2000">
+						<Col span="12" v-if="item.styleType === 3">
+							<Col span="10" style="line-height: 3vh;text-align: right">
+								<span>{{item.label}}：</span>
+							</Col>
+							<Col span="12" style="line-height: 3vh">
+								<span
+									style="display: inline-block;padding:0 0 0 3px; width: 100%;height: 3vh;margin-left: 1vw;text-align: left;">{{item.value}}</span>
+							</Col>
+						</Col>
+					</div>
 					<Row></Row>
 				</Scroll>
 				<!--        <Row></Row>-->

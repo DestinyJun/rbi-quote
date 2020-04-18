@@ -247,7 +247,7 @@ export default {
 				this.reportTypeList.centent[index].value = '1';
 				this.selectReportName = this.reportTypeList.centent[index].uuid;
 				this.selReportTable = this.reportTypeList.centent[index].table;
-				this.initReviewData();
+				this.getTableTitle();
 			}
 
 		},
@@ -372,7 +372,7 @@ export default {
 		},
 		// 审核不通过的请求
 		reviewNoPassRequest(id, reason) {
-			this.reviewSrv.reviewReportNoPass({sysTemplateId:this.selectReportName, sysDocumentId: id, auditReason: reason}).then(val => {
+			this.reviewSrv.reviewReportNoPass({sysTemplateId:this.selectReportName, sysDocumentId: id, sysReason: reason}).then(val => {
 				if (val.code === '1000') {
 					this.reviewTool.toast('success', val.msg);
 					this.closeModelAndClearData();

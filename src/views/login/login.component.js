@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import ToolUtil from "../../utils/tool";
 import service from '../../service/service'
+import store from '@/store';
 let loginSrv = new service();
 export default {
     name: 'login',
@@ -64,7 +65,9 @@ export default {
                             if (Object.is(res.code ,'1000')){
                                 this.tool.toast('success', '登录成功!');
                                 this.tool.setItem('accessToken', res.data);
-                                this.getMenu();
+															// eslint-disable-next-line no-mixed-spaces-and-tabs
+															  store.dispatch('setToken', res.data);
+															  this.getMenu();
                             }else {
                                 this.tool.toast('error', `${res.msg}`);
                             }

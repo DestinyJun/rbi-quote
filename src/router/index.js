@@ -28,6 +28,11 @@ const routes = [
         {path: 'graphic', name: 'graphic', component: () => import('@/views/common/graphic/graphic.vue')}
     ]
   },
+	{
+		path:'/QRcode',
+		name: 'QRcode',
+		component: () => import('@/views/QRCode/QRcodeDetail.vue')
+	}
 ];
 
 const router = new VueRouter({

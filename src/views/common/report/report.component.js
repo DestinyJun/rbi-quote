@@ -1,15 +1,15 @@
 // 自定义组件
-import paging from "../../../components/paging";
-import tables from "../../../components/table";
-import QRCodes from "../../../components/QRCode";
-import modal from '../../../components/model/dialog'
-import detailModal from '../../../components/model/detailModal'
+import paging from "@/components/paging";
+import tables from "@/components/table";
+import QRCodes from "@/components/QRCode";
+import modal from '@/components/model/dialog'
+import detailModal from '@/components/model/detailModal'
 // 服务
-import serve from "../../../service/service";
+import serve from "@/service/service";
 // 工具类
-import Tool from '../../../utils/tool'
+import Tool from '@/utils/tool'
 // 实体类
-import mianModel from "../../../model/model";
+import mianModel from "@/model/model";
 
 export default {
 	name: 'report',
@@ -48,60 +48,7 @@ export default {
 			selReportTable: '',
 			// 表格数据
 			tableOption: {
-				title: [
-
-					// {
-					// 	title: '报告编号',
-					// 	key: 'reportId',
-					// 	align: 'left',
-					// 	width: 180,
-					// },
-					// {
-					// 	title: '报告类型',
-					// 	key: 'reportType',
-					// 	align: 'center',
-					// 	width: 180,
-					// },
-					// {
-					// 	title: '审核状态',
-					// 	key: 'auditStatus',
-					// 	align: 'center',
-					// 	width: 180,
-					// },
-					// {
-					// 	title: '估价委托人',
-					// 	key: 'mandatorName',
-					// 	align: 'center',
-					// 	width: 180,
-					// },
-					// {
-					// 	title: '估价对象',
-					// 	key: 'valuationObject',
-					// 	align: 'center',
-					// },
-					// {
-					// 	title: '项目负责人',
-					// 	key: 'projectPrincipal',
-					// 	align: 'center',
-					// 	width: 140,
-					// },
-					// {
-					// 	title: '估价结果',
-					// 	key: 'valuationResult',
-					// 	align: 'right',
-					// 	width: 140,
-					// 	render: (h, params) => {
-					// 		return h('div', [
-					// 			h('span', {
-					// 				style: {
-					// 					color: '#EF9F20'
-					// 				},
-					// 			}, params.row.result)
-					// 		]);
-					// 	}
-					// },
-
-				],
+				title: [],
 				content: [],
 			},
 			// 模态框数据
@@ -121,7 +68,7 @@ export default {
 			// 估价师总列表
 			appraiserTotalList: [],
 			// 二维码内容
-			codeUrl: 'http://www.gyrbi.com/quote',
+			codeUrl: '',
 			// 工具类
 			reportTool: new Tool(),
 			reportSrv: new serve(),
@@ -234,7 +181,7 @@ export default {
 									},
 									on: {
 										click: () => {
-											this.printQRCode(params.index)
+											this.printQRCode(params.row.sysDocumentId)
 										}
 									}
 								}, '打印二维码')
@@ -359,6 +306,7 @@ export default {
 		},
 		// 展示详情弹窗
 		showDetailDialog(data) {
+			console.log(this.selectReportName);
 			this.reportSrv.queryDetailInfo({templateId: this.selectReportName, reportId: data.sysDocumentId}).then(res => {
 				if (res.code === '1000') {
 					this.setDetailReportInfo(res.data)
@@ -368,7 +316,8 @@ export default {
 			});
 		},
 		// 打印二维码
-		printQRCode() {
+		printQRCode(code) {
+			this.codeUrl = `http://192.168.28.32:4500/quote/#/QRcode?code=${code}&id=${this.selectReportName}&token=${localStorage.getItem('accessToken')}`;
 			this.QRCodeModal = true;
 		},
 		// 显示填报选择弹窗

@@ -152,11 +152,12 @@ export default {
         initUserData(){
             this.userSrv.getUserListData({pageSize: this.now_num, page:this.now_page, role: this.selectType}).then(
                 (value) => {
+                	console.log(value);
                     this.pageOption.page_list = [];
                     if (value.code === '1000') {
                         this.tableOption.content = value.data.contents;
                         this.tableOption.content.forEach(v => {
-                        	v.status = v.status === '0'? '正常': '锁定'
+                        	v.status = v.status === 0? '正常': '锁定'
 												});
                         for (let i = 1; i<= value.data.totalPage; i++) {
                             if (i ===  this.now_page) {

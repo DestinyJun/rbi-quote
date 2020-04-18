@@ -66,7 +66,6 @@ export default {
 		// 获取项目负责人
 		getProjectMangerList() {
 			this.graphicSrv.getProjectManager({}).then(res => {
-				console.log(res);
 				if (res.code === '1000') {
 					this.reportTypeList = [{label: '全部', value: '0'}];
 					this.autorList = [{label: '全部', value: '0'}];
@@ -82,7 +81,6 @@ export default {
 			})
 		},
 		getPieDataForType(){
-			console.log(this.reportType);
 			this.graphicSrv.getPieData({uuid: this.selectAutor, reportType: this.reportType}).then(val => {
 					if (val.code === '1000') {
 						this.dataPiesec.listData = [];

@@ -1,6 +1,6 @@
 <template>
   <div id="QRCode" class="QRCode">
-    <VueQr :margin='20' :size='200' :text='config.text' :logoSrc="config.logo" :logoScale="0.2"></VueQr>
+    <VueQr :margin='20' :size='200' :text='codeUrl' :logoSrc="config.logo" :logoScale="0.2"></VueQr>
   </div>
 </template>
 
@@ -14,7 +14,7 @@ export default {
                   text:'123',		//必须写text属性,
                   margin: 20,
                   whiteMargin: true,
-								  logo: require("../assets/images/ic_header.jpg"),
+								  logo: require("../assets/code.png"),
               }
           }
       },

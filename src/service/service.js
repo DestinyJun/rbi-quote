@@ -60,6 +60,10 @@ export default class Server {
 	queryDetailInfo(data) {
 		return clientHttp.post('/report/findOneByReportId', data)
 	}
+	// 查询单条报告
+	queryDetailInfo2(data) {
+		return clientHttp.post('/report/findOneByReportId1', data)
+	}
 	// 获取表头
 	getTableTitleData(data){
 		return clientHttp.post('/report/getHeader', data)

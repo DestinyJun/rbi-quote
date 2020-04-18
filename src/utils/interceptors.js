@@ -15,13 +15,17 @@ axios.defaults.retryDelay = 1000;
 axios.defaults.timeout = 30000;
 axios.interceptors.request.use((config) => {
     if(!Object.is(config.url, undefined)){
-
-        store.dispatch("setLoadingStatus", "showLoading");
-        if (config.url.includes('./user/login')) {
-            config.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-        } else {
-            config.headers.post['accessToken'] = localStorage.getItem('accessToken')
-        }
+			store.dispatch("setLoadingStatus", "showLoading");
+			if (config.url !== '/report/findOneByReportId1'){
+					if (config.url.includes('./user/login')) {
+						config.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+					}else {
+						config.headers.post['accessToken'] = localStorage.getItem('accessToken')
+					}
+				}else {
+				config.url = config.url.substring(0, config.url.length -1);
+				config.headers.post['accessToken'] = router.history.current.query.token
+			}
     }
     return config;
 }, error => {
@@ -33,7 +37,6 @@ axios.interceptors.response.use( (config) => {
     store.dispatch("setLoadingStatus", "hideLoading");
     // 返回请求正确的结果
     if (config.status === 200) {
-
         return config.data;
     }else {
         // window.alert('链接服务器失败，请稍后重试！')

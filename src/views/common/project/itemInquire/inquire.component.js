@@ -1,8 +1,9 @@
-import paging from "../../../../components/paging";
-import tables from "../../../../components/table";
-import Tool from "../../../../utils/tool";
-import serve from "../../../../service/service";
-import detailModal from '../../../../components/model/detailModal'
+import paging from "@/components/paging";
+import tables from "@/components/table";
+import Tool from "@/utils/tool";
+import serve from "@/service/service";
+import detailModal from '@/components/model/detailModal'
+import QRCodes from "@/components/QRCode";
 
 export default {
 	name: 'inquire',
@@ -80,7 +81,7 @@ export default {
 							},
 							on: {
 								click: () => {
-									this.inquireClick(params.index)
+									this.inquireShowQRcodeClick(params.row.sysDocumentId)
 								}
 							}
 						}, '打印二维码')
@@ -96,6 +97,9 @@ export default {
 				page_list: []
 			},
 			detailOption: '',
+			// 二维码连接
+			QRCodeModal: false,
+			codeUrl: '',
 			// 分页数据
 			now_page: 1,
 			now_num: 10,
@@ -134,8 +138,6 @@ export default {
 		}).then(() => {
 			Promise.resolve(this.getTableTitle())
 		});
-		this.getReportNum();
-		this.getReportCost();
 	},
 	methods: {
 		// 获取类型
@@ -249,6 +251,8 @@ export default {
 		},
 		// 初始化列表
 		initMyReportData() {
+			this.getReportNum();
+			this.getReportCost();
 			this.iquireSrv.queryMyReportPageData({
 				auditStatus: this.auditName,
 				templateId: this.selectReportName,
@@ -325,16 +329,19 @@ export default {
 		},
 		// 未完成按钮事件  设置完成
 		inquireSetCompleteClick(data){
-			this.iquireSrv.reviewReportPass({sysTemplateId: this.selectReportName, sysDocumentId: data}).then(
-				value => {
-					console.log(value);
-					if (value.code === '1000') {
-						this.initMyReportData();
-					} else {
-						this.iquireTool.toast('error', value.message)
+			this.iquireTool.setRemind('修改', '修改完成状态', () => {
+				this.iquireSrv.reviewReportPass({sysTemplateId: this.selectReportName, sysDocumentId: data}).then(
+					value => {
+						console.log(value);
+						if (value.code === '1000') {
+							this.initMyReportData();
+							this.iquireTool.toast('success', value.msg)
+						} else {
+							this.iquireTool.toast('error', value.message)
+						}
 					}
-				}
-			);
+				);
+			})
 		},
 		// 详情按钮 ，查看详情
 		inquireGetDetailReportClick(data){
@@ -344,7 +351,7 @@ export default {
 					if (value.code === '1000'){
 						this.setDetailReportInfo(value.data)
 					}else {
-						this.reviewTool.toast('error', value.message)
+						this.iquireTool.toast('error', value.message)
 					}
 				}
 			);
@@ -364,6 +371,10 @@ export default {
 		},
 		closeDetailModel(){
 			this.detailOption.hidden = false;
+		},
+		inquireShowQRcodeClick(code){
+			this.codeUrl = `http://192.168.28.32:4500/quote/#/QRcode?code=${code}&id=${this.selectReportName}&token=${localStorage.getItem('accessToken')}`;
+       this.QRCodeModal = true;
 		},
 		// 搜索
 		searchData() {
@@ -385,6 +396,7 @@ export default {
 	components: {
 		paging,
 		tables,
-		detailModal
+		detailModal,
+		QRCodes
 	}
 }

@@ -10,7 +10,6 @@ import echarts from 'echarts'
 
 Vue.config.productionTip = false;
 Vue.prototype.$echarts = echarts;
-
 Vue.prototype.clientHttp = clientHttp;
 Vue.use(ViewUI);
 Vue.use(echarts);
