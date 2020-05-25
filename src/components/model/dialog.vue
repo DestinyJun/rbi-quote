@@ -11,15 +11,17 @@
               <Col span="12" v-if="item.styleType === 1">
                 <FormItem :label="item.label" :prop="item.key" :label-width="100">
                   <Col span="22" v-if="item.type === 'input'">
-                    <Input v-model="dialogOption.modelData[item.key]" :placeholder="item.placeholder"  :disabled="!item.disabled"/>
+										<Input v-model="dialogOption.modelData[item.key]" number :placeholder="item.placeholder" :disabled="!item.disabled" v-if="item.dataType === 'Number'"></Input>
+										<Input v-model="dialogOption.modelData[item.key]"  :placeholder="item.placeholder" :disabled="!item.disabled" v-if="item.dataType !== 'Number'"></Input>
                   </Col>
                   <Col span="22" v-if="item.type === 'select'">
-                    <Select v-model="dialogOption.modelData[item.key]" style="text-align: left">
+                    <Select v-model="dialogOption.modelData[item.key]" style="text-align: left" filterable allow-create>
                       <Option v-for="(select_item, selIndex) in item.list" :value="select_item.value" :key="selIndex" :disabled="!item.disabled">{{ select_item.label }}</Option>
                     </Select>
                   </Col>
                 </FormItem>
               </Col>
+
             </div>
             <div >
               <Col span="24">
@@ -69,7 +71,8 @@
               <Col span="12" v-if="item.styleType === 3">
                 <FormItem :label="item.label" :prop="item.key" :label-width="100">
                   <Col span="20" v-if="item.type === 'input'">
-                    <Input v-model="dialogOption.modelData[item.key]"  :placeholder="item.placeholder" :disabled="!item.disabled"></Input>
+										<Input v-model="dialogOption.modelData[item.key]" number :placeholder="item.placeholder" :disabled="!item.disabled" v-if="item.dataType === 'Number'"></Input>
+										<Input v-model="dialogOption.modelData[item.key]"  :placeholder="item.placeholder" :disabled="!item.disabled" v-if="item.dataType !== 'Number'"></Input>
                   </Col>
                   <Col span="20" v-if="item.type === 'select'">
                     <Select v-model="dialogOption.modelData[item.key]" style="text-align: left">
@@ -157,7 +160,7 @@
 		// 	}
 		// },
 		methods:{
-			addUploadReport(){
+			addUploadReport(item){
 				console.log(this.dialogOption.modelData);
 				this.$refs['modelData'].validate(valid => {
 					if (valid){

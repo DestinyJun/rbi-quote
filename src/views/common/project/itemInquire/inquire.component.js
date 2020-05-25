@@ -373,7 +373,7 @@ export default {
 			this.detailOption.hidden = false;
 		},
 		inquireShowQRcodeClick(code){
-			this.codeUrl = `http://192.168.28.32:4500/quote/#/QRcode?code=${code}&id=${this.selectReportName}&token=${localStorage.getItem('accessToken')}`;
+			this.codeUrl = `http://www.gyrbi.com/quote/quote/#/QRcode?code=${code}&id=${this.selectReportName}&token=${localStorage.getItem('accessToken')}`;
        this.QRCodeModal = true;
 		},
 		// 搜索

@@ -14,7 +14,7 @@ export default {
                   text:'123',		//必须写text属性,
                   margin: 20,
                   whiteMargin: true,
-								  logo: require("../assets/code.png"),
+								  logo: require("../assets/logo.jpg"),
               }
           }
       },

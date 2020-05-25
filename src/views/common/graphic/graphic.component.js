@@ -57,27 +57,31 @@ export default {
 		}
 	},
 	created() {
-		this.getProjectMangerList();
-		this.getPieDataForType();
-		this.getPieDataForSchedule();
-
+	  this.getProjectMangerList().then(() => {
+			this.getPieDataForType();
+			this.getPieDataForSchedule();
+		});
 	},
 	methods: {
 		// 获取项目负责人
 		getProjectMangerList() {
-			this.graphicSrv.getProjectManager({}).then(res => {
-				if (res.code === '1000') {
-					this.reportTypeList = [{label: '全部', value: '0'}];
-					this.autorList = [{label: '全部', value: '0'}];
-					res.data.principal.forEach(val => {
-						this.autorList.push({label: val.sysPrincipalName, value: val.sysPrincipalId})
-					});
-					res.data.template.forEach(val => {
-						this.reportTypeList.push({label: val.tempName, value: val.tempTable})
-					});
-				} else {
-					this.graphicTool.toast('error', res.msg)
-				}
+			return new Promise(resolve => {
+				this.graphicSrv.getProjectManager({}).then(res => {
+					if (res.code === '1000') {
+						resolve();
+						this.reportTypeList = [{label: '全部', value: '0'}];
+						this.autorList = [{label: '全部', value: '0'}];
+						res.data.principal.forEach(val => {
+							this.autorList.push({label: val.sysPrincipalName, value: val.sysPrincipalId})
+						});
+						res.data.template.forEach(val => {
+							this.reportTypeList.push({label: val.tempName, value: val.tempTable})
+						});
+					} else {
+						this.graphicTool.toast('error', res.msg)
+					}
+				})
+
 			})
 		},
 		getPieDataForType(){

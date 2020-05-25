@@ -6,9 +6,61 @@
 		<div class="title">
 			<span>您好{{name}},欢迎进入报告验证识别系统！</span>
 			<img src="@/assets/images/ic_header.jpg" alt="" @click="showPreCard">
-			<div :class="{'per-car': true, 'move': !preHiden}" :hidden="preHiden">
-				<li @click="codeClick">个人资料</li>
-				<li @click="loginOut">退出登录</li>
+			<div :class="{'per-card': true, 'move': !preHiden}" :hidden="preHiden">
+				<div style="display: flex;flex-direction: column;color: #000 ">
+					<div v-if="!ischange">
+						<div style="flex: 2;border-bottom: 1px solid #EEEEEE;text-align: left;line-height: 4vh">
+							<p style="margin: 1vh 1vw;font-size: 14px">账户信息</p>
+						</div>
+						<div style="flex: 6;text-align: left;margin:1vh 1vw;">
+							<div style="margin: 5px 0;">用户名： {{name}}</div>
+							<!--            <div style="margin: 5px 0;">用户角色： </div>-->
+							<div style="margin: 5px 0; display: flex;justify-content: center"><span
+								style="flex: 1;color: #000">用户角色：</span>
+								<div style="flex: 3;margin-top: -8px">
+									<span
+										style="display: inline-block; border: 1px solid #D8D8D8;padding: 2px 10px;margin: 6px 10px;font-size: 12px;color: #000;"
+										v-for="(item, index) in roleLists" :key="index">{{item}}</span>
+								</div>
+							</div>
+							<div style="text-align: right">
+								<button
+									style="background: #3DA2F8;border: 0;border-radius: 1px;color: #eee;font-size: 12px;padding: 4px 14px"
+									@click="changePassword">修改密码
+								</button>
+								<button
+									style="border: 0;box-shadow: 0 0 2px #000;border-radius: 1px;color: #000;background: #fff;font-size: 12px;padding: 4px 14px;margin-left: 1vw"
+									@click="loginOut">退出
+								</button>
+							</div>
+						</div>
+					</div>
+					<div v-if="ischange">
+						<div style="flex: 1;border-bottom: 1px solid #EEEEEE;text-align: left">
+							<p style="margin: 1vh 1vw;font-size: 14px">修改密码</p>
+						</div>
+						<div style="flex: 3;text-align: left;margin:1vh 1vw;">
+							<div style="display: flex;align-items: center">
+								<label for="" style="flex: 1">原密码：</label>
+								<Input v-model="oldPass" type="password" placeholder="请输入原密码" style="flex: 4"/>
+							</div>
+							<div style="display: flex;align-items: center;margin: 1vh 0">
+								<label for="" style="flex: 1">新密码：</label>
+								<Input v-model="newPass"  type="password" placeholder="请输入新密码" style="flex: 4"/>
+							</div>
+							<div style="text-align: right">
+								<button
+									style="background: #3DA2F8;border: 0;border-radius: 1px;color: #eee;font-size: 12px;padding: 4px 14px"
+									@click="sureChange">确定修改
+								</button>
+								<button
+									style="border: 0;box-shadow: 0 0 2px #000;border-radius: 1px;color: #000;background: #fff;font-size: 12px;padding: 4px 14px;margin-left: 1vw"
+									@click="ischange = false">取消
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -16,6 +68,7 @@
 
 <script>
 	import ToolUtil from "../../../utils/tool";
+	import service from "../../../service/service";
 
 	export default {
 		name: 'headers',
@@ -23,26 +76,64 @@
 			return {
 				name: 'xxxx',
 				preHiden: true,
-				tool: new ToolUtil()
-
+				ischange: false,
+				newPass: '',
+				oldPass: '',
+				roleLists: [],
+				tool: new ToolUtil(),
+				headerSrv: new service
 			}
 		},
+		created() {
+			this.getUserInfoData();
+		},
 		methods: {
+			getUserInfoData() {
+				this.headerSrv.getUserInfo().then(val => {
+					if (val.code === '1000') {
+						this.name = val.data.name;
+						this.roleLists = val.data.role;
+					} else {
+						this.tool.toast('error', val.msg)
+					}
+				})
+			},
 			showPreCard() {
-				console.log(this.preHiden);
-				if (this.preHiden) {
-					this.preHiden = false;
-				} else {
-					this.preHiden = true;
-				}
+				this.preHiden = !this.preHiden;
 			},
 			loginOut() {
 				this.tool.setModal('confirm', '退出提醒', '确定要退出登录吗?', () => {
-					this.$router.push('/login')
+					this.headerSrv.logout().then(val => {
+						if (val.code === '1000'){
+							this.$router.push('/login')
+
+						}else {
+							this.tool.toast('error', val.msg)
+						}
+					})
 				})
 			},
-			codeClick() {
-				// this.$router.push('/QRcode')
+			changePassword() {
+				this.ischange = true;
+			},
+			sureChange() {
+				if(this.newPass !== '' || this.oldPass !== '') {
+					this.headerSrv.getUserPassword({oldPassword: this.oldPass, newPassword: this.newPass}).then(val => {
+						if (val.code === '1000'){
+							this.tool.toast('success', val.msg);
+							this.$router.push('/login');
+							this.newPass = '';
+							this.oldPass = '';
+							this.ischange = false;
+						}else {
+							this.tool.toast('error', val.msg)
+						}
+					})
+
+				}else {
+					this.tool.toast('error', '请输入需要改的密码')
+				}
+
 			}
 		}
 	}
@@ -100,15 +191,17 @@
 				border: 2px solid #A5AAAB;
 			}
 
-			.per-car {
+			.per-card {
 				position: absolute;
 				margin-top: 1.2vh;
 				background: #FFFFFF;
-				width: 6vw;
+				width: 18vw;
 				border-radius: 4px;
-				right: 10px;
+				/*top: 1px;*/
+				right: 1vw;
 				box-shadow: 0 0 5px #4D4D4D;
 				color: #818181;
+				z-index: 9999;
 
 				li {
 					padding: 10px;

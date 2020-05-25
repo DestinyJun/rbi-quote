@@ -186,4 +186,19 @@ export default class Server {
 		return clientHttp.post('/signed/delete', data)
 	}
 
+
+//	TODO 用户信息
+	// 修改签字人员
+	getUserInfo() {
+		return clientHttp.post('/user/info')
+	}
+	// 修改签字人员
+	getUserPassword(data) {
+		return clientHttp.post('/user/updatePassword', data)
+	}
+	// 修改签字人员
+	logout() {
+		return clientHttp.post('/logout')
+	}
+
 }

@@ -169,15 +169,17 @@ export default {
 								}, '详情'),
 								h('Button', {
 									props: {
-										size: 'small',
+										size: 'small'
 									},
 									style: {
 										fontSize: '12px',
 										background: (params.row.flag !== 1) ? '#3DA2F8' : "#C9D0D6",
-										color: '#fff'
+										color: '#fff',
+										// display: (params.row.sysStatus !== '未缴费' && params.row.sysStatus !== '已完成') ? 'none': 'inline-block'
 									},
 									attrs: {
-										disabled: (params.row.flag === 1)
+										disabled: (params.row.flag === 1),
+										// hidden: false
 									},
 									on: {
 										click: () => {
@@ -199,6 +201,7 @@ export default {
 		getReportStatus() {
 			return new Promise((resolve) => {
 				this.reportSrv.getReportStatusList({}).then(value => {
+					console.log(value);
 					if (value.code === '1000') {
 						value.data.forEach((v, index) => {
 							if (index === 0) {
@@ -233,6 +236,7 @@ export default {
 				pageNo: this.now_page,
 				pageSize: this.now_num
 			}).then(value => {
+				console.log(value);
 				this.pageOption.page_list = [];
 				if (value.code === '1000') {
 					this.tableOption.content = value.data.contents;
@@ -317,7 +321,8 @@ export default {
 		},
 		// 打印二维码
 		printQRCode(code) {
-			this.codeUrl = `http://192.168.28.32:4500/quote/#/QRcode?code=${code}&id=${this.selectReportName}&token=${localStorage.getItem('accessToken')}`;
+			this.codeUrl = `http://192.168.28.99:4500/quote/#/QRcode?code=${code}&id=${this.selectReportName}&token=${localStorage.getItem('accessToken')}`;
+			console.log(this.codeUrl);
 			this.QRCodeModal = true;
 		},
 		// 显示填报选择弹窗
@@ -361,10 +366,15 @@ export default {
 			let objRules = {};
 			this.addList = data;
 			data.forEach(v => {
-				obj[v.key] = '';
+				// eslint-disable-next-line no-prototype-builtins
+				if (v.hasOwnProperty('value')){
+					obj[v.key] = v.value;
+				}else {
+					obj[v.key] = '';
+				}
 				if (v.dataType === 'Number') {
 					objRules[v.key] = [
-						{required: v.required,type: 'number', message: v.label + '是必填项', trigger: 'blur'}
+						{required: false, type: 'number', message: v.label + '是必填项', trigger: 'blur'}
 					]
 				} else {
 					if (v.type === 'date') {
@@ -378,6 +388,8 @@ export default {
 					}
 				}
 			});
+			console.log(data);
+			console.log(objRules);
 			this.addOption = {
 				width: 960,
 				hidden: true,

@@ -87,14 +87,14 @@
 			<Modal
 				title="审核"
 				v-model="inquireModal"
-				class-name="vertical-center-modal" draggable scrollable closable>
+				class-name="vertical-center-modal" draggable scrollable>
 				<p style="text-align: center">待开发中...</p>
 			</Modal>
 			<!-- 打印二维码-->
 			<Modal
 				title="二维码"
 				v-model="QRCodeModal"
-				class-name="vertical-center-modal" draggable scrollable closable>
+				class-name="vertical-center-modal" draggable scrollable>
 				<p style="text-align: center">二维码扫描</p>
 				<div style="text-align: center;background: #EAEAEA;padding: 2vh">
 					<QRCodes :code-url="codeUrl"></QRCodes>
