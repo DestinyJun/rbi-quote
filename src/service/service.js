@@ -105,7 +105,12 @@ export default class Server {
 	getMyReportCostData(data) {
 		return clientHttp.post('/report/findCost', data)
 	}
-
+	getMyReportbySearch(data) {
+		return clientHttp.post('/report/search', data)
+	}
+	importExcelFiles(data) {
+		return clientHttp.post('/sys/printExcel', data)
+	}
 
 	// TODO 图像统计
 	// 获取项目负人

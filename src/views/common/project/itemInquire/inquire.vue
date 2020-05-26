@@ -65,14 +65,16 @@
 					<button class="searchBtn" @click="searchInquireDataByTime">
 						查询
 					</button>
-
+					<button class="searchBtn" style="margin-left: 1vw" @click="importExcelFileClick">
+						导出
+					</button>
 				</div>
 			</div>
 
 		</div>
 		<div class="inquire-centent">
 			<div class="inquire-search">
-				<Input suffix="ios-search" placeholder="请输入报表编号..." style="width: auto" v-model="searchInquireData"
+				<Input suffix="ios-search" placeholder="请输入文档编号..." style="width: auto" v-model="searchInquireData"
 							 @on-search="searchData" search/>
 			</div>
 			<div class="inquire-table">

@@ -134,9 +134,10 @@ export default {
 	created() {
 		Promise.resolve(this.getReportType()).then(() => {
 			return Promise.resolve(this.getReportStatus())
-
 		}).then(() => {
-			Promise.resolve(this.getTableTitle())
+			if(this.reportTypeList.length !== 0){
+				Promise.resolve(this.getTableTitle())
+			}
 		});
 	},
 	methods: {
@@ -145,22 +146,24 @@ export default {
 			return new Promise((resolve) => {
 				this.iquireSrv.getReportTypeList({}).then(value => {
 					if (value.code === '1000') {
-						value.data.forEach(v => {
-							if (v.tempName === '房屋评价报告') {
-								this.reportTypeList.centent.push({
-									name: v.tempName,
-									value: '1',
-									bgc: '#FFFFFF',
-									color: '#5D6063',
-									uuid: v.uuid,
-									table: v.tempTable,
-								});
-								this.selectReportName = v.uuid;
-								this.selReportTable = v.tempTable;
-							} else {
-								this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',		table: v.tempTable, color: '#C2C2C2', uuid: v.uuid})
-							}
-						});
+					  if (value.data.length > 0) {
+							value.data.forEach((v, index) => {
+								if (index === 0) {
+									this.reportTypeList.centent.push({
+										name: v.tempName,
+										value: '1',
+										bgc: '#FFFFFF',
+										color: '#5D6063',
+										uuid: v.uuid,
+										table: v.tempTable,
+									});
+									this.selectReportName = v.uuid;
+									this.selReportTable = v.tempTable;
+								} else {
+									this.reportTypeList.centent.push({name: v.tempName, value: '0', bgc: '#EFEFEF',		table: v.tempTable, color: '#C2C2C2', uuid: v.uuid})
+								}
+							});
+						}
 						resolve();
 					}
 				});
@@ -378,7 +381,48 @@ export default {
 		},
 		// 搜索
 		searchData() {
-			// console.log(this.searchInquireData);
+			if (this.searchInquireData !== ''){
+				this.now_page = 1;
+				this.iquireSrv.getMyReportbySearch(
+					{
+						auditStatus: this.auditName,
+						tempTable: this.selReportTable,
+						keyword: this.searchInquireData,
+						pageNo: this.now_page,
+						pageSize: this.now_num
+					}
+				).then(val => {
+					this.pageOption.page_list = [];
+					if (val.code === '1000') {
+						this.tableOption.content = val.data.contents;
+						this.tableOption.content.forEach(v => {
+							this.reportStatusList.centent.forEach(val => {
+								if (val.value === v.sysStatus.toString()) {
+									v.sysStatus = val.name
+								}
+							})
+						});
+						for (let i = 1; i <= val.data.totalPage; i++) {
+							if (i === this.now_page) {
+								this.pageOption.page_list.push({name: i, bgc: '#A9B0B6', color: '#EDEEEF'})
+							} else {
+								this.pageOption.page_list.push({name: i, bgc: '#FFFFFF', color: '#6D6F71'})
+							}
+						}
+						this.pageOption.pageNum = val.data.totalPage;
+						this.pageOption.now_page = this.now_page;
+						this.pageOption.now_num = this.now_num;
+						this.pageOption.totalRow = val.data.totalRecord;
+						if (val.data.contents.length === 0){
+							this.iquireTool.toast('success', val.msg + ', 数据为空')
+						}
+					} else {
+						this.iquireTool.toast('error', val.msg)
+					}
+				})
+			}else {
+				this.initMyReportData();
+			}
 		},
 		searchInquireDataByTime() {
 			this.now_page = 1;
@@ -391,6 +435,16 @@ export default {
 		changeTime() {
 			this.startTime = this.searchTime[0] === '' ? '' : this.iquireTool.setTimeFomart(this.searchTime[0]);
 			this.endTime = this.searchTime[1] === '' ? '' : this.iquireTool.setTimeFomart(this.searchTime[1]);
+		},
+		importExcelFileClick(){
+			this.iquireSrv.importExcelFiles({table: this.selReportTable}).then(val => {
+         console.log(val);
+         if (val.code === '1000') {
+         	 window.open(val.data)
+				 }else {
+					 this.iquireTool.toast('error', val.msg)
+				 }
+			})
 		}
 	},
 	components: {

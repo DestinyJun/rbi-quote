@@ -321,7 +321,7 @@ export default {
 		},
 		// 打印二维码
 		printQRCode(code) {
-			this.codeUrl = `http://192.168.28.99:4500/quote/#/QRcode?code=${code}&id=${this.selectReportName}&token=${localStorage.getItem('accessToken')}`;
+			this.codeUrl = `http://www.gyrb.com/quote/#/QRcode?code=${code}&id=${this.selectReportName}&token=${localStorage.getItem('accessToken')}`;
 			console.log(this.codeUrl);
 			this.QRCodeModal = true;
 		},
