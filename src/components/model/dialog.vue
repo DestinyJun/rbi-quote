@@ -1,6 +1,6 @@
 <template>
   <div id="basicdialog" class="dialog">
-    <Modal v-model="dialogOption.hidden" draggable scrollable :transfer="false"  :width="dialogOption.width" :styles="dialogOption.style" :closable="false">
+    <Modal v-model="dialogOption.hidden"  scrollable :transfer="false"  :width="dialogOption.width" :styles="dialogOption.style" :closable="false">
       <p slot="header" style="color:#1C1C1C;text-align:left; width: 60vw">
         <span>{{dialogOption.title}}</span>
       </p>
@@ -189,11 +189,13 @@
 </script>
 
 <style scoped lang="scss">
-
-  .dialog{
-  /deep/ .ivu-row{
-        z-index: -1;
-    }
+	.dialog{
+		/deep/ .ivu-row{
+					z-index: -1;
+			}
+			/deep/ .ivu-modal-wrap{
+				overflow: hidden;
+			}
   }
 
 </style>

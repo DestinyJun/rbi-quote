@@ -36,7 +36,7 @@
     <div class="review-modal">
 			<!-- 详情-->
 			<detail-modal :dialog-option="detailOption" @closeModel="closeDetailModel" @sureClick="reviewPasse"/>
-      <Modal v-model="reviewThreeNoModal" draggable scrollable :transfer="false"  width="560" :styles="{top: '250px'}" :closable="false">
+      <Modal v-model="reviewThreeNoModal"  scrollable :transfer="false"  width="560" :styles="{top: '250px'}" :closable="false">
         <p slot="header" style="color:#1C1C1C;text-align:left">
           <span>审核问题上报</span>
         </p>

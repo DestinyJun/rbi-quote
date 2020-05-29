@@ -175,7 +175,7 @@ export default {
 										fontSize: '12px',
 										background: (params.row.flag !== 1) ? '#3DA2F8' : "#C9D0D6",
 										color: '#fff',
-										// display: (params.row.sysStatus !== '未缴费' && params.row.sysStatus !== '已完成') ? 'none': 'inline-block'
+										display: (params.row.sysStatus !== '未缴费' && params.row.sysStatus !== '已完成') ? 'none': 'inline-block'
 									},
 									attrs: {
 										disabled: (params.row.flag === 1),

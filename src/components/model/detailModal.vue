@@ -1,6 +1,6 @@
 <template>
-	<div id="detailModal">
-		<Modal v-model="dialogOption.hidden" draggable scrollable :transfer="false" :width="dialogOption.width"
+	<div id="detailModal" class="detailModal">
+		<Modal v-model="dialogOption.hidden"  scrollable  :width="dialogOption.width"
 					 :styles="dialogOption.style" >
 			<p slot="header" style="color:#1C1C1C;text-align:left; width: 60vw">
 				<span>{{dialogOption.title}}</span>
@@ -120,6 +120,11 @@
 	}
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+	.detailModal{
+		/deep/ .ivu-modal-wrap{
+			overflow: hidden;
+		}
+	}
 
 </style>

@@ -195,7 +195,7 @@
 <!--           <Button style="background: #FFFFFF;color: #2E3235;width: 5vw"  @click="reviewNoPasse">审核不通过</Button>-->
 <!--         </div>-->
 <!--       </Modal>-->
-       <Modal v-model="reviewNoModal" draggable scrollable :transfer="false"  width="560" :styles="{top: '250px'}" :closable="false">
+       <Modal v-model="reviewNoModal"  scrollable :transfer="false"  width="560" :styles="{top: '250px'}" :closable="false">
          <p slot="header" style="color:#1C1C1C;text-align:left">
            <span>审核问题上报</span>
          </p>

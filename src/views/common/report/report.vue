@@ -41,14 +41,14 @@
 			<Modal
 				title="二维码"
 				v-model="QRCodeModal"
-				class-name="vertical-center-modal" draggable scrollable closable>
+				class-name="vertical-center-modal"  scrollable closable>
 				<p style="text-align: center">二维码扫描</p>
 				<div style="text-align: center;background: #EAEAEA;padding: 2vh">
 					<QRCodes :code-url="codeUrl"></QRCodes>
 				</div>
 			</Modal>
 			<!-- 填报类型选择-->
-			<Modal v-model="addTypeReportModel" draggable scrollable :transfer="false" :styles="{top: '250px'}"
+			<Modal v-model="addTypeReportModel"  scrollable :transfer="false" :styles="{top: '250px'}"
 						 :closable="false">
 				<p slot="header" style="color:#1C1C1C;text-align:left">
 					<span>填报类型选择</span>
