@@ -79,6 +79,7 @@ export default {
 					{required: true, message: '请选择报告类型', trigger: 'change'}
 				],
 			},
+			offsetHei: document.documentElement.clientHeight,
 			addOption: ''
 		}
 	},
@@ -393,7 +394,7 @@ export default {
 			this.addOption = {
 				width: 960,
 				hidden: true,
-				height: data.length > 13 ? 600 : data.length < 8 ? 300: 500 ,
+				height: this.offsetHei < 722 ? 300 : this.offsetHei < 937 ? 400: 600 ,
 				title: '添加信息',
 				style: {top: '100px', height: '90vh'},
 				ruleValidate: objRules,
@@ -414,6 +415,7 @@ export default {
 					}
 				})
 			}
+			console.log(model);
 			if (type === 'add') {
 				// 添加请求
 				this.reportSrv.addReport(model).then(value => {
@@ -428,7 +430,6 @@ export default {
 					}
 				});
 			} else {
-				model.sysDocumentId = this.selectItem[0].sysDocumentId;
 				// 修改请求
 				this.reportSrv.updateReport(model).then(value => {
 					if (value.code === '1000') {
@@ -444,8 +445,14 @@ export default {
 		},
 		// 时间转换
 		setTimeFomart(data) {
-			let d = new Date(data);
-			return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+			let date = new Date(data);
+			let y = date.getFullYear() < 10? '0'+ date.getFullYear(): date.getFullYear();
+			let M = (date.getMonth() + 1) < 10? '0'+ (date.getMonth() + 1): (date.getMonth() + 1);
+			let d = date.getDate() < 10? '0'+ date.getDate(): date.getDate();
+			let H = date.getHours()  < 10? '0'+ date.getHours() : date.getHours();
+			let m = date.getMinutes() < 10? '0'+ date.getMinutes(): date.getMinutes();
+			let s = date.getSeconds() < 10? '0'+ date.getSeconds(): date.getSeconds();
+			return  y + '-' + M + '-' + d  + ' ' + H + ':' + m + ':' + s;
 		},
 		// 值获取名字
 		setValueToLable(data, list, callback) {
@@ -503,9 +510,9 @@ export default {
 			});
 			console.log(objRules);
 			this.addOption = {
-				width: 960,
+				width: 1160,
 				hidden: true,
-				height: data.length > 13 ? 600 : data.length < 8 ? 300: 500 ,
+				height: this.offsetHei < 722 ? 300 : this.offsetHei < 937 ? 400: 600 ,
 				title: '修改信息',
 				style: {top: '100px', height: '90vh'},
 				ruleValidate: objRules,
@@ -517,9 +524,9 @@ export default {
 		// 设置详情弹窗
 		setDetailReportInfo(data) {
 			this.detailOption = {
-				width: 960,
+				width: 1060,
 				hidden: true,
-				height: data.length > 15 ? 500 : 300,
+				height: this.offsetHei < 722 ? 300 : this.offsetHei < 937 ? 400: 600 ,
 				title: '详情',
 				style: {top: '100px', height: '90vh'},
 				dataList: data,

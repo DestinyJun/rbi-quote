@@ -6,7 +6,7 @@
         @on-select="selectRowData"
         @on-selection-change="selectDataHandle"
         :columns="tableOption.title"
-        :data="tableOption.content">
+        :data="tableOption.content" max-height="560">
       <template slot-scope="{ row }" slot="result">
         <span style="color: #ffa489">{{ row.result }}</span>
       </template>

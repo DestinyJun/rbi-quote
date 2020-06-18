@@ -1,6 +1,6 @@
 <template>
   <div id="basicdialog" class="dialog">
-    <Modal v-model="dialogOption.hidden"  scrollable :transfer="false"  :width="dialogOption.width" :styles="dialogOption.style" :closable="false">
+    <Modal v-model="dialogOption.hidden" :mask-closable="false"  scrollable :transfer="false"  :width="dialogOption.width" :styles="dialogOption.style" :closable="false">
       <p slot="header" style="color:#1C1C1C;text-align:left; width: 60vw">
         <span>{{dialogOption.title}}</span>
       </p>
@@ -15,7 +15,7 @@
 										<Input v-model="dialogOption.modelData[item.key]"  :placeholder="item.placeholder" :disabled="!item.disabled" v-if="item.dataType !== 'Number'"></Input>
                   </Col>
                   <Col span="22" v-if="item.type === 'select'">
-                    <Select v-model="dialogOption.modelData[item.key]" style="text-align: left" filterable allow-create>
+                    <Select v-model="dialogOption.modelData[item.key]" style="text-align: left" filterable allow-create clearable>
                       <Option v-for="(select_item, selIndex) in item.list" :value="select_item.value" :key="selIndex" :disabled="!item.disabled">{{ select_item.label }}</Option>
                     </Select>
                   </Col>
@@ -39,13 +39,14 @@
                   </Col>
                   <!--下拉框-->
                   <Col span="22" v-if="item.type === 'select'">
-                    <Select v-model="dialogOption.modelData[item.key]" style="text-align: left">
+                    <Select v-model="dialogOption.modelData[item.key]" style="text-align: left" filterable allow-create clearable>
                       <Option v-for="(select_item, selIndex) in item.list" :value="select_item.value" :key="selIndex" :disabled="!item.disabled">{{ select_item.label }}</Option>
                     </Select>
                   </Col>
                   <!--日期-->
                   <Col span="30" style="text-align: left" v-if="item.type === 'date'">
-                    <DatePicker  :placeholder="item.placeholder"  style="width: 92%" format="yyyy-MM-dd" v-model="dialogOption.modelData[item.key]"   @on-change="changeDateOfType($event, item.key)" :disabled="!item.disabled"></DatePicker>
+<!--										<DatePicker type="datetime" placeholder="Select date and time" style="width: 200px"></DatePicker>-->
+                    <DatePicker type="datetime" :placeholder="item.placeholder"  style="width: 92%" v-model="dialogOption.modelData[item.key]"   :ref="item.key" format="yyyy-MM-dd HH:mm:ss"  :disabled="!item.disabled"></DatePicker>
                   </Col>
                   <Col span="22"  v-if="item.type === 'check'">
                     <CheckboxGroup v-model="dialogOption.modelData[item.key]" disabled>
@@ -75,7 +76,7 @@
 										<Input v-model="dialogOption.modelData[item.key]"  :placeholder="item.placeholder" :disabled="!item.disabled" v-if="item.dataType !== 'Number'"></Input>
                   </Col>
                   <Col span="20" v-if="item.type === 'select'">
-                    <Select v-model="dialogOption.modelData[item.key]" style="text-align: left">
+                    <Select v-model="dialogOption.modelData[item.key]" style="text-align: left" filterable allow-create clearable>
                       <Option v-for="(select_item, selIndex) in item.selList" :value="select_item.value" :disabled="!item.disabled" :key="selIndex">{{ select_item.label }}</Option>
                     </Select>
                   </Col>
@@ -98,7 +99,7 @@
 <!--        <Row></Row>-->
       </div>
       <div slot="footer" style="text-align: center">
-        <Button style="background-color:#3DA2F8;color: #fff;width: 5vw" @click="addUploadReport">上报</Button>
+        <Button style="background-color:#3DA2F8;color: #fff;width: 5vw" @click="addReport">上报</Button>
         <Button style="background: #FFFFFF;color: #2E3235;width: 5vw"  @click="clearData">取消</Button>
       </div>
     </Modal>
@@ -160,29 +161,29 @@
 		// 	}
 		// },
 		methods:{
-			addUploadReport(item){
-				console.log(this.dialogOption.modelData);
+			addReport(){
 				this.$refs['modelData'].validate(valid => {
+					console.log(valid);
+					console.log(this.dialogOption.modelData);
 					if (valid){
 						this.$emit('addUploadReport', this.dialogOption.modelData, this.dialogOption.modalType)
-					}else {
-						console.log(item.modelData);
 					}
 				})
       },
 			clearData(){
 				this.$emit('closeModel')
       },
-			changeDateOfType(val, key){
-				let date = new Date(val);
-				this.dialogOption.modelData[key] = date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate();
-
-			}
     },
 		filters: {
     	setDateForString: function (data) {
 				let date = new Date(data);
-				return  date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate();
+				let y = date.getFullYear() < 10? '0'+ date.getFullYear(): date.getFullYear();
+				let M = (date.getMonth() + 1) < 10? '0'+ (date.getMonth() + 1): (date.getMonth() + 1);
+				let d = date.getDate() < 10? '0'+ date.getDate(): date.getDate();
+				let H = date.getHours()  < 10? '0'+ date.getHours() : date.getHours();
+				let m = date.getMinutes() < 10? '0'+ date.getMinutes(): date.getMinutes();
+				let s = date.getSeconds() < 10? '0'+ date.getSeconds(): date.getSeconds();
+				return  y + '-' + M + '-' + d  + ' ' + H + ':' + m + ':' + s;
 			}
 		}
   }
@@ -196,6 +197,9 @@
 			/deep/ .ivu-modal-wrap{
 				overflow: hidden;
 			}
+		/deep/ .ivu-form-item {
+			height: 50px;
+		}
   }
 
 </style>
