@@ -65,9 +65,9 @@ export default {
                             if (Object.is(res.code ,'1000')){
                                 this.tool.toast('success', '登录成功!');
                                 this.tool.setItem('accessToken', res.data);
-															// eslint-disable-next-line no-mixed-spaces-and-tabs
-															  store.dispatch('setToken', res.data);
-															  this.getMenu();
+                                // eslint-disable-next-line no-mixed-spaces-and-tabs
+                                    store.dispatch('setToken', res.data);
+                                    this.getMenu();
                             }else {
                                 this.tool.toast('error', `${res.msg}`);
                             }

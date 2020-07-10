@@ -2,16 +2,17 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import clientHttp from './utils/interceptors';
+// import clientHttp from './utils/interceptors';
 import ViewUI from 'view-design';
+import axios from 'axios';
 import 'view-design/dist/styles/iview.css';
 import './assets/icon/iconfont.css'
 import echarts from 'echarts'
 
 Vue.config.productionTip = false;
 Vue.prototype.$echarts = echarts;
-Vue.prototype.clientHttp = clientHttp;
-Vue.use(ViewUI);
+// Vue.prototype.clientHttp = clientHttp;
+Vue.use(ViewUI, axios);
 Vue.use(echarts);
 new Vue({
   router,
